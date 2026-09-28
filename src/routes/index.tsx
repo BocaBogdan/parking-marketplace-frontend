@@ -1,15 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { Button } from '@/components/ui/button'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/')({
-  component: HomePage,
+  beforeLoad: () => {
+    throw redirect({ to: '/home' })
+  },
 })
-
-function HomePage() {
-  return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-4">
-      <h1 className="text-3xl font-semibold">Parking Marketplace</h1>
-      <Button>Get started</Button>
-    </div>
-  )
-}
