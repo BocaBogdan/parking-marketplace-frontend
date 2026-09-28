@@ -1,18 +1,37 @@
 // Per the backend grooming doc, everything happens in Bucharest local time
 const TIME_ZONE = 'Europe/Bucharest'
 
+/**
+ * Instant of a backend timestamp. The API stores and returns UTC *without* an offset
+ * ("2026-09-28T12:30:00"), and JS would read that as browser-local time — hours off.
+ * Timestamps that do carry an offset or `Z` are respected as-is.
+ */
+export function parseApiDate(value: string | number | Date): number {
+  if (typeof value === 'number') return value
+  if (value instanceof Date) return value.getTime()
+  const hasZone = /(Z|[+-]\d{2}:?\d{2})$/i.test(value)
+  return Date.parse(hasZone ? value : `${value}Z`)
+}
+
 function dayKey(date: Date) {
   return new Intl.DateTimeFormat('en-CA', { timeZone: TIME_ZONE }).format(date)
 }
 
-/** "Tomorrow, Sep 26" / "Mâine, 26 sept." — relative word only for today and tomorrow */
+/** "Tomorrow, Sep 26" / "Mâine, 26 sept." — relative word for yesterday/today/tomorrow, else "Mon, Sep 21" */
 export function formatDay(value: string | number | Date, language: string, now: number) {
-  const date = new Date(value)
+  const date = new Date(parseApiDate(value))
   const days = Math.round(
     (Date.parse(dayKey(date)) - Date.parse(dayKey(new Date(now)))) / (24 * 60 * 60 * 1000),
   )
   const monthDay = formatDate(date, language)
-  if (days !== 0 && days !== 1) return monthDay
+  if (Math.abs(days) > 1) {
+    return new Intl.DateTimeFormat(language, {
+      timeZone: TIME_ZONE,
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+    }).format(date)
+  }
 
   const relative = new Intl.RelativeTimeFormat(language, { numeric: 'auto' }).format(days, 'day')
   return `${relative.charAt(0).toLocaleUpperCase(language)}${relative.slice(1)}, ${monthDay}`
@@ -24,7 +43,7 @@ export function formatDate(value: string | number | Date, language: string) {
     timeZone: TIME_ZONE,
     month: 'short',
     day: 'numeric',
-  }).format(new Date(value))
+  }).format(parseApiDate(value))
 }
 
 export function formatTime(value: string | number | Date, language: string) {
@@ -33,7 +52,7 @@ export function formatTime(value: string | number | Date, language: string) {
     hourCycle: 'h23',
     hour: '2-digit',
     minute: '2-digit',
-  }).format(new Date(value))
+  }).format(parseApiDate(value))
 }
 
 const pad = (n: number) => String(n).padStart(2, '0')

@@ -268,6 +268,19 @@ export const ro = {
     },
     toast: { reserved: 'Locul {{number}} e al tău — îl găsești la Activitate viitoare, pe Acasă' },
   },
+  spotReservations: {
+    title: 'Rezervări',
+    tabs: { upcoming: 'Viitoare', past: 'Trecute' },
+    stats: { bookings: 'Rezervări trecute', shared: 'Timp împărțit' },
+    parkedNow: 'Parcat acum',
+    call: 'Sună-l pe {{name}}',
+    empty: {
+      upcoming: 'Nicio rezervare viitoare pentru acest loc',
+      past: 'Nimeni nu a folosit încă acest loc',
+    },
+    privacy:
+      'Datele de contact ale șoferilor sunt vizibile doar pentru tine, ca proprietar al locului.',
+  },
   errors: {
     network: 'Serverul nu poate fi contactat. Verifică conexiunea și încearcă din nou.',
     generic: 'A apărut o eroare. Încearcă din nou.',

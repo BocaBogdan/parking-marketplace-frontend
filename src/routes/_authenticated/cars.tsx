@@ -18,7 +18,7 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute('/_authenticated/cars')({
   validateSearch: searchSchema,
-  loader: ({ context }) => context.queryClient.ensureQueryData(myCarsQuery),
+  loader: ({ context }) => context.queryClient.query({ ...myCarsQuery, staleTime: 'static' }),
   component: MyCarsPage,
 })
 

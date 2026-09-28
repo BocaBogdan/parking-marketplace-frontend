@@ -27,11 +27,12 @@ export const Route = createFileRoute('/_authenticated/find')({
   loader: ({ context: { queryClient }, deps }) => {
     const window = resolveWindow(deps, Date.now())
     return Promise.all([
-      queryClient.ensureQueryData(mySpotsQuery),
-      queryClient.ensureQueryData(myCarsQuery),
-      queryClient.ensureQueryData(
-        availableSpotsQuery(toZonedIso(window.start), toZonedIso(window.end)),
-      ),
+      queryClient.query({ ...mySpotsQuery, staleTime: 'static' }),
+      queryClient.query({ ...myCarsQuery, staleTime: 'static' }),
+      queryClient.query({
+        ...availableSpotsQuery(toZonedIso(window.start), toZonedIso(window.end)),
+        staleTime: 'static',
+      }),
     ])
   },
   component: FindSpotPage,

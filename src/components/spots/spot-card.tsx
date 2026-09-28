@@ -5,11 +5,11 @@ import {
   HourglassIcon,
   PencilIcon,
 } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { WithdrawSpotButton } from '@/components/spots/withdraw-spot-button'
-import { useComingSoon } from '@/lib/coming-soon'
 import { cn } from '@/lib/utils'
 import { formatDate } from '@/lib/format'
 import type { ActiveSpot } from '@/queries/spots'
@@ -30,7 +30,6 @@ interface SpotCardProps {
 
 export function SpotCard({ spot, onEdit, onManageAvailability }: SpotCardProps) {
   const { t, i18n } = useTranslation()
-  const comingSoon = useComingSoon()
 
   return (
     <article className="grid gap-4 rounded-2xl border bg-card p-5 shadow-xs">
@@ -55,14 +54,14 @@ export function SpotCard({ spot, onEdit, onManageAvailability }: SpotCardProps) 
             <CalendarCogIcon />
             {t('spots.manageAvailability')}
           </Button>
-          <button
-            type="button"
-            onClick={() => comingSoon(t('spots.viewReservations'))}
+          <Link
+            to="/spots/$spotId/reservations"
+            params={{ spotId: spot.id }}
             className="flex w-fit items-center text-sm font-semibold text-primary hover:underline"
           >
             {t('spots.viewReservations')}
             <ChevronRightIcon className="size-4" />
-          </button>
+          </Link>
         </>
       )}
 

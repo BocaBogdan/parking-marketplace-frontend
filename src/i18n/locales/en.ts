@@ -251,6 +251,18 @@ export const en = {
     },
     toast: { reserved: 'Spot {{number}} is yours — see it under Upcoming Activity on Home' },
   },
+  spotReservations: {
+    title: 'Reservations',
+    tabs: { upcoming: 'Upcoming', past: 'Past' },
+    stats: { bookings: 'Past bookings', shared: 'Time shared' },
+    parkedNow: 'Parked now',
+    call: 'Call {{name}}',
+    empty: {
+      upcoming: 'No upcoming bookings for this spot',
+      past: 'Nobody has used this spot yet',
+    },
+    privacy: "Drivers' contact details are visible only to you, as the spot's owner.",
+  },
   errors: {
     network: "Couldn't reach the server. Check your connection and try again.",
     generic: 'Something went wrong. Please try again.',

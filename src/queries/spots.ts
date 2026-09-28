@@ -45,3 +45,16 @@ export function updateSpot(spotId: string, body: SpotUpdate) {
 export function deleteSpot(spotId: string) {
   return unwrap(api.DELETE('/api/v1/spots/{spot_id}', { params: { path: { spot_id: spotId } } }))
 }
+
+/** Owner-only: confirmed bookings of a spot, with the driver's name, phone and plate */
+export function spotReservationsQuery(spotId: string) {
+  return queryOptions({
+    queryKey: ['spots', spotId, 'reservations'],
+    queryFn: () =>
+      unwrap(
+        api.GET('/api/v1/spots/{spot_id}/reservations/', {
+          params: { path: { spot_id: spotId } },
+        }),
+      ),
+  })
+}

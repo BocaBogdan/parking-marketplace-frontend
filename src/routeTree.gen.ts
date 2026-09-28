@@ -16,7 +16,8 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as AuthenticatedCarsRouteImport } from './routes/_authenticated/cars'
 import { Route as AuthenticatedFindRouteImport } from './routes/_authenticated/find'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
-import { Route as AuthenticatedSpotsRouteImport } from './routes/_authenticated/spots'
+import { Route as AuthenticatedSpotsIndexRouteImport } from './routes/_authenticated/spots/index'
+import { Route as AuthenticatedSpotsSpotIdReservationsRouteImport } from './routes/_authenticated/spots/$spotId/reservations'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -52,11 +53,17 @@ const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedSpotsRoute = AuthenticatedSpotsRouteImport.update({
-  id: '/spots',
-  path: '/spots',
+const AuthenticatedSpotsIndexRoute = AuthenticatedSpotsIndexRouteImport.update({
+  id: '/spots/',
+  path: '/spots/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedSpotsSpotIdReservationsRoute =
+  AuthenticatedSpotsSpotIdReservationsRouteImport.update({
+    id: '/spots/$spotId/reservations',
+    path: '/spots/$spotId/reservations',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -65,7 +72,8 @@ export interface FileRoutesByFullPath {
   '/cars': typeof AuthenticatedCarsRoute
   '/find': typeof AuthenticatedFindRoute
   '/home': typeof AuthenticatedHomeRoute
-  '/spots': typeof AuthenticatedSpotsRoute
+  '/spots/': typeof AuthenticatedSpotsIndexRoute
+  '/spots/$spotId/reservations': typeof AuthenticatedSpotsSpotIdReservationsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -74,7 +82,8 @@ export interface FileRoutesByTo {
   '/cars': typeof AuthenticatedCarsRoute
   '/find': typeof AuthenticatedFindRoute
   '/home': typeof AuthenticatedHomeRoute
-  '/spots': typeof AuthenticatedSpotsRoute
+  '/spots': typeof AuthenticatedSpotsIndexRoute
+  '/spots/$spotId/reservations': typeof AuthenticatedSpotsSpotIdReservationsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -85,14 +94,30 @@ export interface FileRoutesById {
   '/_authenticated/cars': typeof AuthenticatedCarsRoute
   '/_authenticated/find': typeof AuthenticatedFindRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
-  '/_authenticated/spots': typeof AuthenticatedSpotsRoute
+  '/_authenticated/spots/': typeof AuthenticatedSpotsIndexRoute
+  '/_authenticated/spots/$spotId/reservations': typeof AuthenticatedSpotsSpotIdReservationsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/login' | '/register' | '/cars' | '/find' | '/home' | '/spots'
+    | '/'
+    | '/login'
+    | '/register'
+    | '/cars'
+    | '/find'
+    | '/home'
+    | '/spots/'
+    | '/spots/$spotId/reservations'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/register' | '/cars' | '/find' | '/home' | '/spots'
+  to:
+    | '/'
+    | '/login'
+    | '/register'
+    | '/cars'
+    | '/find'
+    | '/home'
+    | '/spots'
+    | '/spots/$spotId/reservations'
   id:
     | '__root__'
     | '/'
@@ -102,7 +127,8 @@ export interface FileRouteTypes {
     | '/_authenticated/cars'
     | '/_authenticated/find'
     | '/_authenticated/home'
-    | '/_authenticated/spots'
+    | '/_authenticated/spots/'
+    | '/_authenticated/spots/$spotId/reservations'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -163,11 +189,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHomeRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/spots': {
-      id: '/_authenticated/spots'
+    '/_authenticated/spots/': {
+      id: '/_authenticated/spots/'
       path: '/spots'
-      fullPath: '/spots'
-      preLoaderRoute: typeof AuthenticatedSpotsRouteImport
+      fullPath: '/spots/'
+      preLoaderRoute: typeof AuthenticatedSpotsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/spots/$spotId/reservations': {
+      id: '/_authenticated/spots/$spotId/reservations'
+      path: '/spots/$spotId/reservations'
+      fullPath: '/spots/$spotId/reservations'
+      preLoaderRoute: typeof AuthenticatedSpotsSpotIdReservationsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
   }
@@ -177,14 +210,17 @@ interface AuthenticatedRouteChildren {
   AuthenticatedCarsRoute: typeof AuthenticatedCarsRoute
   AuthenticatedFindRoute: typeof AuthenticatedFindRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
-  AuthenticatedSpotsRoute: typeof AuthenticatedSpotsRoute
+  AuthenticatedSpotsIndexRoute: typeof AuthenticatedSpotsIndexRoute
+  AuthenticatedSpotsSpotIdReservationsRoute: typeof AuthenticatedSpotsSpotIdReservationsRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCarsRoute: AuthenticatedCarsRoute,
   AuthenticatedFindRoute: AuthenticatedFindRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
-  AuthenticatedSpotsRoute: AuthenticatedSpotsRoute,
+  AuthenticatedSpotsIndexRoute: AuthenticatedSpotsIndexRoute,
+  AuthenticatedSpotsSpotIdReservationsRoute:
+    AuthenticatedSpotsSpotIdReservationsRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

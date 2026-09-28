@@ -10,6 +10,7 @@ export const Route = createFileRoute('/_authenticated')({
       throw redirect({ to: '/login', search: { redirect: location.href } })
     }
   },
-  loader: ({ context }) => context.queryClient.ensureQueryData(currentUserQuery()),
+  loader: ({ context }) =>
+    context.queryClient.query({ ...currentUserQuery(), staleTime: 'static' }),
   component: AppShell,
 })

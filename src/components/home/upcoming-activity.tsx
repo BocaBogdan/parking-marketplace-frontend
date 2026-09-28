@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 import { LicensePlate } from '@/components/cars/license-plate'
 import { useComingSoon } from '@/lib/coming-soon'
-import { formatDay, formatTime } from '@/lib/format'
+import { formatDay, formatTime, parseApiDate } from '@/lib/format'
 import type { components } from '@/types/api'
 
 interface UpcomingActivityProps {
@@ -54,7 +54,7 @@ function ReservationCard({
   const { t, i18n } = useTranslation()
   const language = i18n.resolvedLanguage ?? 'en'
   const car = cars.find((c) => c.id === reservation.car_id)
-  const isInProgress = new Date(reservation.start_at).getTime() <= now
+  const isInProgress = parseApiDate(reservation.start_at) <= now
 
   return (
     <article className="grid gap-3 rounded-2xl border bg-card p-4 shadow-xs">

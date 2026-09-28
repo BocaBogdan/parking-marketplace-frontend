@@ -20,9 +20,9 @@ const searchSchema = z.object({
   availability: z.uuid().optional().catch(undefined),
 })
 
-export const Route = createFileRoute('/_authenticated/spots')({
+export const Route = createFileRoute('/_authenticated/spots/')({
   validateSearch: searchSchema,
-  loader: ({ context }) => context.queryClient.ensureQueryData(mySpotsQuery),
+  loader: ({ context }) => context.queryClient.query({ ...mySpotsQuery, staleTime: 'static' }),
   component: MySpotsPage,
 })
 

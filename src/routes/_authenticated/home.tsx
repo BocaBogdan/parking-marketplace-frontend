@@ -16,10 +16,10 @@ import { currentUserQuery } from '@/queries/users'
 export const Route = createFileRoute('/_authenticated/home')({
   loader: ({ context: { queryClient } }) =>
     Promise.all([
-      queryClient.ensureQueryData(mySpotsQuery),
-      queryClient.ensureQueryData(myCarsQuery),
-      queryClient.ensureQueryData(myReservationsQuery),
-      queryClient.ensureQueryData(currentSlotAvailabilityQuery(Date.now())),
+      queryClient.query({ ...mySpotsQuery, staleTime: 'static' }),
+      queryClient.query({ ...myCarsQuery, staleTime: 'static' }),
+      queryClient.query({ ...myReservationsQuery, staleTime: 'static' }),
+      queryClient.query({ ...currentSlotAvailabilityQuery(Date.now()), staleTime: 'static' }),
     ]),
   component: HomePage,
 })
