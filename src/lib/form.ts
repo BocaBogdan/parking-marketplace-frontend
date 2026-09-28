@@ -28,11 +28,13 @@ const knownServerErrors: Record<string, TranslationKey> = {
   'A user with this email or phone already exists': 'errors.userExists',
   'This spot already exists': 'errors.spotExists',
   'You do not own this spot': 'errors.notSpotOwner',
+  'You already have a car with this plate': 'errors.plateExists',
   'One or more of these schedules already exist for this spot': 'errors.scheduleExists',
 }
 
 // 422s for these fields always mean the same thing as the client-side check
 const fieldErrorKeys: Record<string, TranslationKey> = {
+  plate: 'validation.plate',
   email: 'validation.email',
   phone: 'validation.phone',
 }

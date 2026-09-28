@@ -1,6 +1,7 @@
-import { CalendarXIcon, CarIcon, ChevronRightIcon, ClockIcon } from 'lucide-react'
+import { CalendarXIcon, ChevronRightIcon, ClockIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
+import { LicensePlate } from '@/components/cars/license-plate'
 import { useComingSoon } from '@/lib/coming-soon'
 import { formatDay, formatTime } from '@/lib/format'
 import type { components } from '@/types/api'
@@ -71,12 +72,7 @@ function ReservationCard({
         {formatDay(reservation.start_at, language, now)} •{' '}
         {formatTime(reservation.start_at, language)} – {formatTime(reservation.end_at, language)}
       </p>
-      {car && (
-        <span className="inline-flex w-fit items-center gap-1.5 rounded-md border bg-muted px-2 py-1 font-mono text-xs font-semibold tracking-wider">
-          <CarIcon className="size-3.5 text-muted-foreground" />
-          {car.plate}
-        </span>
-      )}
+      {car && <LicensePlate plate={car.plate} size="sm" />}
     </article>
   )
 }
