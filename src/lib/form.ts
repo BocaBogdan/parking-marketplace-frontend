@@ -2,14 +2,15 @@ import { createFormHook, type AnyFormApi } from '@tanstack/react-form'
 import { CheckboxField } from '@/components/form/checkbox-field'
 import { SubmitButton } from '@/components/form/submit-button'
 import { TextField } from '@/components/form/text-field'
+import { TextareaField } from '@/components/form/textarea-field'
 import { ApiError } from '@/lib/api'
 import { fieldContext, formContext } from '@/lib/form-context'
-import type { TranslationKey } from '@/i18n'
+import { translateMessage, type TranslationKey } from '@/i18n'
 
 export const { useAppForm } = createFormHook({
   fieldContext,
   formContext,
-  fieldComponents: { TextField, CheckboxField },
+  fieldComponents: { TextField, TextareaField, CheckboxField },
   formComponents: { SubmitButton },
 })
 
@@ -25,12 +26,20 @@ export function setServerErrors(form: AnyFormApi, error: unknown) {
 const knownServerErrors: Record<string, TranslationKey> = {
   'Invalid email or password': 'errors.invalidCredentials',
   'A user with this email or phone already exists': 'errors.userExists',
+  'This spot already exists': 'errors.spotExists',
+  'You do not own this spot': 'errors.notSpotOwner',
+  'One or more of these schedules already exist for this spot': 'errors.scheduleExists',
 }
 
 // 422s for these fields always mean the same thing as the client-side check
 const fieldErrorKeys: Record<string, TranslationKey> = {
   email: 'validation.email',
   phone: 'validation.phone',
+}
+
+/** A failed request as one translated sentence, for toasts outside forms */
+export function serverErrorMessage(error: unknown): string {
+  return translateMessage(toServerErrors(error).form ?? 'errors.generic')
 }
 
 function toServerErrors(error: unknown): { form?: string; fields: Record<string, string> } {

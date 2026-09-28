@@ -28,6 +28,7 @@ export const Route = createFileRoute('/_authenticated/home')({
 function HomePage() {
   const { t } = useTranslation()
   const comingSoon = useComingSoon()
+  const navigate = Route.useNavigate()
   const now = useNow()
   const { data: user } = useSuspenseQuery(currentUserQuery())
   const { data: spots } = useSuspenseQuery(mySpotsQuery)
@@ -63,7 +64,7 @@ function HomePage() {
             {t('home.registerSpot.action')}
           </>
         }
-        onAction={() => comingSoon(t('home.registerSpot.title'))}
+        onAction={() => void navigate({ to: '/spots', search: { spot: 'new' } })}
         footer={
           <>
             <CircleCheckIcon className="size-3.5 text-secondary" />
