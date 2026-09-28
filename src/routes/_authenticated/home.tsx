@@ -7,7 +7,6 @@ import { GreetingCard } from '@/components/home/greeting-card'
 import { StatTiles } from '@/components/home/stat-tiles'
 import { TipCard } from '@/components/home/tip-card'
 import { UpcomingActivity } from '@/components/home/upcoming-activity'
-import { useComingSoon } from '@/lib/coming-soon'
 import { useNow } from '@/lib/use-now'
 import { myCarsQuery } from '@/queries/cars'
 import { myReservationsQuery, upcomingReservations } from '@/queries/reservations'
@@ -27,7 +26,6 @@ export const Route = createFileRoute('/_authenticated/home')({
 
 function HomePage() {
   const { t } = useTranslation()
-  const comingSoon = useComingSoon()
   const navigate = Route.useNavigate()
   const now = useNow()
   const { data: user } = useSuspenseQuery(currentUserQuery())
@@ -87,7 +85,7 @@ function HomePage() {
             <ArrowRightIcon />
           </>
         }
-        onAction={() => comingSoon(t('home.findSpot.title'))}
+        onAction={() => void navigate({ to: '/find' })}
         footer={
           <>
             <span className="size-2 rounded-full bg-secondary" />

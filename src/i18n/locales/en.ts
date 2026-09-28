@@ -132,7 +132,7 @@ export const en = {
     withdrawConfirm: {
       title: 'Withdraw spot {{number}}?',
       description:
-        'The spot will be removed from review and deleted. You can register it again later.',
+        'The spot will be removed from review and your list. You can register the same number again later.',
     },
     empty: {
       title: "You haven't registered a spot yet",
@@ -226,6 +226,31 @@ export const en = {
       defaultSet: '{{plate}} is now your default car',
     },
   },
+  find: {
+    title: 'Find a Spot',
+    description:
+      "Pick when you need parking — we'll show neighbours' spots free for the whole time.",
+    from: 'From',
+    until: 'Until',
+    today: 'Today',
+    tomorrow: 'Tomorrow',
+    results_one: '{{count}} spot available',
+    results_other: '{{count}} spots available',
+    reserve: 'Reserve',
+    table: { spot: 'Spot', details: 'Details', actions: 'Actions', noDetails: 'No details' },
+    empty: {
+      title: 'No spots free for this whole time',
+      description: 'Try a shorter window or a different start time.',
+    },
+    dialog: {
+      title: 'Reserve spot {{number}}',
+      description: 'Choose the car you will park.',
+      chooseCar: 'Which car will you park?',
+      noCars: 'Add a car before reserving — the owner needs to know which car is in their spot.',
+      confirm: 'Reserve for {{duration}}',
+    },
+    toast: { reserved: 'Spot {{number}} is yours — see it under Upcoming Activity on Home' },
+  },
   errors: {
     network: "Couldn't reach the server. Check your connection and try again.",
     generic: 'Something went wrong. Please try again.',
@@ -233,6 +258,9 @@ export const en = {
     notSpotOwner: 'You can only change your own spots',
     scheduleExists: 'These hours already exist on one of these days',
     plateExists: 'You already have a car with this plate',
+    spotTaken: 'Someone just booked this spot for part of that time. Pick another spot.',
+    spotUnavailable: 'This spot is no longer free for that whole time. Pick another spot.',
+    ownSpot: "You can't reserve your own spot",
     invalidCredentials: 'Invalid email or password',
     userExists: 'A user with this email or phone already exists',
   },

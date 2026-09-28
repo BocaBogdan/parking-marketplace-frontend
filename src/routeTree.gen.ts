@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as AuthenticatedCarsRouteImport } from './routes/_authenticated/cars'
+import { Route as AuthenticatedFindRouteImport } from './routes/_authenticated/find'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedSpotsRouteImport } from './routes/_authenticated/spots'
 
@@ -41,6 +42,11 @@ const AuthenticatedCarsRoute = AuthenticatedCarsRouteImport.update({
   path: '/cars',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedFindRoute = AuthenticatedFindRouteImport.update({
+  id: '/find',
+  path: '/find',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
   id: '/home',
   path: '/home',
@@ -57,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/cars': typeof AuthenticatedCarsRoute
+  '/find': typeof AuthenticatedFindRoute
   '/home': typeof AuthenticatedHomeRoute
   '/spots': typeof AuthenticatedSpotsRoute
 }
@@ -65,6 +72,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/cars': typeof AuthenticatedCarsRoute
+  '/find': typeof AuthenticatedFindRoute
   '/home': typeof AuthenticatedHomeRoute
   '/spots': typeof AuthenticatedSpotsRoute
 }
@@ -75,14 +83,16 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/_authenticated/cars': typeof AuthenticatedCarsRoute
+  '/_authenticated/find': typeof AuthenticatedFindRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/spots': typeof AuthenticatedSpotsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/register' | '/cars' | '/home' | '/spots'
+  fullPaths:
+    '/' | '/login' | '/register' | '/cars' | '/find' | '/home' | '/spots'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/register' | '/cars' | '/home' | '/spots'
+  to: '/' | '/login' | '/register' | '/cars' | '/find' | '/home' | '/spots'
   id:
     | '__root__'
     | '/'
@@ -90,6 +100,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/_authenticated/cars'
+    | '/_authenticated/find'
     | '/_authenticated/home'
     | '/_authenticated/spots'
   fileRoutesById: FileRoutesById
@@ -138,6 +149,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCarsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/find': {
+      id: '/_authenticated/find'
+      path: '/find'
+      fullPath: '/find'
+      preLoaderRoute: typeof AuthenticatedFindRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/home': {
       id: '/_authenticated/home'
       path: '/home'
@@ -157,12 +175,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedCarsRoute: typeof AuthenticatedCarsRoute
+  AuthenticatedFindRoute: typeof AuthenticatedFindRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedSpotsRoute: typeof AuthenticatedSpotsRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCarsRoute: AuthenticatedCarsRoute,
+  AuthenticatedFindRoute: AuthenticatedFindRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedSpotsRoute: AuthenticatedSpotsRoute,
 }

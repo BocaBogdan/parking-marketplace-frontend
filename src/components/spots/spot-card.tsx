@@ -12,9 +12,9 @@ import { WithdrawSpotButton } from '@/components/spots/withdraw-spot-button'
 import { useComingSoon } from '@/lib/coming-soon'
 import { cn } from '@/lib/utils'
 import { formatDate } from '@/lib/format'
-import type { components } from '@/types/api'
+import type { ActiveSpot } from '@/queries/spots'
 
-type Spot = components['schemas']['SpotRead']
+type Spot = ActiveSpot
 
 const statusBadge: Record<Spot['status'], string> = {
   APPROVED: 'bg-secondary-100 text-secondary-800 dark:bg-secondary-950 dark:text-secondary-300',

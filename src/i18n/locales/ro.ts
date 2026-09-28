@@ -141,7 +141,8 @@ export const ro = {
     withdraw: 'Retrage',
     withdrawConfirm: {
       title: 'Retragi locul {{number}}?',
-      description: 'Locul va fi scos din evaluare și șters. Îl poți înregistra din nou mai târziu.',
+      description:
+        'Locul va fi scos din evaluare și din lista ta. Poți înregistra din nou același număr mai târziu.',
     },
     empty: {
       title: 'Nu ai înregistrat încă niciun loc',
@@ -240,6 +241,33 @@ export const ro = {
       defaultSet: '{{plate}} este acum mașina ta implicită',
     },
   },
+  find: {
+    title: 'Caută un loc',
+    description:
+      'Alege când ai nevoie de parcare — îți arătăm locurile vecinilor libere pe tot intervalul.',
+    from: 'De la',
+    until: 'Până la',
+    today: 'Azi',
+    tomorrow: 'Mâine',
+    results_one: '{{count}} loc disponibil',
+    results_few: '{{count}} locuri disponibile',
+    results_other: '{{count}} de locuri disponibile',
+    reserve: 'Rezervă',
+    table: { spot: 'Loc', details: 'Detalii', actions: 'Acțiuni', noDetails: 'Fără detalii' },
+    empty: {
+      title: 'Niciun loc liber pe tot intervalul',
+      description: 'Încearcă un interval mai scurt sau altă oră de început.',
+    },
+    dialog: {
+      title: 'Rezervă locul {{number}}',
+      description: 'Alege mașina pe care o vei parca.',
+      chooseCar: 'Ce mașină vei parca?',
+      noCars:
+        'Adaugă o mașină înainte de rezervare — proprietarul trebuie să știe ce mașină e pe locul lui.',
+      confirm: 'Rezervă pentru {{duration}}',
+    },
+    toast: { reserved: 'Locul {{number}} e al tău — îl găsești la Activitate viitoare, pe Acasă' },
+  },
   errors: {
     network: 'Serverul nu poate fi contactat. Verifică conexiunea și încearcă din nou.',
     generic: 'A apărut o eroare. Încearcă din nou.',
@@ -247,6 +275,9 @@ export const ro = {
     notSpotOwner: 'Poți modifica doar locurile tale',
     scheduleExists: 'Aceste ore există deja într-una dintre zile',
     plateExists: 'Ai deja o mașină cu acest număr',
+    spotTaken: 'Cineva tocmai a rezervat acest loc pentru o parte din interval. Alege alt loc.',
+    spotUnavailable: 'Locul nu mai este liber pe tot intervalul. Alege alt loc.',
+    ownSpot: 'Nu îți poți rezerva propriul loc',
     invalidCredentials: 'Email sau parolă incorecte',
     userExists: 'Există deja un utilizator cu acest email sau număr de telefon',
   },

@@ -29,6 +29,9 @@ const knownServerErrors: Record<string, TranslationKey> = {
   'This spot already exists': 'errors.spotExists',
   'You do not own this spot': 'errors.notSpotOwner',
   'You already have a car with this plate': 'errors.plateExists',
+  'This spot is already reserved for an overlapping window': 'errors.spotTaken',
+  'Spot is not available for this window': 'errors.spotUnavailable',
+  'You cannot reserve your own spot': 'errors.ownSpot',
   'One or more of these schedules already exist for this spot': 'errors.scheduleExists',
 }
 

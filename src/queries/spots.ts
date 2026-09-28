@@ -3,9 +3,16 @@ import { api, unwrap } from '@/lib/api'
 import { toZonedIso } from '@/lib/format'
 import type { components } from '@/types/api'
 
+/** A spot that hasn't been withdrawn or deactivated */
+export type ActiveSpot = components['schemas']['SpotRead'] & {
+  status: Exclude<components['schemas']['SpotStatus'], 'INACTIVE'>
+}
+
 export const mySpotsQuery = queryOptions({
   queryKey: ['spots', 'mine'],
   queryFn: () => unwrap(api.GET('/api/v1/spots/mine')),
+  // Withdrawn/deactivated spots stay in the backend as INACTIVE; to the owner they're gone
+  select: (spots) => spots.filter((spot): spot is ActiveSpot => spot.status !== 'INACTIVE'),
 })
 
 export function availableSpotsQuery(from: string, to: string) {
