@@ -1,8 +1,8 @@
 import { CalendarXIcon, ChevronRightIcon, ClockIcon } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 import { LicensePlate } from '@/components/cars/license-plate'
-import { useComingSoon } from '@/lib/coming-soon'
 import { formatDay, formatTime, parseApiDate } from '@/lib/format'
 import type { components } from '@/types/api'
 
@@ -14,20 +14,18 @@ interface UpcomingActivityProps {
 
 export function UpcomingActivity({ reservation, cars, now }: UpcomingActivityProps) {
   const { t } = useTranslation()
-  const comingSoon = useComingSoon()
 
   return (
     <section className="grid gap-3">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold">{t('home.upcoming.title')}</h2>
-        <button
-          type="button"
-          onClick={() => comingSoon(t('nav.bookings'))}
+        <Link
+          to="/bookings"
           className="flex items-center text-sm font-semibold text-primary hover:underline"
         >
           {t('home.upcoming.history')}
           <ChevronRightIcon className="size-4" />
-        </button>
+        </Link>
       </div>
       {reservation ? (
         <ReservationCard reservation={reservation} cars={cars} now={now} />

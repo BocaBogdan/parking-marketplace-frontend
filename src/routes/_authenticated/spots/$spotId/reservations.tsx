@@ -11,6 +11,7 @@ import {
   formatDay,
   formatDuration,
   formatTime,
+  groupByDay,
   parseApiDate,
   zonedDayKey,
 } from '@/lib/format'
@@ -136,15 +137,11 @@ function Stat({ label, value }: { label: string; value: string }) {
 /** Bookings grouped under a heading per start day */
 function ReservationList({ reservations, now }: { reservations: Reservation[]; now: number }) {
   const language = useLanguage()
-  const days = new Map<string, Reservation[]>()
-  for (const reservation of reservations) {
-    const key = zonedDayKey(parseApiDate(reservation.start_at))
-    days.set(key, [...(days.get(key) ?? []), reservation])
-  }
+  const days = groupByDay(reservations, (r) => parseApiDate(r.start_at))
 
   return (
     <div className="grid gap-5">
-      {[...days.entries()].map(([day, items]) => (
+      {days.map(({ day, items }) => (
         <section key={day} className="grid gap-2">
           <h2 className="text-sm font-semibold text-muted-foreground">
             {formatDay(items[0].start_at, language, now)}

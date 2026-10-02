@@ -11,7 +11,7 @@ interface NavItem {
   key: 'home' | 'findSpot' | 'mySpots' | 'myCars' | 'bookings'
   icon: LucideIcon
   /** Omitted until the page exists — the item shows a "coming soon" toast instead */
-  to?: '/home' | '/find' | '/spots' | '/cars'
+  to?: '/home' | '/find' | '/spots' | '/cars' | '/bookings'
 }
 
 export const navItems: NavItem[] = [
@@ -19,5 +19,5 @@ export const navItems: NavItem[] = [
   { key: 'findSpot', icon: CompassIcon, to: '/find' },
   { key: 'mySpots', icon: SquareParkingIcon, to: '/spots' },
   { key: 'myCars', icon: CarIcon, to: '/cars' },
-  { key: 'bookings', icon: CalendarDaysIcon },
+  { key: 'bookings', icon: CalendarDaysIcon, to: '/bookings' },
 ]

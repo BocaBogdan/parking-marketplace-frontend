@@ -131,3 +131,13 @@ export function formatDuration(ms: number, language: string) {
     .filter(Boolean)
     .join(' ')
 }
+
+/** Groups items under their Bucharest calendar day, keeping the input order */
+export function groupByDay<T>(items: T[], instant: (item: T) => number) {
+  const days = new Map<string, T[]>()
+  for (const item of items) {
+    const key = zonedDayKey(instant(item))
+    days.set(key, [...(days.get(key) ?? []), item])
+  }
+  return [...days.entries()].map(([day, dayItems]) => ({ day, items: dayItems }))
+}

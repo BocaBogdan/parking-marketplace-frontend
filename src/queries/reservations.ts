@@ -18,6 +18,15 @@ export function upcomingReservations(reservations: Reservation[], now: number) {
 }
 
 /** One reservation covering the whole window (both ends on :00 or :30) */
+/** Allowed until 15 minutes before the start (backend rule) */
+export function cancelReservation(reservationId: string) {
+  return unwrap(
+    api.DELETE('/api/v1/reservations/{reservation_id}', {
+      params: { path: { reservation_id: reservationId } },
+    }),
+  )
+}
+
 export function createReservation(body: components['schemas']['ReservationCreate']) {
   return unwrap(api.POST('/api/v1/reservations/', { body }))
 }

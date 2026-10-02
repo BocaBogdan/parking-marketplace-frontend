@@ -281,6 +281,32 @@ export const ro = {
     privacy:
       'Datele de contact ale șoferilor sunt vizibile doar pentru tine, ca proprietar al locului.',
   },
+  bookings: {
+    title: 'Rezervări',
+    description: 'Locurile pe care le-ai rezervat de la vecini.',
+    tabs: { upcoming: 'Viitoare', past: 'Trecute', cancelled: 'Anulate' },
+    status: {
+      inProgress: 'În desfășurare',
+      confirmed: 'Confirmată',
+      completed: 'Încheiată',
+      cancelled: 'Anulată',
+      cancelledByAdmin: 'Anulată de admin',
+    },
+    removedCar: 'Mașină ștearsă din cont',
+    cancel: 'Anulează rezervarea',
+    cancelClosed: 'Nu mai poate fi anulată',
+    cancelConfirm: {
+      title: 'Anulezi această rezervare?',
+      description: '{{date}}, {{from}} – {{to}}. Locul devine liber pentru ceilalți vecini.',
+      keep: 'Păstrează rezervarea',
+    },
+    empty: {
+      upcoming: 'Nicio rezervare viitoare',
+      past: 'Nicio rezervare trecută încă',
+      cancelled: 'Nicio rezervare anulată',
+    },
+    toast: { cancelled: 'Rezervarea a fost anulată' },
+  },
   errors: {
     network: 'Serverul nu poate fi contactat. Verifică conexiunea și încearcă din nou.',
     generic: 'A apărut o eroare. Încearcă din nou.',
@@ -291,6 +317,8 @@ export const ro = {
     spotTaken: 'Cineva tocmai a rezervat acest loc pentru o parte din interval. Alege alt loc.',
     spotUnavailable: 'Locul nu mai este liber pe tot intervalul. Alege alt loc.',
     ownSpot: 'Nu îți poți rezerva propriul loc',
+    cancelCutoff: 'Rezervările pot fi anulate cel mai târziu cu 15 minute înainte de început',
+    alreadyCancelled: 'Rezervarea este deja anulată',
     invalidCredentials: 'Email sau parolă incorecte',
     userExists: 'Există deja un utilizator cu acest email sau număr de telefon',
   },

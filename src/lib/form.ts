@@ -32,6 +32,8 @@ const knownServerErrors: Record<string, TranslationKey> = {
   'This spot is already reserved for an overlapping window': 'errors.spotTaken',
   'Spot is not available for this window': 'errors.spotUnavailable',
   'You cannot reserve your own spot': 'errors.ownSpot',
+  'Reservations can only be cancelled at least 15 minutes before they start': 'errors.cancelCutoff',
+  'Reservation is already cancelled': 'errors.alreadyCancelled',
   'One or more of these schedules already exist for this spot': 'errors.scheduleExists',
 }
 
