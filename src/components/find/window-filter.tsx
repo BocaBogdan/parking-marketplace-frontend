@@ -3,7 +3,7 @@ import { ArrowRightIcon, ClockIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Label } from '@/components/ui/label'
 import { endOptions, SLOT_MS, startOptions, type BookingWindow } from '@/lib/booking-window'
-import { formatDuration, formatTime, zonedDayKey } from '@/lib/format'
+import { formatDuration, formatRelativeDay, formatTime, zonedDayKey } from '@/lib/format'
 
 interface WindowFilterProps {
   window: BookingWindow
@@ -19,8 +19,9 @@ export function WindowFilter({ window, now, onChange }: WindowFilterProps) {
 
   const starts = startOptions(now)
   const ends = endOptions(window.start, window.day)
-  const dayLabel = (ms: number) =>
-    zonedDayKey(ms) === window.day ? t('find.today') : t('find.tomorrow')
+  // Relative to the real date: after 23:30 the window starts tomorrow and can end the day after
+  const dayLabel = (ms: number) => formatRelativeDay(ms, language, now)
+  const endDays = [...new Set(ends.map(zonedDayKey))]
 
   const changeStart = (start: number) => {
     // Keep the same length when possible, so moving the start doesn't collapse the window
@@ -34,7 +35,7 @@ export function WindowFilter({ window, now, onChange }: WindowFilterProps) {
       <div className="grid items-end gap-3 sm:grid-cols-[1fr_auto_1fr]">
         <div className="grid gap-2">
           <Label htmlFor={fromId} className="font-semibold">
-            {t('find.from')} · {t('find.today')}
+            {t('find.from')} · {dayLabel(window.start)}
           </Label>
           <select
             id={fromId}
@@ -60,20 +61,16 @@ export function WindowFilter({ window, now, onChange }: WindowFilterProps) {
             onChange={(e) => onChange({ ...window, end: Number(e.target.value) })}
             className={selectClassName}
           >
-            {(['today', 'tomorrow'] as const).map((group) => {
-              const options = ends.filter(
-                (ms) => (zonedDayKey(ms) === window.day) === (group === 'today'),
-              )
+            {endDays.map((day) => {
+              const options = ends.filter((ms) => zonedDayKey(ms) === day)
               return (
-                options.length > 0 && (
-                  <optgroup key={group} label={t(`find.${group}`)}>
-                    {options.map((ms) => (
-                      <option key={ms} value={ms}>
-                        {dayLabel(ms)} {formatTime(ms, language)}
-                      </option>
-                    ))}
-                  </optgroup>
-                )
+                <optgroup key={day} label={dayLabel(options[0])}>
+                  {options.map((ms) => (
+                    <option key={ms} value={ms}>
+                      {dayLabel(ms)} {formatTime(ms, language)}
+                    </option>
+                  ))}
+                </optgroup>
               )
             })}
           </select>

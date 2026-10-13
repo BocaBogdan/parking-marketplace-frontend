@@ -13,11 +13,14 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/_admin'
 import { Route as AuthenticatedBookingsRouteImport } from './routes/_authenticated/bookings'
 import { Route as AuthenticatedCarsRouteImport } from './routes/_authenticated/cars'
 import { Route as AuthenticatedFindRouteImport } from './routes/_authenticated/find'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
+import { Route as AuthenticatedAdminBuildingsRouteImport } from './routes/_authenticated/_admin/buildings'
 import { Route as AuthenticatedSpotsIndexRouteImport } from './routes/_authenticated/spots/index'
+import { Route as AuthenticatedAdminBuildingBuildingIdRouteImport } from './routes/_authenticated/_admin/building/$buildingId'
 import { Route as AuthenticatedSpotsSpotIdReservationsRouteImport } from './routes/_authenticated/spots/$spotId/reservations'
 
 const IndexRoute = IndexRouteImport.update({
@@ -39,6 +42,10 @@ const RegisterRoute = RegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/_admin',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedBookingsRoute = AuthenticatedBookingsRouteImport.update({
   id: '/bookings',
   path: '/bookings',
@@ -59,11 +66,23 @@ const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAdminBuildingsRoute =
+  AuthenticatedAdminBuildingsRouteImport.update({
+    id: '/buildings',
+    path: '/buildings',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedSpotsIndexRoute = AuthenticatedSpotsIndexRouteImport.update({
   id: '/spots/',
   path: '/spots/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAdminBuildingBuildingIdRoute =
+  AuthenticatedAdminBuildingBuildingIdRouteImport.update({
+    id: '/building/$buildingId',
+    path: '/building/$buildingId',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedSpotsSpotIdReservationsRoute =
   AuthenticatedSpotsSpotIdReservationsRouteImport.update({
     id: '/spots/$spotId/reservations',
@@ -79,7 +98,9 @@ export interface FileRoutesByFullPath {
   '/cars': typeof AuthenticatedCarsRoute
   '/find': typeof AuthenticatedFindRoute
   '/home': typeof AuthenticatedHomeRoute
+  '/buildings': typeof AuthenticatedAdminBuildingsRoute
   '/spots/': typeof AuthenticatedSpotsIndexRoute
+  '/building/$buildingId': typeof AuthenticatedAdminBuildingBuildingIdRoute
   '/spots/$spotId/reservations': typeof AuthenticatedSpotsSpotIdReservationsRoute
 }
 export interface FileRoutesByTo {
@@ -90,7 +111,9 @@ export interface FileRoutesByTo {
   '/cars': typeof AuthenticatedCarsRoute
   '/find': typeof AuthenticatedFindRoute
   '/home': typeof AuthenticatedHomeRoute
+  '/buildings': typeof AuthenticatedAdminBuildingsRoute
   '/spots': typeof AuthenticatedSpotsIndexRoute
+  '/building/$buildingId': typeof AuthenticatedAdminBuildingBuildingIdRoute
   '/spots/$spotId/reservations': typeof AuthenticatedSpotsSpotIdReservationsRoute
 }
 export interface FileRoutesById {
@@ -99,11 +122,14 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/_authenticated/_admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/bookings': typeof AuthenticatedBookingsRoute
   '/_authenticated/cars': typeof AuthenticatedCarsRoute
   '/_authenticated/find': typeof AuthenticatedFindRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
+  '/_authenticated/_admin/buildings': typeof AuthenticatedAdminBuildingsRoute
   '/_authenticated/spots/': typeof AuthenticatedSpotsIndexRoute
+  '/_authenticated/_admin/building/$buildingId': typeof AuthenticatedAdminBuildingBuildingIdRoute
   '/_authenticated/spots/$spotId/reservations': typeof AuthenticatedSpotsSpotIdReservationsRoute
 }
 export interface FileRouteTypes {
@@ -116,7 +142,9 @@ export interface FileRouteTypes {
     | '/cars'
     | '/find'
     | '/home'
+    | '/buildings'
     | '/spots/'
+    | '/building/$buildingId'
     | '/spots/$spotId/reservations'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -127,7 +155,9 @@ export interface FileRouteTypes {
     | '/cars'
     | '/find'
     | '/home'
+    | '/buildings'
     | '/spots'
+    | '/building/$buildingId'
     | '/spots/$spotId/reservations'
   id:
     | '__root__'
@@ -135,11 +165,14 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/login'
     | '/register'
+    | '/_authenticated/_admin'
     | '/_authenticated/bookings'
     | '/_authenticated/cars'
     | '/_authenticated/find'
     | '/_authenticated/home'
+    | '/_authenticated/_admin/buildings'
     | '/_authenticated/spots/'
+    | '/_authenticated/_admin/building/$buildingId'
     | '/_authenticated/spots/$spotId/reservations'
   fileRoutesById: FileRoutesById
 }
@@ -180,6 +213,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/_admin': {
+      id: '/_authenticated/_admin'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/bookings': {
       id: '/_authenticated/bookings'
       path: '/bookings'
@@ -208,12 +248,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHomeRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/_admin/buildings': {
+      id: '/_authenticated/_admin/buildings'
+      path: '/buildings'
+      fullPath: '/buildings'
+      preLoaderRoute: typeof AuthenticatedAdminBuildingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/spots/': {
       id: '/_authenticated/spots/'
       path: '/spots'
       fullPath: '/spots/'
       preLoaderRoute: typeof AuthenticatedSpotsIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/_admin/building/$buildingId': {
+      id: '/_authenticated/_admin/building/$buildingId'
+      path: '/building/$buildingId'
+      fullPath: '/building/$buildingId'
+      preLoaderRoute: typeof AuthenticatedAdminBuildingBuildingIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/spots/$spotId/reservations': {
       id: '/_authenticated/spots/$spotId/reservations'
@@ -225,7 +279,22 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminBuildingsRoute: typeof AuthenticatedAdminBuildingsRoute
+  AuthenticatedAdminBuildingBuildingIdRoute: typeof AuthenticatedAdminBuildingBuildingIdRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminBuildingsRoute: AuthenticatedAdminBuildingsRoute,
+  AuthenticatedAdminBuildingBuildingIdRoute:
+    AuthenticatedAdminBuildingBuildingIdRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
 interface AuthenticatedRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedBookingsRoute: typeof AuthenticatedBookingsRoute
   AuthenticatedCarsRoute: typeof AuthenticatedCarsRoute
   AuthenticatedFindRoute: typeof AuthenticatedFindRoute
@@ -235,6 +304,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedBookingsRoute: AuthenticatedBookingsRoute,
   AuthenticatedCarsRoute: AuthenticatedCarsRoute,
   AuthenticatedFindRoute: AuthenticatedFindRoute,

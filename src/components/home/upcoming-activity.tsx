@@ -3,12 +3,13 @@ import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 import { LicensePlate } from '@/components/cars/license-plate'
-import { formatDay, formatTime, parseApiDate } from '@/lib/format'
-import type { components } from '@/types/api'
+import { formatDay, formatTime } from '@/lib/format'
+import type { Reservation } from '@/queries/reservations'
+import type { Car } from '@/types/models'
 
 interface UpcomingActivityProps {
-  reservation: components['schemas']['ReservationRead'] | undefined
-  cars: components['schemas']['CarRead'][]
+  reservation: Reservation | undefined
+  cars: Car[]
   now: number
 }
 
@@ -45,14 +46,14 @@ function ReservationCard({
   cars,
   now,
 }: {
-  reservation: components['schemas']['ReservationRead']
-  cars: components['schemas']['CarRead'][]
+  reservation: Reservation
+  cars: Car[]
   now: number
 }) {
   const { t, i18n } = useTranslation()
   const language = i18n.resolvedLanguage ?? 'en'
-  const car = cars.find((c) => c.id === reservation.car_id)
-  const isInProgress = parseApiDate(reservation.start_at) <= now
+  const car = cars.find((c) => c.id === reservation.carId)
+  const isInProgress = reservation.start <= now
 
   return (
     <article className="grid gap-3 rounded-2xl border bg-card p-4 shadow-xs">
@@ -67,8 +68,8 @@ function ReservationCard({
       </Badge>
       <p className="flex items-center gap-2 font-semibold">
         <ClockIcon className="size-4 text-tertiary" />
-        {formatDay(reservation.start_at, language, now)} •{' '}
-        {formatTime(reservation.start_at, language)} – {formatTime(reservation.end_at, language)}
+        {formatDay(reservation.start, language, now)} • {formatTime(reservation.start, language)} –{' '}
+        {formatTime(reservation.end, language)}
       </p>
       {car && <LicensePlate plate={car.plate} size="sm" />}
     </article>

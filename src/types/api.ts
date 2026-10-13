@@ -4,15 +4,14 @@
  */
 
 export interface paths {
-    "/health": {
+    "/api": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Health Check */
-        get: operations["health_check_health_get"];
+        get: operations["AppController_getHello"];
         put?: never;
         post?: never;
         delete?: never;
@@ -21,41 +20,39 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/reservations/": {
+    "/api/admin/{buildingId}/invite": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** List All Reservations */
-        get: operations["list_all_reservations_api_v1_admin_reservations__get"];
+        get?: never;
         put?: never;
-        post?: never;
+        post: operations["InviteController_inviteNewUser"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/spots/": {
+    "/api/admin/{buildingId}/invite/bulk": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** List Spots For Review */
-        get: operations["list_spots_for_review_api_v1_admin_spots__get"];
+        get?: never;
         put?: never;
-        post?: never;
+        post: operations["InviteController_inviteNewUsers"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/spots/{spot_id}/approve": {
+    "/api/admin/{buildingId}/spot/{id}/status": {
         parameters: {
             query?: never;
             header?: never;
@@ -68,175 +65,17 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Approve Spot */
-        patch: operations["approve_spot_api_v1_admin_spots__spot_id__approve_patch"];
+        patch: operations["AdminSpotController_updateStatus"];
         trace?: never;
     };
-    "/api/v1/admin/spots/{spot_id}/reject": {
+    "/api/admin/{buildingId}/spot": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /** Reject Spot */
-        patch: operations["reject_spot_api_v1_admin_spots__spot_id__reject_patch"];
-        trace?: never;
-    };
-    "/api/v1/auth/register": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Register */
-        post: operations["register_api_v1_auth_register_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/login": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Login */
-        post: operations["login_api_v1_auth_login_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/refresh": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Refresh */
-        post: operations["refresh_api_v1_auth_refresh_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/me/cars/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List Cars */
-        get: operations["list_cars_api_v1_users_me_cars__get"];
-        put?: never;
-        /** Create Car */
-        post: operations["create_car_api_v1_users_me_cars__post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/me/cars/{car_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** Update Car */
-        put: operations["update_car_api_v1_users_me_cars__car_id__put"];
-        post?: never;
-        /** Delete Car */
-        delete: operations["delete_car_api_v1_users_me_cars__car_id__delete"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/spots/{spot_id}/overrides/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List Overrides */
-        get: operations["list_overrides_api_v1_spots__spot_id__overrides__get"];
-        put?: never;
-        /** Create Override */
-        post: operations["create_override_api_v1_spots__spot_id__overrides__post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/spots/{spot_id}/overrides/{override_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** Delete Override */
-        delete: operations["delete_override_api_v1_spots__spot_id__overrides__override_id__delete"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/reservations/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Create Reservation */
-        post: operations["create_reservation_api_v1_reservations__post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/reservations/mine": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get My Reservations */
-        get: operations["get_my_reservations_api_v1_reservations_mine_get"];
+        get: operations["AdminSpotController_getAllByBuildingId"];
         put?: never;
         post?: never;
         delete?: never;
@@ -245,67 +84,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/reservations/{reservation_id}": {
+    "/api/spot": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["SpotController_findAll"];
         put?: never;
-        post?: never;
-        /** Cancel Reservation */
-        delete: operations["cancel_reservation_api_v1_reservations__reservation_id__delete"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/spots/{spot_id}/schedules/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List Schedules */
-        get: operations["list_schedules_api_v1_spots__spot_id__schedules__get"];
-        put?: never;
-        /** Create Schedules */
-        post: operations["create_schedules_api_v1_spots__spot_id__schedules__post"];
+        post: operations["SpotController_create"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/spots/{spot_id}/schedules/{schedule_id}": {
+    "/api/spot/available": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** Delete Schedule */
-        delete: operations["delete_schedule_api_v1_spots__spot_id__schedules__schedule_id__delete"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/spots/{spot_id}/reservations/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List Spot Reservations */
-        get: operations["list_spot_reservations_api_v1_spots__spot_id__reservations__get"];
+        get: operations["SpotController_findByInterval"];
         put?: never;
         post?: never;
         delete?: never;
@@ -314,32 +116,14 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/spots/": {
+    "/api/spot/mine": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
-        put?: never;
-        /** Create Spot */
-        post: operations["create_spot_api_v1_spots__post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/spots/mine": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get My Spots */
-        get: operations["get_my_spots_api_v1_spots_mine_get"];
+        get: operations["SpotController_mine"];
         put?: never;
         post?: never;
         delete?: never;
@@ -348,15 +132,14 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/spots/available": {
+    "/api/spot/{id}/booking": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Get Available Spots */
-        get: operations["get_available_spots_api_v1_spots_available_get"];
+        get: operations["SpotController_booking"];
         put?: never;
         post?: never;
         delete?: never;
@@ -365,33 +148,62 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/spots/{spot_id}": {
+    "/api/spot/{id}": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
-        /** Update Spot */
-        put: operations["update_spot_api_v1_spots__spot_id__put"];
+        get: operations["SpotController_findOne"];
+        put?: never;
         post?: never;
-        /** Delete Spot */
-        delete: operations["delete_spot_api_v1_spots__spot_id__delete"];
+        delete: operations["SpotController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["SpotController_update"];
+        trace?: never;
+    };
+    "/api/spot/{spotId}/schedule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ScheduleController_findAll"];
+        put?: never;
+        post: operations["ScheduleController_create"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/users/": {
+    "/api/spot/{spotId}/schedule/{id}": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Get Users */
-        get: operations["get_users_api_v1_users__get"];
+        get: operations["ScheduleController_findOne"];
+        put?: never;
+        post?: never;
+        delete: operations["ScheduleController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["ScheduleController_update"];
+        trace?: never;
+    };
+    "/api/document/{docId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["DocumentController_getDocumentById"];
         put?: never;
         post?: never;
         delete?: never;
@@ -400,499 +212,203 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/users/{user_id}": {
+    "/api/building": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Get User */
-        get: operations["get_user_api_v1_users__user_id__get"];
+        get: operations["BuildingController_findAll"];
+        put?: never;
+        post: operations["BuildingController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/building/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["BuildingController_findOne"];
+        put?: never;
+        post?: never;
+        delete: operations["BuildingController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["BuildingController_update"];
+        trace?: never;
+    };
+    "/api/booking": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["BookingController_findAll"];
+        put?: never;
+        post: operations["BookingController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/booking/mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["BookingController_mine"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/booking/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["BookingController_findOne"];
+        put?: never;
+        post?: never;
+        delete: operations["BookingController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["BookingController_update"];
+        trace?: never;
+    };
+    "/api/car": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["CarController_findAll"];
+        put?: never;
+        post: operations["CarController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/car/mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["CarController_mine"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/car/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["CarController_findOne"];
+        put?: never;
+        post?: never;
+        delete: operations["CarController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["CarController_update"];
         trace?: never;
     };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /**
-         * AdminReservationRead
-         * @description Audit view for admins — spans every spot, not just ones the caller owns.
-         */
-        AdminReservationRead: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
-             * Spot Id
-             * Format: uuid
-             */
-            spot_id: string;
-            /** Spot Number */
-            spot_number: number;
-            /** Driver Name */
-            driver_name: string;
-            /** Driver Apartment Number */
-            driver_apartment_number: string;
-            /** Car Plate */
-            car_plate: string;
-            /**
-             * Start At
-             * Format: date-time
-             */
-            start_at: string;
-            /**
-             * End At
-             * Format: date-time
-             */
-            end_at: string;
-            status: components["schemas"]["ReservationStatus"];
-        };
-        /**
-         * AdminSpotRead
-         * @description Spot view for admin review — includes the owner's name and apartment number.
-         */
-        AdminSpotRead: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            status: components["schemas"]["SpotStatus"];
-            /** Spot Number */
-            spot_number: number;
-            /** Notes */
-            notes: string | null;
-            /** Rejection Reason */
-            rejection_reason: string | null;
-            /** Owner Name */
-            owner_name: string;
-            /** Owner Apartment Number */
-            owner_apartment_number: string;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /**
-             * Updated At
-             * Format: date-time
-             */
-            updated_at: string;
-        };
-        /** CarCreate */
-        CarCreate: {
-            /** Plate */
-            plate: string;
-            /** Nickname */
-            nickname?: string | null;
-            /**
-             * Is Default
-             * @default false
-             */
-            is_default: boolean;
-        };
-        /** CarRead */
-        CarRead: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Plate */
-            plate: string;
-            /** Nickname */
-            nickname: string | null;
-            /** Is Default */
-            is_default: boolean;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /**
-             * Updated At
-             * Format: date-time
-             */
-            updated_at: string;
-        };
-        /** CarUpdate */
-        CarUpdate: {
-            /** Plate */
-            plate?: string | null;
-            /** Nickname */
-            nickname?: string | null;
-            /** Is Default */
-            is_default?: boolean | null;
-        };
-        /**
-         * DayOfWeek
-         * @enum {string}
-         */
-        DayOfWeek: "MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT" | "SUN";
-        /** HTTPValidationError */
-        HTTPValidationError: {
-            /** Detail */
-            detail?: components["schemas"]["ValidationError"][];
-        };
-        /** LoginRequest */
-        LoginRequest: {
-            /**
-             * Email
-             * Format: email
-             */
+        InviteUserDto: {
             email: string;
-            /** Password */
-            password: string;
+            eBlocUserID: string;
+            apartment: string;
         };
-        /** OverrideCreate */
-        OverrideCreate: {
-            /**
-             * Date
-             * Format: date
-             */
-            date: string;
-            /**
-             * Start Time
-             * Format: time
-             */
-            start_time: string;
-            /**
-             * End Time
-             * Format: time
-             */
-            end_time: string;
-            status: components["schemas"]["OverrideStatus"];
+        InviteUsersDto: {
+            invites: components["schemas"]["InviteUserDto"][];
         };
-        /** OverrideRead */
-        OverrideRead: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
-             * Date
-             * Format: date
-             */
-            date: string;
-            /**
-             * Start Time
-             * Format: time
-             */
-            start_time: string;
-            /**
-             * End Time
-             * Format: time
-             */
-            end_time: string;
-            status: components["schemas"]["OverrideStatus"];
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /**
-             * Updated At
-             * Format: date-time
-             */
-            updated_at: string;
+        LocationDto: {
+            long: string;
+            lat: string;
         };
-        /**
-         * OverrideStatus
-         * @enum {string}
-         */
-        OverrideStatus: "FREE" | "BUSY";
-        /**
-         * OwnerReservationRead
-         * @description Reservation view for the spot's owner only — includes the driver's contact info,
-         *     which must never appear in a public or driver-facing response.
-         */
-        OwnerReservationRead: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
-             * Start At
-             * Format: date-time
-             */
-            start_at: string;
-            /**
-             * End At
-             * Format: date-time
-             */
-            end_at: string;
-            status: components["schemas"]["ReservationStatus"];
-            /** Driver Name */
-            driver_name: string;
-            /** Driver Phone */
-            driver_phone: string;
-            /** Car Plate */
-            car_plate: string;
+        UpdateSpotDto: {
+            number?: number;
+            description?: string;
+            location?: components["schemas"]["LocationDto"];
+            /** @enum {string} */
+            status?: "PENDING" | "CONFIRMED" | "REJECTED";
         };
-        /** PaginatedAdminReservations */
-        PaginatedAdminReservations: {
-            /** Items */
-            items: components["schemas"]["AdminReservationRead"][];
-            /** Total */
-            total: number;
-            /** Page */
-            page: number;
-            /** Page Size */
-            page_size: number;
+        CreateSpotDto: {
+            number: number;
+            description: string;
+            location: components["schemas"]["LocationDto"];
         };
-        /** RefreshRequest */
-        RefreshRequest: {
-            /** Refresh Token */
-            refresh_token: string;
+        CreateScheduleDto: {
+            dayOfWeek: number;
+            startMinute: number;
+            endMinute: number;
         };
-        /** RejectSpotRequest */
-        RejectSpotRequest: {
-            /** Rejection Reason */
-            rejection_reason: string;
+        UpdateScheduleDto: {
+            dayOfWeek?: number;
+            startMinute?: number;
+            endMinute?: number;
         };
-        /** ReservationCreate */
-        ReservationCreate: {
-            /**
-             * Spot Id
-             * Format: uuid
-             */
-            spot_id: string;
-            /**
-             * Car Id
-             * Format: uuid
-             */
-            car_id: string;
-            /**
-             * Start At
-             * Format: date-time
-             */
-            start_at: string;
-            /** End At */
-            end_at?: string | null;
-        };
-        /** ReservationRead */
-        ReservationRead: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
-             * Spot Id
-             * Format: uuid
-             */
-            spot_id: string;
-            /**
-             * Car Id
-             * Format: uuid
-             */
-            car_id: string;
-            /**
-             * Start At
-             * Format: date-time
-             */
-            start_at: string;
-            /**
-             * End At
-             * Format: date-time
-             */
-            end_at: string;
-            status: components["schemas"]["ReservationStatus"];
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /**
-             * Updated At
-             * Format: date-time
-             */
-            updated_at: string;
-        };
-        /**
-         * ReservationStatus
-         * @enum {string}
-         */
-        ReservationStatus: "CONFIRMED" | "CANCELLED" | "CANCELLED_BY_ADMIN";
-        /** ScheduleCreate */
-        ScheduleCreate: {
-            /** Days Of Week */
-            days_of_week: components["schemas"]["DayOfWeek"][];
-            /**
-             * Start Time
-             * Format: time
-             */
-            start_time: string;
-            /**
-             * End Time
-             * Format: time
-             */
-            end_time: string;
-        };
-        /** ScheduleRead */
-        ScheduleRead: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            day_of_week: components["schemas"]["DayOfWeek"];
-            /**
-             * Start Time
-             * Format: time
-             */
-            start_time: string;
-            /**
-             * End Time
-             * Format: time
-             */
-            end_time: string;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /**
-             * Updated At
-             * Format: date-time
-             */
-            updated_at: string;
-        };
-        /** SpotCreate */
-        SpotCreate: {
-            /** Spot Number */
-            spot_number: number;
-            /** Notes */
-            notes?: string | null;
-        };
-        /** SpotRead */
-        SpotRead: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            status: components["schemas"]["SpotStatus"];
-            /** Spot Number */
-            spot_number: number;
-            /** Notes */
-            notes: string | null;
-            /** Rejection Reason */
-            rejection_reason: string | null;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /**
-             * Updated At
-             * Format: date-time
-             */
-            updated_at: string;
-        };
-        /**
-         * SpotStatus
-         * @enum {string}
-         */
-        SpotStatus: "PENDING" | "APPROVED" | "REJECTED" | "INACTIVE";
-        /**
-         * SpotUpdate
-         * @description Owner-facing update. Status is intentionally not settable here — it's only ever
-         *     changed by the admin approve/reject endpoints, or auto-reset to PENDING on resubmission
-         *     of a REJECTED spot (see update_spot).
-         */
-        SpotUpdate: {
-            /** Spot Number */
-            spot_number?: number | null;
-            /** Notes */
-            notes?: string | null;
-        };
-        /** TokenPair */
-        TokenPair: {
-            /** Access Token */
-            access_token: string;
-            /** Refresh Token */
-            refresh_token: string;
-            /**
-             * Token Type
-             * @default bearer
-             */
-            token_type: string;
-        };
-        /** UserCreate */
-        UserCreate: {
-            /** Name */
+        CreateBuildingDto: {
             name: string;
-            /** Apartment Number */
-            apartment_number: string;
-            /** Phone */
-            phone: string;
-            /**
-             * Email
-             * Format: email
-             */
-            email: string;
-            /** Password */
-            password: string;
+            description: string;
         };
-        /** UserRead */
-        UserRead: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Name */
-            name: string;
-            /** Apartment Number */
-            apartment_number: string;
-            /** Phone */
-            phone: string;
-            /**
-             * Email
-             * Format: email
-             */
-            email: string;
-            role: components["schemas"]["UserRole"];
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /**
-             * Updated At
-             * Format: date-time
-             */
-            updated_at: string;
+        UpdateBuildingDto: {
+            name?: string;
+            description?: string;
         };
-        /**
-         * UserRole
-         * @enum {string}
-         */
-        UserRole: "USER" | "ADMIN";
-        /** ValidationError */
-        ValidationError: {
-            /** Location */
-            loc: (string | number)[];
-            /** Message */
-            msg: string;
-            /** Error Type */
-            type: string;
-            /** Input */
-            input?: unknown;
-            /** Context */
-            ctx?: Record<string, never>;
+        CreateBookingDto: {
+            spotId: string;
+            carId: string;
+            dayOfWeek: number;
+            startMinute: number;
+            endMinute: number;
+        };
+        UpdateBookingDto: {
+            spotId?: string;
+            carId?: string;
+            dayOfWeek?: number;
+            startMinute?: number;
+            endMinute?: number;
+        };
+        CreateCarDto: {
+            phone: string;
+            plate: string;
+            description: string;
+        };
+        UpdateCarDto: {
+            phone?: string;
+            plate?: string;
+            description?: string;
         };
     };
     responses: never;
@@ -903,7 +419,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    health_check_health_get: {
+    AppController_getHello: {
         parameters: {
             query?: never;
             header?: never;
@@ -912,672 +428,120 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Successful Response */
             200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-        };
-    };
-    list_all_reservations_api_v1_admin_reservations__get: {
-        parameters: {
-            query?: {
-                spot_id?: string | null;
-                from?: string | null;
-                to?: string | null;
-                status?: components["schemas"]["ReservationStatus"] | null;
-                page?: number;
-                page_size?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaginatedAdminReservations"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    list_spots_for_review_api_v1_admin_spots__get: {
-        parameters: {
-            query?: {
-                status?: components["schemas"]["SpotStatus"] | null;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminSpotRead"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    approve_spot_api_v1_admin_spots__spot_id__approve_patch: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                spot_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SpotRead"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    reject_spot_api_v1_admin_spots__spot_id__reject_patch: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                spot_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RejectSpotRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SpotRead"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    register_api_v1_auth_register_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UserCreate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserRead"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    login_api_v1_auth_login_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["LoginRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TokenPair"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    refresh_api_v1_auth_refresh_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RefreshRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TokenPair"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    list_cars_api_v1_users_me_cars__get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CarRead"][];
-                };
-            };
-        };
-    };
-    create_car_api_v1_users_me_cars__post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CarCreate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CarRead"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    update_car_api_v1_users_me_cars__car_id__put: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                car_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CarUpdate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CarRead"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    delete_car_api_v1_users_me_cars__car_id__delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                car_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            204: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
         };
     };
-    list_overrides_api_v1_spots__spot_id__overrides__get: {
+    InviteController_inviteNewUser: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                spot_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OverrideRead"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    create_override_api_v1_spots__spot_id__overrides__post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                spot_id: string;
+                buildingId: string;
             };
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["OverrideCreate"];
+                "application/json": components["schemas"]["InviteUserDto"];
             };
         };
         responses: {
-            /** @description Successful Response */
             201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OverrideRead"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    delete_override_api_v1_spots__spot_id__overrides__override_id__delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                spot_id: string;
-                override_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            204: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
         };
     };
-    create_reservation_api_v1_reservations__post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ReservationCreate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ReservationRead"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_my_reservations_api_v1_reservations_mine_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ReservationRead"][];
-                };
-            };
-        };
-    };
-    cancel_reservation_api_v1_reservations__reservation_id__delete: {
+    InviteController_inviteNewUsers: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                reservation_id: string;
+                buildingId: string;
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InviteUsersDto"];
+            };
+        };
         responses: {
-            /** @description Successful Response */
-            204: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
         };
     };
-    list_schedules_api_v1_spots__spot_id__schedules__get: {
+    AdminSpotController_updateStatus: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                spot_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ScheduleRead"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    create_schedules_api_v1_spots__spot_id__schedules__post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                spot_id: string;
+                id: string;
             };
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ScheduleCreate"];
+                "application/json": components["schemas"]["UpdateSpotDto"];
             };
         };
         responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ScheduleRead"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    delete_schedule_api_v1_spots__spot_id__schedules__schedule_id__delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                spot_id: string;
-                schedule_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            204: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
         };
     };
-    list_spot_reservations_api_v1_spots__spot_id__reservations__get: {
+    AdminSpotController_getAllByBuildingId: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                spot_id: string;
+                buildingId: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json": components["schemas"]["OwnerReservationRead"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
+                content?: never;
             };
         };
     };
-    create_spot_api_v1_spots__post: {
+    SpotController_findAll: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SpotController_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -1586,55 +550,24 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["SpotCreate"];
+                "application/json": components["schemas"]["CreateSpotDto"];
             };
         };
         responses: {
-            /** @description Successful Response */
-            200: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json": components["schemas"]["SpotRead"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
+                content?: never;
             };
         };
     };
-    get_my_spots_api_v1_spots_mine_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SpotRead"][];
-                };
-            };
-        };
-    };
-    get_available_spots_api_v1_spots_available_get: {
+    SpotController_findByInterval: {
         parameters: {
             query: {
-                from: string;
-                to: string;
+                dayOfWeek: number;
+                startMinute: number;
+                endMinute: number;
             };
             header?: never;
             path?: never;
@@ -1642,91 +575,15 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Successful Response */
             200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SpotRead"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    update_spot_api_v1_spots__spot_id__put: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                spot_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SpotUpdate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SpotRead"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    delete_spot_api_v1_spots__spot_id__delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                spot_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            204: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
         };
     };
-    get_users_api_v1_users__get: {
+    SpotController_mine: {
         parameters: {
             query?: never;
             header?: never;
@@ -1735,45 +592,547 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json": components["schemas"]["UserRead"][];
-                };
+                content?: never;
             };
         };
     };
-    get_user_api_v1_users__user_id__get: {
+    SpotController_booking: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                user_id: string;
+                id: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json": components["schemas"]["UserRead"];
-                };
+                content?: never;
             };
-            /** @description Validation Error */
-            422: {
+        };
+    };
+    SpotController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                content?: never;
+            };
+        };
+    };
+    SpotController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
                 };
+                content?: never;
+            };
+        };
+    };
+    SpotController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateSpotDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ScheduleController_findAll: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                spotId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ScheduleController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                spotId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateScheduleDto"][];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ScheduleController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                spotId: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ScheduleController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                spotId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ScheduleController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                spotId: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateScheduleDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    DocumentController_getDocumentById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                docId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    BuildingController_findAll: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    BuildingController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateBuildingDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    BuildingController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    BuildingController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    BuildingController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateBuildingDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    BookingController_findAll: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    BookingController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateBookingDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    BookingController_mine: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    BookingController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    BookingController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    BookingController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateBookingDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CarController_findAll: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CarController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCarDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CarController_mine: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CarController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CarController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CarController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCarDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

@@ -37,6 +37,22 @@ export function formatDay(value: string | number | Date, language: string, now: 
   return `${relative.charAt(0).toLocaleUpperCase(language)}${relative.slice(1)}, ${monthDay}`
 }
 
+/**
+ * "Today" / "Tomorrow" / "Thursday" (localized), counted from `now`'s Bucharest date. For
+ * labels within the next few days, e.g. booking windows.
+ */
+export function formatRelativeDay(value: string | number | Date, language: string, now: number) {
+  const date = new Date(parseApiDate(value))
+  const days = Math.round(
+    (Date.parse(dayKey(date)) - Date.parse(dayKey(new Date(now)))) / (24 * 60 * 60 * 1000),
+  )
+  const label =
+    Math.abs(days) <= 1
+      ? new Intl.RelativeTimeFormat(language, { numeric: 'auto' }).format(days, 'day')
+      : new Intl.DateTimeFormat(language, { timeZone: TIME_ZONE, weekday: 'long' }).format(date)
+  return `${label.charAt(0).toLocaleUpperCase(language)}${label.slice(1)}`
+}
+
 /** "Sep 25" / "25 sept." */
 export function formatDate(value: string | number | Date, language: string) {
   return new Intl.DateTimeFormat(language, {

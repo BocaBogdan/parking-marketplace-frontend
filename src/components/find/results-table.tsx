@@ -1,9 +1,7 @@
 import { SearchXIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
-import type { components } from '@/types/api'
-
-type Spot = components['schemas']['SpotRead']
+import type { Spot } from '@/types/models'
 
 interface ResultsTableProps {
   spots: Spot[]
@@ -46,11 +44,13 @@ export function ResultsTable({ spots, onReserve }: ResultsTableProps) {
             <tr key={spot.id} className="align-middle">
               <th scope="row" className="px-4 py-3 whitespace-nowrap">
                 <span className="inline-flex size-10 items-center justify-center rounded-lg bg-primary-50 text-base font-bold text-primary dark:bg-primary-950">
-                  {spot.spot_number}
+                  {spot.number}
                 </span>
               </th>
               <td className="px-4 py-3 text-muted-foreground">
-                <span className="line-clamp-2">{spot.notes || t('find.table.noDetails')}</span>
+                <span className="line-clamp-2">
+                  {spot.description || t('find.table.noDetails')}
+                </span>
               </td>
               <td className="px-4 py-3 text-right">
                 <Button size="lg" className="h-9 px-4" onClick={() => onReserve(spot)}>

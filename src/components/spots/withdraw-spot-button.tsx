@@ -16,12 +16,12 @@ import {
 import { Button } from '@/components/ui/button'
 import { serverErrorMessage } from '@/lib/form'
 import { deleteSpot } from '@/queries/spots'
-import type { components } from '@/types/api'
+import type { Spot } from '@/types/models'
 
-export function WithdrawSpotButton({ spot }: { spot: components['schemas']['SpotRead'] }) {
+export function WithdrawSpotButton({ spot }: { spot: Spot }) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
-  const number = spot.spot_number
+  const number = spot.number
 
   const withdraw = useMutation({
     mutationFn: () => deleteSpot(spot.id),

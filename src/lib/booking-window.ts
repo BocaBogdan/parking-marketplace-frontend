@@ -1,4 +1,5 @@
 import { addDays, zonedClock, zonedDayKey, zonedToMs } from '@/lib/format'
+import { MINUTES_PER_DAY, type DayOfWeek } from '@/lib/schedule'
 
 /** Bookings are made of 30-minute slots aligned to :00 and :30 */
 export const SLOT_MS = 30 * 60 * 1000
@@ -63,4 +64,30 @@ export function endOptions(start: number, day: string) {
   const options: number[] = []
   for (let t = start + SLOT_MS; t <= last; t += SLOT_MS) options.push(t)
   return options
+}
+
+/** Minutes since Bucharest midnight of an instant */
+function minuteOfDay(ms: number) {
+  const [hours, minutes] = zonedClock(ms).split(':').map(Number)
+  return hours * 60 + minutes
+}
+
+/**
+ * The window as the weekly intervals the backend matches schedules against: one per
+ * Bucharest day it touches, so a window past midnight becomes two.
+ */
+export function weeklyIntervals(start: number, end: number) {
+  const intervals: { dayOfWeek: DayOfWeek; startMinute: number; endMinute: number }[] = []
+  for (let from = start; from < end;) {
+    const day = zonedDayKey(from)
+    const midnight = zonedToMs(addDays(day, 1), '00:00')
+    const to = Math.min(end, midnight)
+    intervals.push({
+      dayOfWeek: new Date(`${day}T00:00:00Z`).getUTCDay() as DayOfWeek,
+      startMinute: minuteOfDay(from),
+      endMinute: to === midnight ? MINUTES_PER_DAY : minuteOfDay(to),
+    })
+    from = to
+  }
+  return intervals
 }

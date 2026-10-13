@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { AvailabilityDialog } from '@/components/spots/availability-dialog'
 import { SpotCard } from '@/components/spots/spot-card'
 import { SpotFormDialog } from '@/components/spots/spot-form-dialog'
+import { spotSchedulesQuery } from '@/queries/schedules'
 import { mySpotsQuery } from '@/queries/spots'
 
 // `?spot=new` opens the register dialog, `?spot=<id>` the edit dialog and
@@ -22,7 +23,15 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute('/_authenticated/spots/')({
   validateSearch: searchSchema,
-  loader: ({ context }) => context.queryClient.query({ ...mySpotsQuery, staleTime: 'static' }),
+  loader: async ({ context: { queryClient } }) => {
+    const spots = await queryClient.query({ ...mySpotsQuery, staleTime: 'static' })
+    // Every card shows the spot's weekly hours
+    await Promise.all(
+      spots.map((spot) =>
+        queryClient.query({ ...spotSchedulesQuery(spot.id), staleTime: 'static' }),
+      ),
+    )
+  },
   component: MySpotsPage,
 })
 
@@ -33,7 +42,7 @@ function MySpotsPage() {
   const { data: spots } = useSuspenseQuery(mySpotsQuery)
 
   const editing = spots.find((spot) => spot.id === dialog)
-  const managing = spots.find((spot) => spot.id === availability && spot.status === 'APPROVED')
+  const managing = spots.find((spot) => spot.id === availability)
   const openDialog = (spot: 'new' | string) =>
     void navigate({ search: { spot }, replace: true, resetScroll: false })
   const openAvailability = (spotId: string) =>

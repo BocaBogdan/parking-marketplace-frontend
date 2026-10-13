@@ -16,15 +16,9 @@ import {
 import { Button } from '@/components/ui/button'
 import { serverErrorMessage } from '@/lib/form'
 import { deleteCar } from '@/queries/cars'
-import type { components } from '@/types/api'
+import type { Car } from '@/types/models'
 
-interface RemoveCarButtonProps {
-  car: components['schemas']['CarRead']
-  /** Removing the default car hands the role to another one — say so in the confirmation */
-  hasOtherCars: boolean
-}
-
-export function RemoveCarButton({ car, hasOtherCars }: RemoveCarButtonProps) {
+export function RemoveCarButton({ car }: { car: Car }) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
 
@@ -53,11 +47,7 @@ export function RemoveCarButton({ car, hasOtherCars }: RemoveCarButtonProps) {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{t('cars.removeConfirm.title', { plate: car.plate })}</AlertDialogTitle>
-          <AlertDialogDescription>
-            {car.is_default && hasOtherCars
-              ? t('cars.removeConfirm.defaultDescription')
-              : t('cars.removeConfirm.description')}
-          </AlertDialogDescription>
+          <AlertDialogDescription>{t('cars.removeConfirm.description')}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>

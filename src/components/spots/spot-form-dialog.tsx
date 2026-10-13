@@ -13,17 +13,17 @@ import {
 import { FormError } from '@/components/form/form-error'
 import { setServerErrors, useAppForm } from '@/lib/form'
 import { createSpot, updateSpot } from '@/queries/spots'
-import type { components } from '@/types/api'
+import type { Spot } from '@/types/models'
 
-type Spot = components['schemas']['SpotRead']
-
-// Mirrors SpotCreate in the backend; messages are translation keys
+// Mirrors CreateSpotDto in the backend (description is a varchar(255)); messages are
+// translation keys. The location picker and proof document aren't in the first release:
+// see components/spots/location-picker.tsx and document-input.tsx.
 const spotFormSchema = z.object({
-  spot_number: z
+  number: z
     .string()
     .trim()
     .regex(/^[1-9]\d{0,8}$/, 'validation.spotNumber'),
-  notes: z.string().max(1000, 'validation.notesMax'),
+  description: z.string().trim().min(1, 'validation.notesRequired').max(255, 'validation.max255'),
 })
 
 type SpotFormValues = z.infer<typeof spotFormSchema>
@@ -49,25 +49,24 @@ export function SpotFormDialog({ open, onOpenChange, spot }: SpotFormDialogProps
 function SpotForm({ spot, onDone }: { spot?: Spot; onDone: () => void }) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
-  const mode = !spot ? 'create' : spot.status === 'REJECTED' ? 'resubmit' : 'edit'
 
   const save = useMutation({
-    mutationFn: ({ spot_number, notes }: SpotFormValues) => {
-      const body = { spot_number: Number(spot_number), notes: notes.trim() || null }
-      return spot ? updateSpot(spot.id, body) : createSpot(body)
+    mutationFn: (values: SpotFormValues) => {
+      const fields = { number: Number(values.number), description: values.description.trim() }
+      return spot ? updateSpot(spot.id, fields) : createSpot(fields)
     },
     onSuccess: async (saved) => {
       await queryClient.invalidateQueries({ queryKey: ['spots'] })
-      const toastKey =
-        mode === 'create' ? 'created' : mode === 'resubmit' ? 'resubmitted' : 'updated'
-      toast.success(t(`spots.toast.${toastKey}`, { number: saved.spot_number }))
+      toast.success(
+        t(spot ? 'spots.toast.updated' : 'spots.toast.created', { number: saved.number }),
+      )
       onDone()
     },
   })
 
   const defaultValues: SpotFormValues = {
-    spot_number: spot ? String(spot.spot_number) : '',
-    notes: spot?.notes ?? '',
+    number: spot ? String(spot.number) : '',
+    description: spot?.description ?? '',
   }
 
   const form = useAppForm({
@@ -82,30 +81,15 @@ function SpotForm({ spot, onDone }: { spot?: Spot; onDone: () => void }) {
     },
   })
 
-  const number = spot?.spot_number
-  const copy = {
-    create: {
-      title: t('spots.form.createTitle'),
-      description: t('spots.form.createDescription'),
-      submit: t('spots.form.create'),
-    },
-    edit: {
-      title: t('spots.form.editTitle', { number }),
-      description: t('spots.form.editDescription'),
-      submit: t('spots.form.save'),
-    },
-    resubmit: {
-      title: t('spots.form.resubmitTitle', { number }),
-      description: t('spots.form.resubmitDescription'),
-      submit: t('spots.form.resubmit'),
-    },
-  }[mode]
-
   return (
     <>
       <DialogHeader>
-        <DialogTitle className="text-lg font-bold">{copy.title}</DialogTitle>
-        <DialogDescription>{copy.description}</DialogDescription>
+        <DialogTitle className="text-lg font-bold">
+          {spot ? t('spots.form.editTitle', { number: spot.number }) : t('spots.form.createTitle')}
+        </DialogTitle>
+        <DialogDescription>
+          {spot ? t('spots.form.editDescription') : t('spots.form.createDescription')}
+        </DialogDescription>
       </DialogHeader>
       <form
         noValidate
@@ -118,7 +102,7 @@ function SpotForm({ spot, onDone }: { spot?: Spot; onDone: () => void }) {
         <form.AppForm>
           <FormError />
         </form.AppForm>
-        <form.AppField name="spot_number">
+        <form.AppField name="number">
           {(field) => (
             <field.TextField
               label={t('spots.form.spotNumber')}
@@ -130,18 +114,20 @@ function SpotForm({ spot, onDone }: { spot?: Spot; onDone: () => void }) {
             />
           )}
         </form.AppField>
-        <form.AppField name="notes">
+        <form.AppField name="description">
           {(field) => (
             <field.TextareaField
               label={t('spots.form.notes')}
               placeholder={t('spots.form.notesPlaceholder')}
               hint={t('spots.form.notesHint')}
-              maxLength={1000}
+              maxLength={255}
             />
           )}
         </form.AppField>
         <form.AppForm>
-          <form.SubmitButton>{copy.submit}</form.SubmitButton>
+          <form.SubmitButton>
+            {spot ? t('spots.form.save') : t('spots.form.create')}
+          </form.SubmitButton>
         </form.AppForm>
       </form>
     </>

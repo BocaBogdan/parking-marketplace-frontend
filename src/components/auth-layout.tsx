@@ -3,15 +3,9 @@ import { ShieldCheckIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { useComingSoon } from '@/lib/coming-soon'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
-interface AuthLayoutProps {
-  title: string
-  description: string
-  children: ReactNode
-}
-
-export function AuthLayout({ title, description, children }: AuthLayoutProps) {
+/** Branded frame around Clerk's sign-in and sign-up cards */
+export function AuthLayout({ children }: { children: ReactNode }) {
   const { t } = useTranslation()
 
   return (
@@ -34,13 +28,7 @@ export function AuthLayout({ title, description, children }: AuthLayoutProps) {
           </span>
         </header>
 
-        <Card className="gap-6 py-6 shadow-xl shadow-neutral-900/5 [--card-spacing:--spacing(6)]">
-          <CardHeader>
-            <CardTitle className="text-xl font-bold">{title}</CardTitle>
-            <CardDescription>{description}</CardDescription>
-          </CardHeader>
-          <CardContent>{children}</CardContent>
-        </Card>
+        <div className="flex justify-center">{children}</div>
       </main>
 
       <footer className="mx-auto mt-8 flex w-full max-w-md items-center justify-between text-sm">
@@ -59,7 +47,7 @@ export function AuthLayout({ title, description, children }: AuthLayoutProps) {
 }
 
 /** Placeholder for pages that don't exist yet — shows a toast instead of navigating */
-export function ComingSoonLink({ label, className }: { label: string; className?: string }) {
+function ComingSoonLink({ label, className }: { label: string; className?: string }) {
   const comingSoon = useComingSoon()
 
   return (

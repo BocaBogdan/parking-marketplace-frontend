@@ -17,25 +17,20 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { LicensePlate } from '@/components/cars/license-plate'
 import { serverErrorMessage } from '@/lib/form'
-import { formatDate, formatDuration, formatTime, parseApiDate, zonedDayKey } from '@/lib/format'
+import { formatDate, formatDuration, formatTime, zonedDayKey } from '@/lib/format'
 import { cn } from '@/lib/utils'
-import { cancelReservation } from '@/queries/reservations'
-import type { components } from '@/types/api'
+import { cancelReservation, type Reservation } from '@/queries/reservations'
+import type { Car } from '@/types/models'
 
-type Reservation = components['schemas']['ReservationRead']
-type Car = components['schemas']['CarRead']
-
-/** Cancelling closes 15 minutes before the start (backend rule) */
+/** Cancelling closes 15 minutes before the start, so the owner isn't left guessing */
 const CANCELLATION_CUTOFF_MS = 15 * 60 * 1000
 
-type Phase = 'inProgress' | 'confirmed' | 'completed' | 'cancelled' | 'cancelledByAdmin'
+type Phase = 'inProgress' | 'confirmed' | 'completed'
 
 const phaseBadge: Record<Phase, string> = {
   inProgress: 'bg-secondary text-secondary-foreground',
   confirmed: 'bg-secondary-100 text-secondary-800 dark:bg-secondary-950 dark:text-secondary-300',
   completed: 'bg-muted text-muted-foreground',
-  cancelled: 'bg-muted text-muted-foreground',
-  cancelledByAdmin: 'bg-destructive/10 text-destructive dark:bg-destructive/20',
 }
 
 interface BookingRowProps {
@@ -48,19 +43,9 @@ interface BookingRowProps {
 export function BookingRow({ reservation, car, now }: BookingRowProps) {
   const { t, i18n } = useTranslation()
   const language = i18n.resolvedLanguage ?? 'en'
-  const start = parseApiDate(reservation.start_at)
-  const end = parseApiDate(reservation.end_at)
+  const { start, end } = reservation
 
-  const phase: Phase =
-    reservation.status === 'CANCELLED'
-      ? 'cancelled'
-      : reservation.status === 'CANCELLED_BY_ADMIN'
-        ? 'cancelledByAdmin'
-        : end <= now
-          ? 'completed'
-          : start <= now
-            ? 'inProgress'
-            : 'confirmed'
+  const phase: Phase = end <= now ? 'completed' : start <= now ? 'inProgress' : 'confirmed'
   const canCancel = phase === 'confirmed' && now < start - CANCELLATION_CUTOFF_MS
   // Overnight bookings show the end date too
   const endLabel =
@@ -74,12 +59,11 @@ export function BookingRow({ reservation, car, now }: BookingRowProps) {
         'grid gap-3 rounded-2xl border bg-card p-4 shadow-xs',
         phase === 'inProgress' &&
           'border-secondary-300 bg-secondary-50 dark:border-secondary-800 dark:bg-secondary-950/40',
-        (phase === 'cancelled' || phase === 'cancelledByAdmin') && 'opacity-75',
       )}
     >
       <div className="flex flex-wrap items-start justify-between gap-2">
         <p className="flex flex-wrap items-baseline gap-x-2 font-semibold tabular-nums">
-          <span className={cn(phase.startsWith('cancelled') && 'line-through')}>
+          <span>
             {formatTime(start, language)} – {endLabel}
           </span>
           <span className="text-sm font-normal text-muted-foreground">
@@ -95,9 +79,7 @@ export function BookingRow({ reservation, car, now }: BookingRowProps) {
         {car ? (
           <span className="flex min-w-0 items-center gap-2">
             <LicensePlate plate={car.plate} size="sm" />
-            {car.nickname && (
-              <span className="truncate text-sm text-muted-foreground">{car.nickname}</span>
-            )}
+            <span className="truncate text-sm text-muted-foreground">{car.description}</span>
           </span>
         ) : (
           <span className="text-sm text-muted-foreground">{t('bookings.removedCar')}</span>
@@ -121,7 +103,7 @@ function CancelBookingButton({ reservation }: { reservation: Reservation }) {
   const queryClient = useQueryClient()
 
   const cancel = useMutation({
-    mutationFn: () => cancelReservation(reservation.id),
+    mutationFn: () => cancelReservation(reservation),
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['reservations'] }),
@@ -150,9 +132,9 @@ function CancelBookingButton({ reservation }: { reservation: Reservation }) {
           <AlertDialogTitle>{t('bookings.cancelConfirm.title')}</AlertDialogTitle>
           <AlertDialogDescription>
             {t('bookings.cancelConfirm.description', {
-              date: formatDate(reservation.start_at, language),
-              from: formatTime(reservation.start_at, language),
-              to: formatTime(reservation.end_at, language),
+              date: formatDate(reservation.start, language),
+              from: formatTime(reservation.start, language),
+              to: formatTime(reservation.end, language),
             })}
           </AlertDialogDescription>
         </AlertDialogHeader>

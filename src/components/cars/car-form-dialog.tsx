@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { CarIcon, TagIcon } from 'lucide-react'
+import { CarIcon, PhoneIcon, TagIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -13,11 +13,9 @@ import {
 import { FormError } from '@/components/form/form-error'
 import { setServerErrors, useAppForm } from '@/lib/form'
 import { createCar, updateCar } from '@/queries/cars'
-import type { components } from '@/types/api'
+import type { Car } from '@/types/models'
 
-type Car = components['schemas']['CarRead']
-
-// Mirrors CarCreate in the backend, which also upper-cases the plate
+// Mirrors CreateCarDto in the backend; the plate is upper-cased before saving
 const carFormSchema = z.object({
   plate: z
     .string()
@@ -25,8 +23,15 @@ const carFormSchema = z.object({
     .min(1, 'validation.plateRequired')
     .max(20, 'validation.plateMax')
     .regex(/^[\p{L}\d][\p{L}\d -]*$/u, 'validation.plate'),
-  nickname: z.string().trim().max(100, 'validation.nicknameMax'),
-  is_default: z.boolean(),
+  description: z
+    .string()
+    .trim()
+    .min(1, 'validation.carDescriptionRequired')
+    .max(100, 'validation.carDescriptionMax'),
+  phone: z
+    .string()
+    .trim()
+    .regex(/^\+[1-9]\d{1,14}$/, 'validation.phone'),
 })
 
 type CarFormValues = z.infer<typeof carFormSchema>
@@ -36,37 +41,30 @@ interface CarFormDialogProps {
   onOpenChange: (open: boolean) => void
   /** Car to edit; omit to add a new one */
   car?: Car
-  /** Whether the user already has cars — the first one always becomes the default */
-  hasCars: boolean
 }
 
-export function CarFormDialog({ open, onOpenChange, car, hasCars }: CarFormDialogProps) {
+export function CarFormDialog({ open, onOpenChange, car }: CarFormDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
-        <CarForm
-          key={car?.id ?? 'new'}
-          car={car}
-          hasCars={hasCars}
-          onDone={() => onOpenChange(false)}
-        />
+        <CarForm key={car?.id ?? 'new'} car={car} onDone={() => onOpenChange(false)} />
       </DialogContent>
     </Dialog>
   )
 }
 
-function CarForm({ car, hasCars, onDone }: { car?: Car; hasCars: boolean; onDone: () => void }) {
+function CarForm({ car, onDone }: { car?: Car; onDone: () => void }) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
-  const isFirstCar = !car && !hasCars
 
   const save = useMutation({
     mutationFn: (values: CarFormValues) => {
-      const plate = values.plate.toUpperCase()
-      const nickname = values.nickname || null
-      if (!car) return createCar({ plate, nickname, is_default: values.is_default })
-      // Only ever send `true` on edit: unsetting could leave the user without a default
-      return updateCar(car.id, { plate, nickname, ...(values.is_default && { is_default: true }) })
+      const body = {
+        plate: values.plate.trim().toUpperCase(),
+        description: values.description.trim(),
+        phone: values.phone.trim(),
+      }
+      return car ? updateCar(car.id, body) : createCar(body)
     },
     onSuccess: async (saved) => {
       await queryClient.invalidateQueries({ queryKey: ['cars'] })
@@ -77,8 +75,8 @@ function CarForm({ car, hasCars, onDone }: { car?: Car; hasCars: boolean; onDone
 
   const defaultValues: CarFormValues = {
     plate: car?.plate ?? '',
-    nickname: car?.nickname ?? '',
-    is_default: car?.is_default ?? isFirstCar,
+    description: car?.description ?? '',
+    phone: car?.phone ?? '',
   }
 
   const form = useAppForm({
@@ -127,31 +125,29 @@ function CarForm({ car, hasCars, onDone }: { car?: Car; hasCars: boolean; onDone
             />
           )}
         </form.AppField>
-        <form.AppField name="nickname">
+        <form.AppField name="description">
           {(field) => (
             <field.TextField
-              label={t('cars.form.nickname')}
+              label={t('cars.form.description')}
               icon={TagIcon}
               autoComplete="off"
-              placeholder={t('cars.form.nicknamePlaceholder')}
-              hint={t('cars.form.nicknameHint')}
+              placeholder={t('cars.form.descriptionPlaceholder')}
+              hint={t('cars.form.descriptionHint')}
             />
           )}
         </form.AppField>
-        {/* The current default stays default until another car takes over */}
-        {car?.is_default ? (
-          <p className="rounded-lg bg-primary-50 px-3 py-2.5 text-sm text-primary-800 dark:bg-primary-950 dark:text-primary-200">
-            {t('cars.form.isDefaultNote')}
-          </p>
-        ) : isFirstCar ? (
-          <p className="rounded-lg bg-primary-50 px-3 py-2.5 text-sm text-primary-800 dark:bg-primary-950 dark:text-primary-200">
-            {t('cars.form.firstCarNote')}
-          </p>
-        ) : (
-          <form.AppField name="is_default">
-            {(field) => <field.CheckboxField label={t('cars.form.makeDefault')} />}
-          </form.AppField>
-        )}
+        <form.AppField name="phone">
+          {(field) => (
+            <field.TextField
+              label={t('cars.form.phone')}
+              icon={PhoneIcon}
+              type="tel"
+              autoComplete="tel"
+              placeholder={t('cars.form.phonePlaceholder')}
+              hint={t('cars.form.phoneHint')}
+            />
+          )}
+        </form.AppField>
         <form.AppForm>
           <form.SubmitButton>{car ? t('cars.form.save') : t('cars.form.add')}</form.SubmitButton>
         </form.AppForm>

@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from '@tanstack/react-router'
+import { Link, Outlet, useLocation } from '@tanstack/react-router'
 import { BellIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
@@ -18,11 +18,18 @@ export function AppShell() {
     <div className="min-h-svh bg-background">
       <header className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-5xl items-center gap-3 px-4">
-          <LogoMark />
-          <div className="leading-tight">
-            <p className="font-bold">{t('common.appName')}</p>
-            {current && <p className="text-xs text-muted-foreground">{t(`nav.${current.key}`)}</p>}
-          </div>
+          <Link
+            to="/home"
+            className="-m-1 flex items-center gap-3 rounded-xl p-1 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            <LogoMark />
+            <span className="grid leading-tight">
+              <span className="font-bold">{t('common.appName')}</span>
+              {current && (
+                <span className="text-xs text-muted-foreground">{t(`nav.${current.key}`)}</span>
+              )}
+            </span>
+          </Link>
           <nav className="ml-6 hidden items-center gap-1 lg:flex">
             <NavLinks variant="inline" />
           </nav>

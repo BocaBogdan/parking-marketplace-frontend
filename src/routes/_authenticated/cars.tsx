@@ -4,7 +4,7 @@ import { CarIcon, InfoIcon, PlusIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
-import { CarCard, DefaultCarCard } from '@/components/cars/car-cards'
+import { CarCard } from '@/components/cars/car-cards'
 import { CarFormDialog } from '@/components/cars/car-form-dialog'
 import { myCarsQuery } from '@/queries/cars'
 
@@ -28,9 +28,6 @@ function MyCarsPage() {
   const navigate = Route.useNavigate()
   const { data: cars } = useSuspenseQuery(myCarsQuery)
 
-  const defaultCar = cars.find((car) => car.is_default)
-  const otherCars = cars.filter((car) => !car.is_default)
-  const hasOtherCars = cars.length > 1
   const editing = cars.find((car) => car.id === dialog)
 
   const openDialog = (car: 'new' | string) =>
@@ -64,27 +61,11 @@ function MyCarsPage() {
         </section>
       ) : (
         <>
-          {defaultCar && (
-            <DefaultCarCard
-              car={defaultCar}
-              hasOtherCars={hasOtherCars}
-              onEdit={() => openDialog(defaultCar.id)}
-            />
-          )}
-
-          {otherCars.length > 0 && (
-            <section className="grid gap-3">
-              <h2 className="text-lg font-bold">{t('cars.otherCars')}</h2>
-              {otherCars.map((car) => (
-                <CarCard
-                  key={car.id}
-                  car={car}
-                  hasOtherCars={hasOtherCars}
-                  onEdit={() => openDialog(car.id)}
-                />
-              ))}
-            </section>
-          )}
+          <section className="grid gap-3">
+            {cars.map((car) => (
+              <CarCard key={car.id} car={car} onEdit={() => openDialog(car.id)} />
+            ))}
+          </section>
 
           <aside className="flex items-start gap-3 rounded-2xl bg-muted p-4 text-sm text-muted-foreground">
             <InfoIcon className="mt-0.5 size-4 shrink-0 text-primary" />
@@ -97,7 +78,6 @@ function MyCarsPage() {
         open={dialog === 'new' || editing !== undefined}
         onOpenChange={(open) => !open && closeDialog()}
         car={editing}
-        hasCars={cars.length > 0}
       />
     </div>
   )

@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { useIsAdmin } from '@/lib/auth'
 import { useComingSoon } from '@/lib/coming-soon'
 import { navItems } from '@/components/app-shell/nav-items'
 
@@ -21,24 +22,27 @@ const styles: Record<Variant, { base: string; active: string }> = {
 export function NavLinks({ variant }: { variant: Variant }) {
   const { t } = useTranslation()
   const comingSoon = useComingSoon()
+  const isAdmin = useIsAdmin()
   const { base, active } = styles[variant]
 
-  return navItems.map(({ key, icon: Icon, to }) => {
-    const label = t(`nav.${key}`)
-    const content = (
-      <>
-        <Icon className="size-5" />
-        {label}
-      </>
-    )
-    return to ? (
-      <Link key={key} to={to} className={base} activeProps={{ className: active }}>
-        {content}
-      </Link>
-    ) : (
-      <button key={key} type="button" className={base} onClick={() => comingSoon(label)}>
-        {content}
-      </button>
-    )
-  })
+  return navItems
+    .filter((item) => !item.adminOnly || isAdmin)
+    .map(({ key, icon: Icon, to }) => {
+      const label = t(`nav.${key}`)
+      const content = (
+        <>
+          <Icon className="size-5" />
+          {label}
+        </>
+      )
+      return to ? (
+        <Link key={key} to={to} className={base} activeProps={{ className: active }}>
+          {content}
+        </Link>
+      ) : (
+        <button key={key} type="button" className={base} onClick={() => comingSoon(label)}>
+          {content}
+        </button>
+      )
+    })
 }

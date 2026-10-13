@@ -5,16 +5,13 @@ import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { BookingRow } from '@/components/bookings/booking-row'
-import { formatDay, groupByDay, parseApiDate } from '@/lib/format'
+import { formatDay, groupByDay } from '@/lib/format'
 import { useNow } from '@/lib/use-now'
 import { cn } from '@/lib/utils'
 import { myCarsQuery } from '@/queries/cars'
-import { myReservationsQuery } from '@/queries/reservations'
-import type { components } from '@/types/api'
+import { myReservationsQuery, type Reservation } from '@/queries/reservations'
 
-type Reservation = components['schemas']['ReservationRead']
-
-const tabs = ['upcoming', 'past', 'cancelled'] as const
+const tabs = ['upcoming', 'past'] as const
 type Tab = (typeof tabs)[number]
 
 const searchSchema = z.object({
@@ -31,16 +28,12 @@ export const Route = createFileRoute('/_authenticated/bookings')({
   component: BookingsPage,
 })
 
-/** Upcoming soonest first (including the one in progress); past and cancelled latest first */
+/** Upcoming soonest first (including the one in progress); past latest first. Cancelled
+ * bookings are deleted by the backend, so there's nothing to show for them. */
 function splitByTab(reservations: Reservation[], now: number): Record<Tab, Reservation[]> {
-  const byStartAsc = [...reservations].sort(
-    (a, b) => parseApiDate(a.start_at) - parseApiDate(b.start_at),
-  )
-  const confirmed = byStartAsc.filter((r) => r.status === 'CONFIRMED')
   return {
-    upcoming: confirmed.filter((r) => parseApiDate(r.end_at) > now),
-    past: confirmed.filter((r) => parseApiDate(r.end_at) <= now).reverse(),
-    cancelled: byStartAsc.filter((r) => r.status !== 'CONFIRMED').reverse(),
+    upcoming: reservations.filter((r) => r.end > now),
+    past: reservations.filter((r) => r.end <= now).reverse(),
   }
 }
 
@@ -55,7 +48,7 @@ function BookingsPage() {
 
   const byTab = splitByTab(reservations, now)
   const shown = byTab[tab]
-  const days = groupByDay(shown, (r) => parseApiDate(r.start_at))
+  const days = groupByDay(shown, (r) => r.start)
 
   return (
     <div className="mx-auto grid max-w-md gap-5 md:max-w-2xl">
@@ -74,7 +67,7 @@ function BookingsPage() {
 
       <nav
         aria-label={t('bookings.title')}
-        className="grid grid-cols-3 rounded-full bg-muted p-1 text-sm font-semibold"
+        className="grid grid-cols-2 rounded-full bg-muted p-1 text-sm font-semibold"
       >
         {tabs.map((key) => (
           <Link
@@ -112,14 +105,14 @@ function BookingsPage() {
           {days.map(({ day, items }) => (
             <section key={day} className="grid gap-2">
               <h2 className="text-sm font-semibold text-muted-foreground">
-                {formatDay(items[0].start_at, language, now)}
+                {formatDay(items[0].start, language, now)}
               </h2>
               <ul className="grid gap-2">
                 {items.map((reservation) => (
                   <BookingRow
                     key={reservation.id}
                     reservation={reservation}
-                    car={cars.find((car) => car.id === reservation.car_id)}
+                    car={cars.find((car) => car.id === reservation.carId)}
                     now={now}
                   />
                 ))}

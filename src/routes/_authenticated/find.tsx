@@ -1,13 +1,12 @@
 import { keepPreviousData, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { Loader2Icon } from 'lucide-react'
+import { InfoIcon, Loader2Icon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 import { ReserveDialog } from '@/components/find/reserve-dialog'
 import { ResultsTable } from '@/components/find/results-table'
 import { WindowFilter } from '@/components/find/window-filter'
 import { resolveWindow, toSearch } from '@/lib/booking-window'
-import { toZonedIso } from '@/lib/format'
 import { useNow } from '@/lib/use-now'
 import { myCarsQuery } from '@/queries/cars'
 import { availableSpotsQuery, mySpotsQuery } from '@/queries/spots'
@@ -30,7 +29,7 @@ export const Route = createFileRoute('/_authenticated/find')({
       queryClient.query({ ...mySpotsQuery, staleTime: 'static' }),
       queryClient.query({ ...myCarsQuery, staleTime: 'static' }),
       queryClient.query({
-        ...availableSpotsQuery(toZonedIso(window.start), toZonedIso(window.end)),
+        ...availableSpotsQuery(window.start, window.end),
         staleTime: 'static',
       }),
     ])
@@ -48,13 +47,14 @@ function FindSpotPage() {
   const { data: mySpots } = useSuspenseQuery(mySpotsQuery)
   // Not suspense: keep the previous results on screen while a new window loads
   const { data: available = [], isFetching } = useQuery({
-    ...availableSpotsQuery(toZonedIso(window.start), toZonedIso(window.end)),
+    ...availableSpotsQuery(window.start, window.end),
     placeholderData: keepPreviousData,
   })
 
   // The backend lists the user's own spots too, but they can't reserve those
   const mySpotIds = new Set(mySpots.map((spot) => spot.id))
   const spots = available.filter((spot) => !mySpotIds.has(spot.id))
+  const ownFree = available.filter((spot) => mySpotIds.has(spot.id))
   const reserving = spots.find((spot) => spot.id === search.reserve)
 
   return (
@@ -77,6 +77,15 @@ function FindSpotPage() {
           {t('find.results', { count: spots.length })}
           {isFetching && <Loader2Icon className="size-4 animate-spin text-muted-foreground" />}
         </h2>
+        {ownFree.length > 0 && (
+          <p className="flex items-start gap-2 text-sm text-muted-foreground">
+            <InfoIcon className="mt-0.5 size-4 shrink-0" />
+            {t('find.ownSpotsHidden', {
+              count: ownFree.length,
+              numbers: ownFree.map((spot) => spot.number).join(', '),
+            })}
+          </p>
+        )}
         <ResultsTable
           spots={spots}
           onReserve={(spot) =>

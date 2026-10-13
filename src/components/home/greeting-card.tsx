@@ -1,11 +1,14 @@
+import { useUser } from '@clerk/react'
 import { Building2Icon, ShieldCheckIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { Badge } from '@/components/ui/badge'
-import type { components } from '@/types/api'
 
-export function GreetingCard({ user }: { user: components['schemas']['UserRead'] }) {
+export function GreetingCard() {
   const { t } = useTranslation()
-  const firstName = user.name.trim().split(/\s+/)[0]
+  const { user } = useUser()
+  // Invited residents get their apartment from the invitation (public metadata)
+  const apartment = user?.publicMetadata.apartment
+  const firstName =
+    user?.firstName || user?.fullName || user?.primaryEmailAddress?.emailAddress.split('@')[0]
 
   return (
     <section className="flex items-start gap-3 rounded-2xl border bg-card p-5 shadow-xs">
@@ -19,13 +22,12 @@ export function GreetingCard({ user }: { user: components['schemas']['UserRead']
             👋
           </span>
         </h1>
-        <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
-          <Building2Icon className="size-4 text-primary" />
-          {t('home.apartment', { number: user.apartment_number })}
-        </p>
-        <Badge className="bg-secondary-100 font-bold tracking-wide text-secondary-800 uppercase dark:bg-secondary-950 dark:text-secondary-300">
-          {t(`home.role.${user.role}`)}
-        </Badge>
+        {apartment && (
+          <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+            <Building2Icon className="size-4 text-primary" />
+            {t('home.apartment', { number: apartment })}
+          </p>
+        )}
       </div>
       <div
         title={t('home.verified')}

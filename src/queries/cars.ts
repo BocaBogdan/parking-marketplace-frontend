@@ -1,27 +1,28 @@
 import { queryOptions } from '@tanstack/react-query'
 import { api, unwrap } from '@/lib/api'
 import type { components } from '@/types/api'
+import type { Car } from '@/types/models'
 
 export const myCarsQuery = queryOptions({
   queryKey: ['cars', 'mine'],
-  queryFn: () => unwrap(api.GET('/api/v1/users/me/cars/')),
+  queryFn: async () => {
+    const cars = await unwrap<Car[]>(api.GET('/api/car/mine'))
+    return cars.sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+  },
 })
 
-/** The first car a user adds becomes the default automatically (backend rule) */
-export function createCar(body: components['schemas']['CarCreate']) {
-  return unwrap(api.POST('/api/v1/users/me/cars/', { body }))
+export function createCar(body: components['schemas']['CreateCarDto']) {
+  return unwrap<Car>(api.POST('/api/car', { body }))
 }
 
-/** `is_default: true` also clears the flag on the user's other cars (backend rule) */
-export function updateCar(carId: string, body: components['schemas']['CarUpdate']) {
-  return unwrap(
-    api.PUT('/api/v1/users/me/cars/{car_id}', { params: { path: { car_id: carId } }, body }),
+/** Responds with a one-element array (the backend uses findBy) */
+export async function updateCar(carId: string, body: components['schemas']['UpdateCarDto']) {
+  const [car] = await unwrap<Car[]>(
+    api.PATCH('/api/car/{id}', { params: { path: { id: carId } }, body }),
   )
+  return car
 }
 
-/** Soft-deletes; removing the default car promotes the newest remaining car (backend rule) */
 export function deleteCar(carId: string) {
-  return unwrap(
-    api.DELETE('/api/v1/users/me/cars/{car_id}', { params: { path: { car_id: carId } } }),
-  )
+  return unwrap(api.DELETE('/api/car/{id}', { params: { path: { id: carId } } }))
 }

@@ -1,8 +1,8 @@
-import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
+import { useClerk, useUser } from '@clerk/react'
+import { useQueryClient } from '@tanstack/react-query'
 import { LanguagesIcon, LogOutIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,8 +14,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { languages } from '@/i18n'
-import { logout } from '@/lib/auth'
-import { currentUserQuery } from '@/queries/users'
 
 function initials(name: string) {
   return name
@@ -28,9 +26,17 @@ function initials(name: string) {
 
 export function AccountMenu() {
   const { t, i18n } = useTranslation()
-  const { data: user } = useSuspenseQuery(currentUserQuery())
+  // Only rendered inside _authenticated, so Clerk has a signed-in user
+  const { user } = useUser()
+  const { signOut } = useClerk()
   const queryClient = useQueryClient()
-  const navigate = useNavigate()
+  const name = user?.fullName || user?.primaryEmailAddress?.emailAddress || ''
+
+  const logout = async () => {
+    await signOut({ redirectUrl: '/login' })
+    // Clear only after leaving the signed-in pages, or their queries refetch without a token
+    queryClient.clear()
+  }
 
   return (
     <DropdownMenu>
@@ -39,15 +45,16 @@ export function AccountMenu() {
         className="rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
       >
         <Avatar className="size-9">
+          {user?.hasImage && <AvatarImage src={user.imageUrl} alt="" />}
           <AvatarFallback className="bg-primary-100 font-semibold text-primary-700 dark:bg-primary-950 dark:text-primary-300">
-            {initials(user.name)}
+            {initials(name)}
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel className="grid">
-          <span className="truncate font-semibold text-foreground">{user.name}</span>
-          <span className="truncate font-normal">{user.email}</span>
+          <span className="truncate font-semibold text-foreground">{name}</span>
+          <span className="truncate font-normal">{user?.primaryEmailAddress?.emailAddress}</span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuLabel className="flex items-center gap-2">
@@ -65,10 +72,7 @@ export function AccountMenu() {
           ))}
         </DropdownMenuRadioGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          variant="destructive"
-          onSelect={() => void logout(queryClient, () => navigate({ to: '/login' }))}
-        >
+        <DropdownMenuItem variant="destructive" onSelect={() => void logout()}>
           <LogOutIcon />
           {t('auth.logout')}
         </DropdownMenuItem>

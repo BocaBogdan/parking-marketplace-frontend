@@ -15,32 +15,16 @@ export const { useAppForm } = createFormHook({
 })
 
 /**
- * Maps a failed request onto form errors: FastAPI 422s go to the matching fields,
- * anything else becomes a form-level message. The errors clear on the next edit.
+ * Maps a failed request onto form errors: validation messages about a known field go to
+ * that field, anything else becomes a form-level message. The errors clear on the next edit.
  */
 export function setServerErrors(form: AnyFormApi, error: unknown) {
   form.setErrorMap({ onServer: toServerErrors(error) })
 }
 
-// Backend messages we have translations for; unknown ones are shown untranslated
-const knownServerErrors: Record<string, TranslationKey> = {
-  'Invalid email or password': 'errors.invalidCredentials',
-  'A user with this email or phone already exists': 'errors.userExists',
-  'This spot already exists': 'errors.spotExists',
-  'You do not own this spot': 'errors.notSpotOwner',
-  'You already have a car with this plate': 'errors.plateExists',
-  'This spot is already reserved for an overlapping window': 'errors.spotTaken',
-  'Spot is not available for this window': 'errors.spotUnavailable',
-  'You cannot reserve your own spot': 'errors.ownSpot',
-  'Reservations can only be cancelled at least 15 minutes before they start': 'errors.cancelCutoff',
-  'Reservation is already cancelled': 'errors.alreadyCancelled',
-  'One or more of these schedules already exist for this spot': 'errors.scheduleExists',
-}
-
-// 422s for these fields always mean the same thing as the client-side check
+// The backend's checks for these fields mean the same thing as the client-side ones
 const fieldErrorKeys: Record<string, TranslationKey> = {
   plate: 'validation.plate',
-  email: 'validation.email',
   phone: 'validation.phone',
 }
 
@@ -53,15 +37,17 @@ function toServerErrors(error: unknown): { form?: string; fields: Record<string,
   if (!(error instanceof ApiError)) {
     return { form: 'errors.network', fields: {} }
   }
-  if (!Array.isArray(error.detail)) {
-    return { form: knownServerErrors[error.message] ?? error.message, fields: {} }
-  }
 
+  // NestJS's ValidationPipe sends one sentence per problem, starting with the field name
+  // ("plate should not be empty"). Other errors are a single message — sometimes a
+  // translation key, e.g. from a stubbed endpoint.
   const fields: Record<string, string> = {}
-  for (const { loc, msg } of error.detail) {
-    // loc looks like ['body', 'phone']; pydantic prefixes custom validator messages
-    const field = String(loc.at(-1))
-    fields[field] ??= fieldErrorKeys[field] ?? msg.replace(/^Value error, /, '')
+  const unmatched: string[] = []
+  for (const message of error.messages) {
+    const field = message.split(' ')[0]
+    if (fieldErrorKeys[field]) fields[field] ??= fieldErrorKeys[field]
+    else unmatched.push(message)
   }
-  return { fields }
+  const form = unmatched.join('. ') || (error.messages.length ? undefined : error.message)
+  return { form, fields }
 }

@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { CircleAlertIcon, ClockIcon, Loader2Icon, PlusIcon, StarIcon } from 'lucide-react'
+import { CircleAlertIcon, ClockIcon, Loader2Icon, PlusIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -16,13 +15,11 @@ import {
 import { LicensePlate } from '@/components/cars/license-plate'
 import type { BookingWindow } from '@/lib/booking-window'
 import { serverErrorMessage } from '@/lib/form'
-import { formatDuration, formatTime, toZonedIso, zonedDayKey } from '@/lib/format'
+import { formatDuration, formatRelativeDay, formatTime } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { myCarsQuery } from '@/queries/cars'
 import { createReservation } from '@/queries/reservations'
-import type { components } from '@/types/api'
-
-type Spot = components['schemas']['SpotRead']
+import type { Spot } from '@/types/models'
 
 interface ReserveDialogProps {
   spot: Spot | undefined
@@ -60,37 +57,30 @@ function ReserveForm({
   const language = i18n.resolvedLanguage ?? 'en'
   const queryClient = useQueryClient()
   const { data: cars } = useSuspenseQuery(myCarsQuery)
-  // The backend lists the default car first
-  const [carId, setCarId] = useState(() => cars.find((car) => car.is_default)?.id ?? cars[0]?.id)
+  const [carId, setCarId] = useState(() => cars[0]?.id)
 
   const reserve = useMutation({
     mutationFn: () =>
-      createReservation({
-        spot_id: spot.id,
-        car_id: carId!,
-        start_at: toZonedIso(window.start),
-        end_at: toZonedIso(window.end),
-      }),
+      createReservation({ spotId: spot.id, carId: carId!, start: window.start, end: window.end }),
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['reservations'] }),
         queryClient.invalidateQueries({ queryKey: ['spots', 'available'] }),
       ])
-      toast.success(t('find.toast.reserved', { number: spot.spot_number }))
+      toast.success(t('find.toast.reserved', { number: spot.number }))
       onDone()
     },
   })
 
-  const day = (ms: number) =>
-    zonedDayKey(ms) === window.day ? t('find.today') : t('find.tomorrow')
+  const day = (ms: number) => formatRelativeDay(ms, language, Date.now())
 
   return (
     <>
       <DialogHeader>
         <DialogTitle className="text-lg font-bold">
-          {t('find.dialog.title', { number: spot.spot_number })}
+          {t('find.dialog.title', { number: spot.number })}
         </DialogTitle>
-        <DialogDescription>{spot.notes || t('find.dialog.description')}</DialogDescription>
+        <DialogDescription>{spot.description || t('find.dialog.description')}</DialogDescription>
       </DialogHeader>
 
       <p className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-lg bg-primary-50 px-3 py-2.5 text-sm text-primary-800 dark:bg-primary-950 dark:text-primary-200">
@@ -145,16 +135,8 @@ function ReserveForm({
               />
               <span className="grid min-w-0 flex-1 justify-items-start gap-1">
                 <LicensePlate plate={car.plate} size="sm" />
-                {car.nickname && (
-                  <span className="truncate text-sm text-muted-foreground">{car.nickname}</span>
-                )}
+                <span className="truncate text-sm text-muted-foreground">{car.description}</span>
               </span>
-              {car.is_default && (
-                <Badge className="gap-1">
-                  <StarIcon className="fill-current" />
-                  {t('cars.default')}
-                </Badge>
-              )}
             </label>
           ))}
         </fieldset>

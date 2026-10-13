@@ -1,38 +1,34 @@
-import type { components } from '@/types/api'
+import type { Schedule } from '@/types/models'
 
-export type DayOfWeek = components['schemas']['DayOfWeek']
-type Schedule = components['schemas']['ScheduleRead']
+/** 0 = Sunday … 6 = Saturday, like `Date.getDay()` */
+export type DayOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6
 
-export const DAYS: DayOfWeek[] = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+/** Display order: the week starts on Monday in Romania */
+export const DAYS = [1, 2, 3, 4, 5, 6, 0] as const satisfies readonly DayOfWeek[]
 
 export const DAY_PRESETS = {
-  weekdays: ['MON', 'TUE', 'WED', 'THU', 'FRI'],
-  weekend: ['SAT', 'SUN'],
-  everyDay: DAYS,
+  weekdays: [1, 2, 3, 4, 5],
+  weekend: [6, 0],
+  everyDay: [...DAYS],
 } satisfies Record<string, DayOfWeek[]>
 
-/**
- * "Until midnight". The backend has no 24:00 and checks that one schedule fully covers
- * a booking, where the end of a day is time.max — so a day-long schedule must end there.
- */
-export const END_OF_DAY = '23:59:59.999999'
+/** Schedules are minutes since midnight; a day-long one ends at 1440 ("24:00") */
+export const MINUTES_PER_DAY = 24 * 60
 
-/** Every 30-minute boundary as "HH:MM:SS" — bookings are 30-minute slots */
-const HALF_HOURS = Array.from({ length: 48 }, (_, i) => {
-  const minutes = i * 30
-  return `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${minutes % 60 ? '30' : '00'}:00`
-})
+/** Every 30-minute boundary — bookings are 30-minute slots */
+const HALF_HOURS = Array.from({ length: 48 }, (_, i) => i * 30)
 export const START_TIMES = HALF_HOURS
-export const END_TIMES = [...HALF_HOURS.slice(1), END_OF_DAY]
+export const END_TIMES = [...HALF_HOURS.slice(1), MINUTES_PER_DAY]
 
-/** "09:00:00" → "09:00", end of day → "24:00" */
-export function displayTime(time: string) {
-  return time === END_OF_DAY || time.startsWith('23:59:59') ? '24:00' : time.slice(0, 5)
+/** 540 → "09:00", 1440 → "24:00" */
+export function displayTime(minutes: number) {
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${pad(Math.floor(minutes / 60))}:${pad(minutes % 60)}`
 }
 
-// 2024-01-01 was a Monday
+// 2024-01-07 was a Sunday
 function weekdayDate(day: DayOfWeek) {
-  return new Date(Date.UTC(2024, 0, 1 + DAYS.indexOf(day)))
+  return new Date(Date.UTC(2024, 0, 7 + day))
 }
 
 export function weekdayName(day: DayOfWeek, language: string, width: 'short' | 'long') {
@@ -41,13 +37,15 @@ export function weekdayName(day: DayOfWeek, language: string, width: 'short' | '
   )
 }
 
+const dayOrder = (day: DayOfWeek) => DAYS.indexOf(day)
+
 /** "Mon – Fri", "Sat, Sun", "Mon, Wed – Fri": runs of 3+ consecutive days are collapsed */
 export function formatDays(days: DayOfWeek[], language: string) {
-  const sorted = [...new Set(days)].sort((a, b) => DAYS.indexOf(a) - DAYS.indexOf(b))
+  const sorted = [...new Set(days)].sort((a, b) => dayOrder(a) - dayOrder(b))
   const runs: DayOfWeek[][] = []
   for (const day of sorted) {
     const run = runs.at(-1)
-    if (run && DAYS.indexOf(day) === DAYS.indexOf(run.at(-1)!) + 1) run.push(day)
+    if (run && dayOrder(day) === dayOrder(run.at(-1)!) + 1) run.push(day)
     else runs.push([day])
   }
   const label = (day: DayOfWeek) => weekdayName(day, language, 'short')
@@ -60,8 +58,8 @@ export function formatDays(days: DayOfWeek[], language: string) {
 
 export interface ScheduleGroup {
   key: string
-  start_time: string
-  end_time: string
+  startMinute: number
+  endMinute: number
   days: DayOfWeek[]
   /** One backend row per day */
   ids: string[]
@@ -71,21 +69,30 @@ export interface ScheduleGroup {
 export function groupSchedules(schedules: Schedule[]): ScheduleGroup[] {
   const groups = new Map<string, ScheduleGroup>()
   for (const schedule of schedules) {
-    const key = `${schedule.start_time}-${schedule.end_time}`
+    const key = `${schedule.startMinute}-${schedule.endMinute}`
     const group = groups.get(key) ?? {
       key,
-      start_time: schedule.start_time,
-      end_time: schedule.end_time,
+      startMinute: schedule.startMinute,
+      endMinute: schedule.endMinute,
       days: [],
       ids: [],
     }
-    group.days.push(schedule.day_of_week)
+    group.days.push(schedule.dayOfWeek as DayOfWeek)
     group.ids.push(schedule.id)
     groups.set(key, group)
   }
+  for (const group of groups.values()) group.days.sort((a, b) => dayOrder(a) - dayOrder(b))
   return [...groups.values()].sort(
+    (a, b) => dayOrder(a.days[0]) - dayOrder(b.days[0]) || a.startMinute - b.startMinute,
+  )
+}
+
+/** One row per day, in week order (Monday first), earliest hours first */
+export function sortSchedules(schedules: Schedule[]) {
+  return [...schedules].sort(
     (a, b) =>
-      DAYS.indexOf(a.days[0]) - DAYS.indexOf(b.days[0]) || a.start_time.localeCompare(b.start_time),
+      dayOrder(a.dayOfWeek as DayOfWeek) - dayOrder(b.dayOfWeek as DayOfWeek) ||
+      a.startMinute - b.startMinute,
   )
 }
 
@@ -93,10 +100,10 @@ export function groupSchedules(schedules: Schedule[]): ScheduleGroup[] {
 export function overlapsExisting(
   schedules: Schedule[],
   days: DayOfWeek[],
-  start: string,
-  end: string,
+  start: number,
+  end: number,
 ) {
   return schedules.some(
-    (s) => days.includes(s.day_of_week) && s.start_time < end && s.end_time > start,
+    (s) => days.includes(s.dayOfWeek as DayOfWeek) && s.startMinute < end && s.endMinute > start,
   )
 }

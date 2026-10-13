@@ -11,7 +11,6 @@ import { useNow } from '@/lib/use-now'
 import { myCarsQuery } from '@/queries/cars'
 import { myReservationsQuery, upcomingReservations } from '@/queries/reservations'
 import { currentSlotAvailabilityQuery, mySpotsQuery } from '@/queries/spots'
-import { currentUserQuery } from '@/queries/users'
 
 export const Route = createFileRoute('/_authenticated/home')({
   loader: ({ context: { queryClient } }) =>
@@ -28,7 +27,6 @@ function HomePage() {
   const { t } = useTranslation()
   const navigate = Route.useNavigate()
   const now = useNow()
-  const { data: user } = useSuspenseQuery(currentUserQuery())
   const { data: spots } = useSuspenseQuery(mySpotsQuery)
   const { data: cars } = useSuspenseQuery(myCarsQuery)
   const { data: reservations } = useSuspenseQuery(myReservationsQuery)
@@ -46,7 +44,7 @@ function HomePage() {
   return (
     <div className="mx-auto grid max-w-md gap-5 md:max-w-3xl md:grid-cols-2">
       <div className="grid gap-5 md:col-span-2 md:grid-cols-2">
-        <GreetingCard user={user} />
+        <GreetingCard />
         <StatTiles spots={spots.length} cars={cars.length} active={upcoming.length} />
       </div>
 

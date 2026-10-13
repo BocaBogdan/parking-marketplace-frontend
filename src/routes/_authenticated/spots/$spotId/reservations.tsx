@@ -12,15 +12,12 @@ import {
   formatDuration,
   formatTime,
   groupByDay,
-  parseApiDate,
   zonedDayKey,
 } from '@/lib/format'
 import { useNow } from '@/lib/use-now'
 import { cn } from '@/lib/utils'
-import { mySpotsQuery, spotReservationsQuery } from '@/queries/spots'
-import type { components } from '@/types/api'
-
-type Reservation = components['schemas']['OwnerReservationRead']
+import { spotReservationsQuery, type OwnerReservation as Reservation } from '@/queries/reservations'
+import { mySpotsQuery } from '@/queries/spots'
 
 const searchSchema = z.object({
   tab: z.enum(['upcoming', 'past']).optional().catch(undefined),
@@ -47,13 +44,10 @@ function SpotReservationsPage() {
   const spot = spots.find((s) => s.id === spotId)
 
   // Upcoming includes the booking in progress; past is most recent first
-  const upcoming = reservations.filter((r) => parseApiDate(r.end_at) > now)
-  const past = reservations.filter((r) => parseApiDate(r.end_at) <= now).reverse()
+  const upcoming = reservations.filter((r) => r.end > now)
+  const past = reservations.filter((r) => r.end <= now).reverse()
   const shown = tab === 'upcoming' ? upcoming : past
-  const hoursShared = past.reduce(
-    (sum, r) => sum + parseApiDate(r.end_at) - parseApiDate(r.start_at),
-    0,
-  )
+  const hoursShared = past.reduce((sum, r) => sum + r.end - r.start, 0)
 
   return (
     <div className="mx-auto grid max-w-md gap-5 md:max-w-2xl">
@@ -68,7 +62,7 @@ function SpotReservationsPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{t('spotReservations.title')}</h1>
           <p className="text-sm text-muted-foreground">
-            {t('spots.name', { number: spot?.spot_number })}
+            {t('spots.name', { number: spot?.number })}
           </p>
         </div>
       </header>
@@ -137,14 +131,14 @@ function Stat({ label, value }: { label: string; value: string }) {
 /** Bookings grouped under a heading per start day */
 function ReservationList({ reservations, now }: { reservations: Reservation[]; now: number }) {
   const language = useLanguage()
-  const days = groupByDay(reservations, (r) => parseApiDate(r.start_at))
+  const days = groupByDay(reservations, (r) => r.start)
 
   return (
     <div className="grid gap-5">
       {days.map(({ day, items }) => (
         <section key={day} className="grid gap-2">
           <h2 className="text-sm font-semibold text-muted-foreground">
-            {formatDay(items[0].start_at, language, now)}
+            {formatDay(items[0].start, language, now)}
           </h2>
           <ul className="grid gap-2">
             {items.map((reservation) => (
@@ -160,8 +154,7 @@ function ReservationList({ reservations, now }: { reservations: Reservation[]; n
 function ReservationRow({ reservation, now }: { reservation: Reservation; now: number }) {
   const { t } = useTranslation()
   const language = useLanguage()
-  const start = parseApiDate(reservation.start_at)
-  const end = parseApiDate(reservation.end_at)
+  const { start, end, car } = reservation
   const isNow = start <= now && now < end
   // Overnight bookings show the end date too
   const endLabel =
@@ -189,20 +182,23 @@ function ReservationRow({ reservation, now }: { reservation: Reservation; now: n
             </Badge>
           )}
         </p>
-        <div className="flex flex-wrap items-center gap-2">
-          <LicensePlate plate={reservation.car_plate} size="sm" />
-          <span className="truncate text-sm">{reservation.driver_name}</span>
-        </div>
+        {car ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <LicensePlate plate={car.plate} size="sm" />
+            <span className="truncate text-sm">{car.description}</span>
+          </div>
+        ) : (
+          <span className="text-sm text-muted-foreground">{t('spotReservations.unknownCar')}</span>
+        )}
       </div>
-      <Button asChild variant="outline" className="h-9 px-3">
-        <a
-          href={`tel:${reservation.driver_phone}`}
-          aria-label={t('spotReservations.call', { name: reservation.driver_name })}
-        >
-          <PhoneIcon />
-          <span className="tabular-nums">{reservation.driver_phone}</span>
-        </a>
-      </Button>
+      {car && (
+        <Button asChild variant="outline" className="h-9 px-3">
+          <a href={`tel:${car.phone}`} aria-label={t('spotReservations.call', { name: car.plate })}>
+            <PhoneIcon />
+            <span className="tabular-nums">{car.phone}</span>
+          </a>
+        </Button>
+      )}
     </li>
   )
 }
