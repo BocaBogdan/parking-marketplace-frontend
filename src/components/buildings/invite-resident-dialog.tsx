@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { DoorOpenIcon, IdCardIcon, MailIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -19,15 +19,23 @@ const inviteFormSchema = z.object({
   email: z.string().trim().pipe(z.email('validation.email')),
   apartment: z.string().trim().min(1, 'validation.apartmentRequired'),
   eBlocUserID: z.string().trim().min(1, 'validation.eBlocRequired'),
+  isBuildingAdmin: z.boolean(),
 })
 
 type InviteFormValues = z.input<typeof inviteFormSchema>
 
-const defaultValues: InviteFormValues = { email: '', apartment: '', eBlocUserID: '' }
+const defaultValues: InviteFormValues = {
+  email: '',
+  apartment: '',
+  eBlocUserID: '',
+  isBuildingAdmin: false,
+}
 
 interface InviteResidentDialogProps {
   buildingId: string
   buildingName: string
+  /** Only admins can make someone a building admin; the backend refuses it from anyone else */
+  canInviteBuildingAdmin: boolean
   open: boolean
   onOpenChange: (open: boolean) => void
 }
@@ -35,6 +43,7 @@ interface InviteResidentDialogProps {
 export function InviteResidentDialog({
   buildingId,
   buildingName,
+  canInviteBuildingAdmin,
   open,
   onOpenChange,
 }: InviteResidentDialogProps) {
@@ -51,21 +60,41 @@ export function InviteResidentDialog({
             {t('buildings.invite.single.description', { building: buildingName })}
           </DialogDescription>
         </DialogHeader>
-        <InviteForm buildingId={buildingId} onDone={() => onOpenChange(false)} />
+        <InviteForm
+          buildingId={buildingId}
+          canInviteBuildingAdmin={canInviteBuildingAdmin}
+          onDone={() => onOpenChange(false)}
+        />
       </DialogContent>
     </Dialog>
   )
 }
 
-function InviteForm({ buildingId, onDone }: { buildingId: string; onDone: () => void }) {
+interface InviteFormProps {
+  buildingId: string
+  canInviteBuildingAdmin: boolean
+  onDone: () => void
+}
+
+function InviteForm({ buildingId, canInviteBuildingAdmin, onDone }: InviteFormProps) {
   const { t } = useTranslation()
+
+  const queryClient = useQueryClient()
 
   const invite = useMutation({
     mutationFn: (values: InviteFormValues) => {
-      const { email, apartment, eBlocUserID } = inviteFormSchema.parse(values)
-      return inviteResident(buildingId, { email, apartment, eBlocUserID })
+      const { email, apartment, eBlocUserID, isBuildingAdmin } = inviteFormSchema.parse(values)
+      return inviteResident(buildingId, {
+        email,
+        apartment,
+        eBlocUserID,
+        ...(canInviteBuildingAdmin && isBuildingAdmin && { role: 'BUILDING_ADMIN' }),
+      })
     },
     onSuccess: (_, values) => {
+      // Existing accounts join right away; everyone else is listed as pending
+      void queryClient.invalidateQueries({ queryKey: ['buildings', buildingId, 'members'] })
+      void queryClient.invalidateQueries({ queryKey: ['buildings', buildingId, 'invites'] })
       toast.success(t('buildings.invite.toast.sent', { email: values.email.trim() }))
       onDone()
     },
@@ -128,6 +157,11 @@ function InviteForm({ buildingId, onDone }: { buildingId: string; onDone: () => 
           )}
         </form.AppField>
       </div>
+      {canInviteBuildingAdmin && (
+        <form.AppField name="isBuildingAdmin">
+          {(field) => <field.CheckboxField label={t('buildings.invite.fields.buildingAdmin')} />}
+        </form.AppField>
+      )}
       <form.AppForm>
         <form.SubmitButton>{t('buildings.invite.single.submit')}</form.SubmitButton>
       </form.AppForm>

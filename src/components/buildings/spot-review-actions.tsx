@@ -16,7 +16,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { serverErrorMessage } from '@/lib/form'
 import { setSpotStatus } from '@/queries/admin-spots'
-import type { ReviewableSpot as Spot } from '@/types/models'
+import type { Spot } from '@/types/models'
 
 type Decision = 'CONFIRMED' | 'REJECTED'
 

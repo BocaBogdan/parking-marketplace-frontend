@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-// Not in the first release: the spot's proof-of-ownership PDF (see DocumentInput)
+// The spot's proof-of-ownership PDF (see DocumentInput)
 
 // The backend has no upload limit; this keeps uploads from stalling on mobile data
 export const MAX_DOCUMENT_MB = 10

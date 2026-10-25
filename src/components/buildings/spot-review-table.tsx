@@ -1,32 +1,40 @@
-import { FileTextIcon, MapPinIcon } from 'lucide-react'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { FileTextIcon, MapPinIcon, SquareParkingIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { SpotReviewActions } from '@/components/buildings/spot-review-actions'
 import { SpotStatusBadge } from '@/components/spots/spot-status-badge'
 import { formatDate } from '@/lib/format'
-import type { ReviewableSpot as Spot } from '@/types/models'
+import { displayName } from '@/lib/users'
+import type { AdminSpot, Spot } from '@/types/models'
 
-/**
- * Not in the first release (no review status or documents in the API): the admin's review
- * table with status, proof document, map link and approve/reject.
- */
 interface SpotReviewTableProps {
   buildingId: string
-  spots: Spot[]
+  spots: AdminSpot[]
   onViewDocument: (spot: Spot) => void
 }
 
 const mapsUrl = (spot: Spot) =>
   `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${spot.lat},${spot.long}`)}`
 
+/**
+ * The admin's review table: owner, status, proof document, map link and approve/reject.
+ * Clicking a row opens the spot's page with its schedule and reservations.
+ */
 export function SpotReviewTable({ buildingId, spots, onViewDocument }: SpotReviewTableProps) {
   const { t, i18n } = useTranslation()
   const language = i18n.resolvedLanguage ?? 'en'
+  const navigate = useNavigate()
+  const open = (spot: Spot) =>
+    void navigate({
+      to: '/building/$buildingId/spots/$spotId',
+      params: { buildingId, spotId: spot.id },
+    })
 
   return (
-    // Seven columns don't fit a phone; the table scrolls sideways inside its card
+    // Eight columns don't fit a phone; the table scrolls sideways inside its card
     <div className="overflow-x-auto rounded-2xl border bg-card shadow-xs">
-      <table className="w-full min-w-3xl text-left text-sm">
+      <table className="w-full min-w-4xl text-left text-sm">
         <thead className="border-b bg-muted/60 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
           <tr>
             <th scope="col" className="px-4 py-3">
@@ -34,6 +42,9 @@ export function SpotReviewTable({ buildingId, spots, onViewDocument }: SpotRevie
             </th>
             <th scope="col" className="px-4 py-3">
               {t('buildings.spots.columns.description')}
+            </th>
+            <th scope="col" className="px-4 py-3">
+              {t('buildings.spots.columns.owner')}
             </th>
             <th scope="col" className="px-4 py-3">
               {t('buildings.spots.columns.status')}
@@ -54,14 +65,31 @@ export function SpotReviewTable({ buildingId, spots, onViewDocument }: SpotRevie
         </thead>
         <tbody className="divide-y">
           {spots.map((spot) => (
-            <tr key={spot.id} className="align-middle">
+            <tr
+              key={spot.id}
+              // The number is the keyboard-reachable link; the rest of the row is a mouse shortcut.
+              // React bubbles clicks out of portals too, so ignore ones from the review dialogs.
+              onClick={(e) => {
+                const target = e.target as HTMLElement
+                if (e.currentTarget.contains(target) && !target.closest('a, button')) open(spot)
+              }}
+              className="cursor-pointer align-middle transition-colors hover:bg-muted/40"
+            >
               <th scope="row" className="px-4 py-3">
-                <span className="inline-flex size-10 items-center justify-center rounded-lg bg-primary-50 text-base font-bold text-primary dark:bg-primary-950">
+                <Link
+                  to="/building/$buildingId/spots/$spotId"
+                  params={{ buildingId, spotId: spot.id }}
+                  aria-label={t('buildings.spots.open', { number: spot.number })}
+                  className="inline-flex size-10 items-center justify-center rounded-lg bg-primary-50 text-base font-bold text-primary outline-none hover:bg-primary-100 focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-primary-950"
+                >
                   {spot.number}
-                </span>
+                </Link>
               </th>
               <td className="max-w-56 px-4 py-3 text-muted-foreground">
                 <span className="line-clamp-2">{spot.description}</span>
+              </td>
+              <td className="max-w-56 px-4 py-3">
+                <OwnerCell owner={spot.owner} />
               </td>
               <td className="px-4 py-3">
                 <SpotStatusBadge status={spot.status} />
@@ -70,7 +98,7 @@ export function SpotReviewTable({ buildingId, spots, onViewDocument }: SpotRevie
                 {formatDate(spot.updatedAt, language)}
               </td>
               <td className="px-4 py-3">
-                {spot.fileId ? (
+                {spot.status === 'PENDING' && spot.fileId ? (
                   <Button
                     size="sm"
                     variant="ghost"
@@ -106,6 +134,28 @@ export function SpotReviewTable({ buildingId, spots, onViewDocument }: SpotRevie
           ))}
         </tbody>
       </table>
+    </div>
+  )
+}
+
+function OwnerCell({ owner }: { owner: AdminSpot['owner'] }) {
+  const { t } = useTranslation()
+  if (!owner)
+    return <span className="text-muted-foreground">{t('buildings.spots.unknownOwner')}</span>
+  const name = displayName(owner)
+  return (
+    <span className="grid min-w-0">
+      <span className="truncate font-semibold">{name || owner.email}</span>
+      {name && <span className="truncate text-muted-foreground">{owner.email}</span>}
+    </span>
+  )
+}
+
+export function BuildingSpotsEmpty({ message }: { message: string }) {
+  return (
+    <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed px-6 py-10 text-center">
+      <SquareParkingIcon className="mb-1 size-6 text-muted-foreground" />
+      <p className="font-semibold">{message}</p>
     </div>
   )
 }

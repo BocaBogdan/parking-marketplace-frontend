@@ -1,5 +1,4 @@
 import { addDays, zonedClock, zonedDayKey, zonedToMs } from '@/lib/format'
-import { MINUTES_PER_DAY, type DayOfWeek } from '@/lib/schedule'
 
 /** Bookings are made of 30-minute slots aligned to :00 and :30 */
 export const SLOT_MS = 30 * 60 * 1000
@@ -10,8 +9,15 @@ export function nextSlotStart(now: number) {
   return Math.ceil(now / SLOT_MS) * SLOT_MS
 }
 
-/** The window as it lives in the URL: start is always on the booking day, end on it or the next */
+/** How many days ahead, today included, a spot can be searched for and reserved */
+export const BOOKING_DAYS = 14
+/** Where a window on a later day starts until the user picks a time */
+const DEFAULT_START = '08:00'
+
+/** The window as it lives in the URL: start is always on `date`, end on it or the next day */
 export interface WindowSearch {
+  /** "2026-10-28"; omitted means the first bookable day */
+  date?: string
   from?: string
   to?: string
   toNextDay?: boolean
@@ -20,7 +26,7 @@ export interface WindowSearch {
 export interface BookingWindow {
   start: number
   end: number
-  /** The day searches start on — today, or tomorrow after 23:30 */
+  /** The day the window starts on */
   day: string
 }
 
@@ -28,12 +34,21 @@ function isClock(value: string | undefined): value is string {
   return !!value && /^([01]\d|2[0-3]):(00|30)$/.test(value)
 }
 
+/** Bookable days, from today (tomorrow after 23:30) for BOOKING_DAYS days */
+export function dayOptions(now: number) {
+  const first = zonedDayKey(nextSlotStart(now))
+  return Array.from({ length: BOOKING_DAYS }, (_, offset) => addDays(first, offset))
+}
+
 /** Turns URL params into instants, falling back to sensible defaults for missing/stale values */
 export function resolveWindow(search: WindowSearch, now: number): BookingWindow {
-  const earliest = nextSlotStart(now)
-  const day = zonedDayKey(earliest)
+  const days = dayOptions(now)
+  const day = search.date && days.includes(search.date) ? search.date : days[0]
+  // Today starts at the next slot; later days at midnight
+  const earliest = Math.max(nextSlotStart(now), zonedToMs(day, '00:00'))
 
-  let start = isClock(search.from) ? zonedToMs(day, search.from) : earliest
+  let start = zonedToMs(day, isClock(search.from) ? search.from : DEFAULT_START)
+  if (!isClock(search.from) && day === days[0]) start = earliest
   if (start < earliest) start = earliest
 
   let end = isClock(search.to)
@@ -45,14 +60,19 @@ export function resolveWindow(search: WindowSearch, now: number): BookingWindow 
   return { start, end, day }
 }
 
-export function toSearch({ start, end, day }: BookingWindow): Required<WindowSearch> {
-  return { from: zonedClock(start), to: zonedClock(end), toNextDay: zonedDayKey(end) !== day }
+/** The window as search params; the first bookable day is left out of the URL */
+export function toSearch({ start, end, day }: BookingWindow, now: number): WindowSearch {
+  return {
+    date: day === dayOptions(now)[0] ? undefined : day,
+    from: zonedClock(start),
+    to: zonedClock(end),
+    toNextDay: zonedDayKey(end) !== day,
+  }
 }
 
-/** Start options: every remaining slot of the booking day */
-export function startOptions(now: number) {
-  const first = nextSlotStart(now)
-  const day = zonedDayKey(first)
+/** Start options: every slot of the day still ahead */
+export function startOptions(day: string, now: number) {
+  const first = Math.max(nextSlotStart(now), zonedToMs(day, '00:00'))
   const options: number[] = []
   for (let t = first; zonedDayKey(t) === day; t += SLOT_MS) options.push(t)
   return options
@@ -64,30 +84,4 @@ export function endOptions(start: number, day: string) {
   const options: number[] = []
   for (let t = start + SLOT_MS; t <= last; t += SLOT_MS) options.push(t)
   return options
-}
-
-/** Minutes since Bucharest midnight of an instant */
-function minuteOfDay(ms: number) {
-  const [hours, minutes] = zonedClock(ms).split(':').map(Number)
-  return hours * 60 + minutes
-}
-
-/**
- * The window as the weekly intervals the backend matches schedules against: one per
- * Bucharest day it touches, so a window past midnight becomes two.
- */
-export function weeklyIntervals(start: number, end: number) {
-  const intervals: { dayOfWeek: DayOfWeek; startMinute: number; endMinute: number }[] = []
-  for (let from = start; from < end;) {
-    const day = zonedDayKey(from)
-    const midnight = zonedToMs(addDays(day, 1), '00:00')
-    const to = Math.min(end, midnight)
-    intervals.push({
-      dayOfWeek: new Date(`${day}T00:00:00Z`).getUTCDay() as DayOfWeek,
-      startMinute: minuteOfDay(from),
-      endMinute: to === midnight ? MINUTES_PER_DAY : minuteOfDay(to),
-    })
-    from = to
-  }
-  return intervals
 }

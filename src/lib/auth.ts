@@ -28,8 +28,10 @@ export function currentBuildingId(): string | undefined {
 }
 
 /**
- * Admins are marked by hand in the Clerk dashboard (Users → user → Public metadata:
- * `{ "role": "ADMIN" }`). This only hides admin pages; the backend must enforce it too.
+ * Admins manage every building and are marked by hand in the Clerk dashboard (Users → user →
+ * Public metadata: `{ "role": "ADMIN" }`). Building admins manage only the building they live
+ * in (`buildingId`) and get the role through their invitation. These only hide pages; the
+ * backend enforces the same rules.
  */
 export function isAdmin() {
   return clerk()?.user?.publicMetadata.role === 'ADMIN'
@@ -37,6 +39,20 @@ export function isAdmin() {
 
 export function useIsAdmin() {
   return useUser().user?.publicMetadata.role === 'ADMIN'
+}
+
+function managedBuilding(metadata: UserPublicMetadata | undefined) {
+  return metadata?.role === 'BUILDING_ADMIN' ? metadata.buildingId : undefined
+}
+
+/** The building a building admin manages; undefined for everyone else, admins included */
+export function useManagedBuildingId() {
+  return managedBuilding(useUser().user?.publicMetadata)
+}
+
+/** Whether the signed-in user may open a building's admin page */
+export function canManageBuilding(buildingId: string) {
+  return isAdmin() || managedBuilding(clerk()?.user?.publicMetadata) === buildingId
 }
 
 // Only follow same-origin paths so ?redirect= can't bounce users to another site
@@ -49,10 +65,10 @@ export const authSearchSchema = z.object({
 })
 
 // What the backend's invite endpoint stores on the Clerk user (InviteUserDto minus email),
-// plus the role set by hand for admins
+// where `role` is BUILDING_ADMIN or absent; ADMIN is set by hand
 declare global {
   interface UserPublicMetadata {
-    role?: 'ADMIN'
+    role?: 'ADMIN' | 'BUILDING_ADMIN'
     buildingId?: string
     apartment?: string
     eBlocUserID?: string

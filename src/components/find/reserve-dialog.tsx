@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { LicensePlate } from '@/components/cars/license-plate'
+import { ApiError } from '@/lib/api'
 import type { BookingWindow } from '@/lib/booking-window'
 import { serverErrorMessage } from '@/lib/form'
 import { formatDuration, formatRelativeDay, formatTime } from '@/lib/format'
@@ -70,6 +71,10 @@ function ReserveForm({
       toast.success(t('find.toast.reserved', { number: spot.number }))
       onDone()
     },
+    onError: async (error) => {
+      // Someone else got the window first: refresh the list so the spot drops out
+      if (isTaken(error)) await queryClient.invalidateQueries({ queryKey: ['spots', 'available'] })
+    },
   })
 
   const day = (ms: number) => formatRelativeDay(ms, language, Date.now())
@@ -98,7 +103,7 @@ function ReserveForm({
           className="flex items-start gap-2 rounded-lg bg-destructive/10 px-3 py-2.5 text-sm text-destructive"
         >
           <CircleAlertIcon className="mt-0.5 size-4 shrink-0" />
-          {serverErrorMessage(reserve.error)}
+          {isTaken(reserve.error) ? t('find.dialog.taken') : serverErrorMessage(reserve.error)}
         </p>
       )}
 
@@ -155,4 +160,9 @@ function ReserveForm({
       </Button>
     </>
   )
+}
+
+/** The backend answers 409 when the window was booked meanwhile or is no longer offered */
+function isTaken(error: unknown) {
+  return error instanceof ApiError && error.status === 409
 }

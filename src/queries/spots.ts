@@ -1,9 +1,9 @@
 import { queryOptions } from '@tanstack/react-query'
 import { api, unwrap } from '@/lib/api'
 import { currentBuildingId } from '@/lib/auth'
-import { SLOT_MS, weeklyIntervals } from '@/lib/booking-window'
+import { SLOT_MS } from '@/lib/booking-window'
 import type { components } from '@/types/api'
-import type { Spot, SpotStatus } from '@/types/models'
+import type { Spot, SpotStats, StatsRange } from '@/types/models'
 
 export const mySpotsQuery = queryOptions({
   queryKey: ['spots', 'mine'],
@@ -14,28 +14,36 @@ export const mySpotsQuery = queryOptions({
 })
 
 /**
- * Spots with a schedule covering the whole window. The backend matches one
- * weekday at a time, so a window past midnight needs a match on each day it touches.
- * TODO: the backend doesn't subtract existing bookings yet, and doesn't limit results to
- * the user's building, so that's filtered here until it does.
+ * Approved spots whose schedule covers the whole window (even past midnight) and that
+ * nobody has booked for any part of it, by spot number.
+ * TODO: the backend doesn't limit results to the user's building yet, so that's filtered here.
  */
 export function availableSpotsQuery(start: number, end: number) {
   return queryOptions({
     queryKey: ['spots', 'available', { start, end }],
     queryFn: async () => {
-      const [first = [], ...rest] = await Promise.all(
-        weeklyIntervals(start, end).map((query) =>
-          unwrap<Spot[]>(api.GET('/api/spot/available', { params: { query } })),
-        ),
+      const spots = await unwrap<Spot[]>(
+        api.GET('/api/spot/available', {
+          params: {
+            query: { startsAt: new Date(start).toISOString(), endsAt: new Date(end).toISOString() },
+          },
+        }),
       )
-      const freeOnOtherDays = rest.map((spots) => new Set(spots.map((spot) => spot.id)))
       // Residents share spots within their own building only
       const buildingId = currentBuildingId()
-      return first
-        .filter((spot) => !buildingId || spot.buildingId === buildingId)
-        .filter((spot) => freeOnOtherDays.every((free) => free.has(spot.id)))
-        .sort((a, b) => a.number - b.number)
+      return spots.filter((spot) => !buildingId || spot.buildingId === buildingId)
     },
+  })
+}
+
+/** The owner's statistics for one of their spots */
+export function spotStatsQuery(spotId: string, range: StatsRange) {
+  return queryOptions({
+    queryKey: ['spots', spotId, 'stats', range],
+    queryFn: () =>
+      unwrap<SpotStats>(
+        api.GET('/api/spot/{id}/stats', { params: { path: { id: spotId }, query: { range } } }),
+      ),
   })
 }
 
@@ -47,43 +55,35 @@ export function currentSlotAvailabilityQuery(now: number) {
 
 type SpotFields = Pick<Spot, 'number' | 'description'>
 
-export function createSpot(body: SpotFields) {
+/**
+ * Registers a spot for review. The body is multipart: the proof PDF is the `file` part, and
+ * `location[lat]` / `location[long]` arrive as the nested `location` object (multer parses
+ * the brackets).
+ */
+export function createSpot(
+  fields: SpotFields & { location: components['schemas']['LocationDto']; document: File },
+) {
+  const form = new FormData()
+  form.append('number', String(fields.number))
+  form.append('description', fields.description)
+  form.append('location[lat]', fields.location.lat)
+  form.append('location[long]', fields.location.long)
+  form.append('file', fields.document, fields.document.name)
   return unwrap<Spot>(
     api.POST('/api/spot', {
-      // TODO: CreateSpotDto still declares `location`, but the first release has none and
-      // the backend accepts a spot without it. Drop the cast once the DTO loses the field.
-      body: body as components['schemas']['CreateSpotDto'],
+      // openapi-fetch sends FormData as is, letting the browser set the multipart boundary
+      body: form as unknown as components['schemas']['CreateSpotDto'],
     }),
   )
 }
 
-/** Fields left out stay as they are */
+/**
+ * Fields left out stay as they are. Any edit sends the spot back to PENDING for review.
+ * TODO: the backend spreads the body straight into the entity, so `location` (not a column)
+ * would fail, and PATCH takes no file. Add both once the endpoint maps them.
+ */
 export function updateSpot(spotId: string, body: Partial<SpotFields>) {
   return unwrap<Spot>(api.PATCH('/api/spot/{id}', { params: { path: { id: spotId } }, body }))
-}
-
-/**
- * Not in the first release. The multipart body the spot form sent while spots had a
- * location and a proof document: the PDF is the `file` part, and `location[lat]` /
- * `location[long]` arrive as the nested `location` object (multer parses the brackets).
- */
-export function spotFormData(fields: {
-  number?: number
-  description?: string
-  location?: components['schemas']['LocationDto']
-  status?: SpotStatus
-  document?: File
-}) {
-  const form = new FormData()
-  if (fields.number !== undefined) form.append('number', String(fields.number))
-  if (fields.description !== undefined) form.append('description', fields.description)
-  if (fields.location) {
-    form.append('location[lat]', fields.location.lat)
-    form.append('location[long]', fields.location.long)
-  }
-  if (fields.status) form.append('status', fields.status)
-  if (fields.document) form.append('file', fields.document, fields.document.name)
-  return form
 }
 
 export function deleteSpot(spotId: string) {

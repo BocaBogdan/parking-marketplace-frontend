@@ -12,13 +12,14 @@ export const buildingsQuery = queryOptions({
   },
 })
 
+/** Admins read any building, building admins only their own */
 export function buildingQuery(buildingId: string) {
   return queryOptions({
     queryKey: ['buildings', buildingId],
     queryFn: async () => {
       // The backend answers an unknown id with 200 and an empty body
       const building = await unwrap<Building | undefined>(
-        api.GET('/api/building/{id}', { params: { path: { id: buildingId } } }),
+        api.GET('/api/building/{buildingId}', { params: { path: { buildingId } } }),
       )
       if (!building) throw notFound()
       return building

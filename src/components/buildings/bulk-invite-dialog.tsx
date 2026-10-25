@@ -1,5 +1,5 @@
 import { useId, useState } from 'react'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CircleAlertIcon, CircleCheckIcon, FileUpIcon, Loader2Icon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -56,9 +56,14 @@ function BulkInviteForm({ buildingId, onDone }: { buildingId: string; onDone: ()
   const { rows, errors } = parseInvites(text)
   const canSend = rows.length > 0 && errors.length === 0
 
+  const queryClient = useQueryClient()
+
   const invite = useMutation({
     mutationFn: () => inviteResidents(buildingId, rows),
     onSuccess: () => {
+      // Existing accounts join right away; everyone else is listed as pending
+      void queryClient.invalidateQueries({ queryKey: ['buildings', buildingId, 'members'] })
+      void queryClient.invalidateQueries({ queryKey: ['buildings', buildingId, 'invites'] })
       toast.success(t('buildings.invite.toast.sentBulk', { count: rows.length }))
       onDone()
     },

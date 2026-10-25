@@ -148,6 +148,23 @@ export function formatDuration(ms: number, language: string) {
     .join(' ')
 }
 
+/** "3.5 h" / "3,5 h": compact hours for chart labels */
+export function formatHours(minutes: number, language: string) {
+  return new Intl.NumberFormat(language, {
+    style: 'unit',
+    unit: 'hour',
+    unitDisplay: 'short',
+    maximumFractionDigits: minutes < 600 ? 1 : 0,
+  }).format(minutes / 60)
+}
+
+/** Formats a calendar day key ("2026-10-28") — at noon UTC, so it stays on the same date */
+export function formatDayKey(day: string, language: string, options: Intl.DateTimeFormatOptions) {
+  return new Intl.DateTimeFormat(language, { timeZone: 'UTC', ...options }).format(
+    Date.parse(`${day}T12:00:00Z`),
+  )
+}
+
 /** Groups items under their Bucharest calendar day, keeping the input order */
 export function groupByDay<T>(items: T[], instant: (item: T) => number) {
   const days = new Map<string, T[]>()

@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dialog'
 import { serverErrorMessage } from '@/lib/form'
 import { documentUrlQuery } from '@/queries/admin-spots'
-import type { ReviewableSpot as Spot } from '@/types/models'
+import type { Spot } from '@/types/models'
 
 interface SpotDocumentDialogProps {
   /** Spot whose document to preview; undefined closes the dialog */
@@ -44,7 +44,7 @@ export function SpotDocumentDialog({ spot, onOpenChange }: SpotDocumentDialogPro
 
 function DocumentPreview({ spot }: { spot: Spot }) {
   const { t } = useTranslation()
-  const { data: url, error, isPending } = useQuery(documentUrlQuery(spot.fileId))
+  const { data: url, error, isPending } = useQuery(documentUrlQuery(spot.buildingId, spot.fileId))
 
   if (isPending) {
     return (

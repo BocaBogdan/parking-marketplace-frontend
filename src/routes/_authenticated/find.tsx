@@ -14,6 +14,7 @@ import { availableSpotsQuery, mySpotsQuery } from '@/queries/spots'
 // The window is in the URL so a search can be shared or reloaded. Stale or invalid
 // values (e.g. yesterday's link) fall back to defaults in resolveWindow.
 const searchSchema = z.object({
+  date: z.iso.date().optional().catch(undefined),
   from: z.string().optional().catch(undefined),
   to: z.string().optional().catch(undefined),
   toNextDay: z.boolean().optional().catch(undefined),
@@ -22,7 +23,7 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute('/_authenticated/find')({
   validateSearch: searchSchema,
-  loaderDeps: ({ search: { from, to, toNextDay } }) => ({ from, to, toNextDay }),
+  loaderDeps: ({ search: { date, from, to, toNextDay } }) => ({ date, from, to, toNextDay }),
   loader: ({ context: { queryClient }, deps }) => {
     const window = resolveWindow(deps, Date.now())
     return Promise.all([
@@ -68,7 +69,7 @@ function FindSpotPage() {
         window={window}
         now={now}
         onChange={(next) =>
-          void navigate({ search: toSearch(next), replace: true, resetScroll: false })
+          void navigate({ search: toSearch(next, now), replace: true, resetScroll: false })
         }
       />
 

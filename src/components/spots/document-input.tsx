@@ -3,12 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { MAX_DOCUMENT_MB } from '@/lib/spot-document'
 import { cn } from '@/lib/utils'
 
-/*
- * Not in the first release: the API dropped the spot's proof-of-ownership document.
- * Kept so the upload can come back to the spot form (validate it with `documentSchema`,
- * send it as the multipart `file` part via `spotFormData` in queries/spots.ts).
- */
-
 interface DocumentInputProps {
   file: File | null
   /** Editing: the spot already has a document, so picking one is optional */

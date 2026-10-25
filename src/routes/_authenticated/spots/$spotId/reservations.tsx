@@ -1,22 +1,14 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link, notFound } from '@tanstack/react-router'
-import { ArrowLeftIcon, CalendarXIcon, PhoneIcon, ShieldIcon } from 'lucide-react'
+import { ArrowLeftIcon, CalendarXIcon, ShieldIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { LicensePlate } from '@/components/cars/license-plate'
-import {
-  formatDate,
-  formatDay,
-  formatDuration,
-  formatTime,
-  groupByDay,
-  zonedDayKey,
-} from '@/lib/format'
+import { ReservationList } from '@/components/spots/reservation-list'
+import { SpotTabs } from '@/components/spots/spot-tabs'
+import { formatDuration } from '@/lib/format'
 import { useNow } from '@/lib/use-now'
 import { cn } from '@/lib/utils'
-import { spotReservationsQuery, type OwnerReservation as Reservation } from '@/queries/reservations'
+import { spotReservationsQuery } from '@/queries/reservations'
 import { mySpotsQuery } from '@/queries/spots'
 
 const searchSchema = z.object({
@@ -66,6 +58,8 @@ function SpotReservationsPage() {
           </p>
         </div>
       </header>
+
+      {spot && <SpotTabs spotId={spot.id} number={spot.number} />}
 
       <div className="grid grid-cols-2 gap-3">
         <Stat label={t('spotReservations.stats.bookings')} value={String(past.length)} />
@@ -125,80 +119,5 @@ function Stat({ label, value }: { label: string; value: string }) {
       <p className="text-xs font-medium text-muted-foreground">{label}</p>
       <p className="text-xl font-bold tabular-nums">{value}</p>
     </div>
-  )
-}
-
-/** Bookings grouped under a heading per start day */
-function ReservationList({ reservations, now }: { reservations: Reservation[]; now: number }) {
-  const language = useLanguage()
-  const days = groupByDay(reservations, (r) => r.start)
-
-  return (
-    <div className="grid gap-5">
-      {days.map(({ day, items }) => (
-        <section key={day} className="grid gap-2">
-          <h2 className="text-sm font-semibold text-muted-foreground">
-            {formatDay(items[0].start, language, now)}
-          </h2>
-          <ul className="grid gap-2">
-            {items.map((reservation) => (
-              <ReservationRow key={reservation.id} reservation={reservation} now={now} />
-            ))}
-          </ul>
-        </section>
-      ))}
-    </div>
-  )
-}
-
-function ReservationRow({ reservation, now }: { reservation: Reservation; now: number }) {
-  const { t } = useTranslation()
-  const language = useLanguage()
-  const { start, end, car } = reservation
-  const isNow = start <= now && now < end
-  // Overnight bookings show the end date too
-  const endLabel =
-    zonedDayKey(end) === zonedDayKey(start)
-      ? formatTime(end, language)
-      : `${formatDate(end, language)}, ${formatTime(end, language)}`
-
-  return (
-    <li
-      className={cn(
-        'flex flex-wrap items-center gap-3 rounded-2xl border bg-card p-4 shadow-xs',
-        isNow &&
-          'border-secondary-300 bg-secondary-50 dark:border-secondary-800 dark:bg-secondary-950/40',
-      )}
-    >
-      <div className="grid min-w-0 flex-1 gap-1.5">
-        <p className="flex flex-wrap items-center gap-2 font-semibold tabular-nums">
-          {formatTime(start, language)} – {endLabel}
-          <span className="text-sm font-normal text-muted-foreground">
-            · {formatDuration(end - start, language)}
-          </span>
-          {isNow && (
-            <Badge className="bg-secondary text-secondary-foreground">
-              {t('spotReservations.parkedNow')}
-            </Badge>
-          )}
-        </p>
-        {car ? (
-          <div className="flex flex-wrap items-center gap-2">
-            <LicensePlate plate={car.plate} size="sm" />
-            <span className="truncate text-sm">{car.description}</span>
-          </div>
-        ) : (
-          <span className="text-sm text-muted-foreground">{t('spotReservations.unknownCar')}</span>
-        )}
-      </div>
-      {car && (
-        <Button asChild variant="outline" className="h-9 px-3">
-          <a href={`tel:${car.phone}`} aria-label={t('spotReservations.call', { name: car.plate })}>
-            <PhoneIcon />
-            <span className="tabular-nums">{car.phone}</span>
-          </a>
-        </Button>
-      )}
-    </li>
   )
 }

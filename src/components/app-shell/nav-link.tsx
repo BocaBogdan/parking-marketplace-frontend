@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { useIsAdmin } from '@/lib/auth'
+import { useIsAdmin, useManagedBuildingId } from '@/lib/auth'
 import { useComingSoon } from '@/lib/coming-soon'
 import { navItems } from '@/components/app-shell/nav-items'
 
@@ -23,10 +23,16 @@ export function NavLinks({ variant }: { variant: Variant }) {
   const { t } = useTranslation()
   const comingSoon = useComingSoon()
   const isAdmin = useIsAdmin()
+  const managedBuildingId = useManagedBuildingId()
   const { base, active } = styles[variant]
 
   return navItems
-    .filter((item) => !item.adminOnly || isAdmin)
+    .filter(
+      ({ audience }) =>
+        !audience ||
+        (audience === 'admin' && isAdmin) ||
+        (audience === 'buildingAdmin' && managedBuildingId),
+    )
     .map(({ key, icon: Icon, to }) => {
       const label = t(`nav.${key}`)
       const content = (
@@ -36,7 +42,13 @@ export function NavLinks({ variant }: { variant: Variant }) {
         </>
       )
       return to ? (
-        <Link key={key} to={to} className={base} activeProps={{ className: active }}>
+        <Link
+          key={key}
+          to={to}
+          params={{ buildingId: managedBuildingId ?? '' }}
+          className={base}
+          activeProps={{ className: active }}
+        >
           {content}
         </Link>
       ) : (

@@ -62,6 +62,7 @@ export const ro = {
     buildings: 'Clădiri',
     notifications: 'Notificări',
     accountMenu: 'Meniu cont',
+    myBuilding: 'Blocul meu',
   },
   home: {
     greeting: 'Salut, {{name}}',
@@ -259,6 +260,7 @@ export const ro = {
     title: 'Caută un loc',
     description:
       'Alege când ai nevoie de parcare — îți arătăm locurile vecinilor libere pe tot intervalul.',
+    day: 'Ziua',
     from: 'De la',
     until: 'Până la',
     today: 'Azi',
@@ -276,7 +278,7 @@ export const ro = {
     table: { spot: 'Loc', details: 'Detalii', actions: 'Acțiuni', noDetails: 'Fără detalii' },
     empty: {
       title: 'Niciun loc liber pe tot intervalul',
-      description: 'Încearcă un interval mai scurt sau altă oră de început.',
+      description: 'Încearcă un interval mai scurt, altă oră de început sau altă zi.',
     },
     dialog: {
       title: 'Rezervă locul {{number}}',
@@ -285,6 +287,8 @@ export const ro = {
       noCars:
         'Adaugă o mașină înainte de rezervare — proprietarul trebuie să știe ce mașină e pe locul lui.',
       confirm: 'Rezervă pentru {{duration}}',
+      taken:
+        'Cineva tocmai a rezervat acest loc pentru o parte din interval. Alege alt loc sau alt interval.',
     },
     toast: { reserved: 'Locul {{number}} a fost rezervat' },
   },
@@ -294,13 +298,87 @@ export const ro = {
     stats: { bookings: 'Rezervări trecute', shared: 'Timp împărțit' },
     parkedNow: 'Parcat acum',
     unknownCar: 'Detaliile mașinii nu mai sunt disponibile',
+    unknownDriver: 'Șofer încă nesincronizat',
     call: 'Sună-l pe {{name}}',
     empty: {
       upcoming: 'Nicio rezervare viitoare pentru acest loc',
       past: 'Nimeni nu a folosit încă acest loc',
     },
     privacy:
-      'Datele de contact ale șoferilor sunt vizibile doar pentru tine, ca proprietar al locului.',
+      'Datele de contact ale șoferilor sunt vizibile doar pentru tine, ca proprietar al locului, și pentru administratorii clădirii.',
+  },
+  stats: {
+    title: 'Statistici',
+    description: 'Cum folosește clădirea locurile de parcare.',
+    range: {
+      label: 'Perioadă',
+      short: { '30d': '30 de zile', '90d': '90 de zile', '12m': '12 luni', all: 'Tot timpul' },
+    },
+    bookingsCount_one: '{{count}} rezervare',
+    bookingsCount_few: '{{count}} rezervări',
+    bookingsCount_other: '{{count}} de rezervări',
+    empty: 'Nicio rezervare în această perioadă',
+    kpis: {
+      bookings: 'Rezervări',
+      booked: 'Timp rezervat',
+      shared: 'Timp împărțit',
+      activeSpots: 'Locuri rezervabile',
+      drivers: 'Șoferi',
+      avgLength: 'Rezervare medie',
+      utilization: 'Grad de utilizare',
+    },
+    timeline: {
+      title: 'Rezervări în timp',
+      description: {
+        day: 'Ore rezervate pe zi',
+        week: 'Ore rezervate pe săptămână',
+        month: 'Ore rezervate pe lună',
+      },
+      weekOf: 'Săptămâna din {{date}}',
+    },
+    topSpots: { title: 'Cele mai folosite locuri', description: 'Top 25 după orele rezervate' },
+    topCars: {
+      title: 'Mașinile care rezervă cel mai des',
+      spotTitle: 'Mașinile care au parcat aici cel mai des',
+      description: 'Top 25 după orele rezervate',
+      removed: 'Mașină ștearsă',
+    },
+    heatmap: {
+      title: 'Orele cele mai aglomerate',
+      description: 'Numărul mediu de locuri ocupate, pe zi a săptămânii și oră',
+      spotDescription: 'Cât de des e rezervat locul, pe zi a săptămânii și oră',
+      hint: 'Indică o celulă ca să vezi valoarea',
+      inUse: 'în medie {{value}} locuri ocupate',
+      bookedShare: 'rezervat {{value}} din timp',
+      less: 'Mai puțin',
+      more: 'Mai mult',
+      max: 'Maxim: {{value}}',
+    },
+    utilization: {
+      title: 'Gradul de utilizare al locurilor',
+      description: 'Orele rezervate din orele oferite de fiecare proprietar',
+      detail: '{{booked}} din {{offered}}',
+      noHours: 'Fără program',
+      note: 'Orele oferite se calculează după programul săptămânal actual al fiecărui loc, așa că pentru perioade lungi sunt o estimare.',
+    },
+    table: {
+      show: 'Tabel',
+      hide: 'Grafic',
+      spot: 'Loc',
+      owner: 'Proprietar',
+      car: 'Mașină',
+      driver: 'Șofer',
+      details: 'Detalii',
+      bookings: 'Rezervări',
+      hours: 'Ore',
+      period: 'Perioadă',
+      day: 'Zi',
+      hour: 'Oră',
+      busy: 'Ocupare',
+      utilization: 'Utilizare',
+      booked: 'Rezervat',
+      offered: 'Oferit',
+    },
   },
   bookings: {
     title: 'Rezervări',
@@ -352,19 +430,35 @@ export const ro = {
       descriptionPlaceholder: 'ex. Str. Lalelelor 12, Cluj-Napoca',
       submit: 'Creează clădirea',
     },
+    users: {
+      title: 'Utilizatori',
+      empty: 'Nimeni nu s-a alăturat încă acestui bloc',
+      pending: 'Invitații în așteptare',
+      invited: 'Apartamentul {{apartment}} · invitat pe {{date}}',
+      role: { RESIDENT: 'Locatar', BUILDING_ADMIN: 'Administrator bloc' },
+      columns: {
+        name: 'Nume',
+        apartment: 'Apartament',
+        eBloc: 'ID eBloc',
+        role: 'Rol',
+        joined: 'Înscris',
+      },
+    },
     spots: {
       title: 'Locuri',
       all: 'Toate',
       map: 'Hartă',
       location: 'Deschide locul {{number}} în Google Maps',
+      open: 'Deschide locul {{number}}',
+      unknownOwner: 'Proprietar încă nesincronizat',
       columns: {
         number: 'Loc',
         description: 'Descriere',
         status: 'Stare',
         submitted: 'Trimis',
-        registered: 'Înregistrat',
         document: 'Dovadă',
         location: 'Locație',
+        owner: 'Proprietar',
         actions: 'Acțiuni',
       },
       empty: {
@@ -398,6 +492,12 @@ export const ro = {
       },
     },
     toast: { created: '{{name}} a fost creată' },
+    spotDetail: {
+      owner: 'Proprietar',
+      apartment: 'Apartamentul {{apartment}}',
+      details: 'Detalii',
+      noHours: 'Proprietarul nu a stabilit încă un program săptămânal.',
+    },
     invite: {
       single: {
         action: 'Invită locatar',
@@ -429,6 +529,8 @@ export const ro = {
         apartmentPlaceholder: '12B',
         eBloc: 'ID utilizator eBloc',
         eBlocPlaceholder: '4821',
+        buildingAdmin:
+          'Numește ca administrator al blocului (poate verifica locuri și invita locatari)',
       },
       toast: {
         sent: 'Invitație trimisă către {{email}}',

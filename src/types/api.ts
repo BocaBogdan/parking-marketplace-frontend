@@ -27,7 +27,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["InviteController_findPending"];
         put?: never;
         post: operations["InviteController_inviteNewUser"];
         delete?: never;
@@ -46,6 +46,38 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["InviteController_inviteNewUsers"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/user/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["UserController_me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/user/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["UserController_sync"];
         delete?: never;
         options?: never;
         head?: never;
@@ -84,6 +116,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/{buildingId}/spot/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminSpotController_findOne"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/{buildingId}/spot/{id}/booking": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminSpotController_bookings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/spot": {
         parameters: {
             query?: never;
@@ -107,7 +171,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["SpotController_findByInterval"];
+        get: operations["SpotController_findAvailable"];
         put?: never;
         post?: never;
         delete?: never;
@@ -132,6 +196,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/spot/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["SpotController_findOne"];
+        put?: never;
+        post?: never;
+        delete: operations["SpotController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["SpotController_update"];
+        trace?: never;
+    };
     "/api/spot/{id}/booking": {
         parameters: {
             query?: never;
@@ -148,20 +228,20 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/spot/{id}": {
+    "/api/spot/{id}/stats": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["SpotController_findOne"];
+        get: operations["SpotController_stats"];
         put?: never;
         post?: never;
-        delete: operations["SpotController_remove"];
+        delete?: never;
         options?: never;
         head?: never;
-        patch: operations["SpotController_update"];
+        patch?: never;
         trace?: never;
     };
     "/api/spot/{spotId}/schedule": {
@@ -196,7 +276,7 @@ export interface paths {
         patch: operations["ScheduleController_update"];
         trace?: never;
     };
-    "/api/document/{docId}": {
+    "/api/admin/{buildingId}/document/{docId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -204,6 +284,38 @@ export interface paths {
             cookie?: never;
         };
         get: operations["DocumentController_getDocumentById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/{buildingId}/member": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MemberController_findByBuilding"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admin/{buildingId}/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminStatsController_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -228,7 +340,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/building/{id}": {
+    "/api/building/{buildingId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -236,6 +348,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["BuildingController_findOne"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/building/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
         put?: never;
         post?: never;
         delete: operations["BuildingController_remove"];
@@ -348,6 +476,8 @@ export interface components {
             email: string;
             eBlocUserID: string;
             apartment: string;
+            /** @enum {string} */
+            role?: "BUILDING_ADMIN";
         };
         InviteUsersDto: {
             invites: components["schemas"]["InviteUserDto"][];
@@ -389,16 +519,18 @@ export interface components {
         CreateBookingDto: {
             spotId: string;
             carId: string;
-            dayOfWeek: number;
-            startMinute: number;
-            endMinute: number;
+            /** Format: date-time */
+            startsAt: string;
+            /** Format: date-time */
+            endsAt: string;
         };
         UpdateBookingDto: {
             spotId?: string;
             carId?: string;
-            dayOfWeek?: number;
-            startMinute?: number;
-            endMinute?: number;
+            /** Format: date-time */
+            startsAt?: string;
+            /** Format: date-time */
+            endsAt?: string;
         };
         CreateCarDto: {
             phone: string;
@@ -424,6 +556,25 @@ export interface operations {
             query?: never;
             header?: never;
             path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    InviteController_findPending: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                buildingId: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -482,11 +633,46 @@ export interface operations {
             };
         };
     };
+    UserController_me: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UserController_sync: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     AdminSpotController_updateStatus: {
         parameters: {
             query?: never;
             header?: never;
             path: {
+                buildingId: string;
                 id: string;
             };
             cookie?: never;
@@ -511,6 +697,46 @@ export interface operations {
             header?: never;
             path: {
                 buildingId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminSpotController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                buildingId: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminSpotController_bookings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                buildingId: string;
+                id: string;
             };
             cookie?: never;
         };
@@ -550,7 +776,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CreateSpotDto"];
+                "multipart/form-data": components["schemas"]["CreateSpotDto"];
             };
         };
         responses: {
@@ -562,12 +788,11 @@ export interface operations {
             };
         };
     };
-    SpotController_findByInterval: {
+    SpotController_findAvailable: {
         parameters: {
             query: {
-                dayOfWeek: number;
-                startMinute: number;
-                endMinute: number;
+                startsAt: string;
+                endsAt: string;
             };
             header?: never;
             path?: never;
@@ -588,25 +813,6 @@ export interface operations {
             query?: never;
             header?: never;
             path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    SpotController_booking: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
             cookie?: never;
         };
         requestBody?: never;
@@ -671,6 +877,46 @@ export interface operations {
                 "application/json": components["schemas"]["UpdateSpotDto"];
             };
         };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SpotController_booking: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    SpotController_stats: {
+        parameters: {
+            query?: {
+                range?: "30d" | "90d" | "12m" | "all";
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             200: {
                 headers: {
@@ -791,7 +1037,48 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                buildingId: string;
                 docId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MemberController_findByBuilding: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                buildingId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminStatsController_get: {
+        parameters: {
+            query?: {
+                range?: "30d" | "90d" | "12m" | "all";
+            };
+            header?: never;
+            path: {
+                buildingId: string;
             };
             cookie?: never;
         };
@@ -848,7 +1135,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                id: string;
+                buildingId: string;
             };
             cookie?: never;
         };
