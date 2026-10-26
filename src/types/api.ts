@@ -276,6 +276,38 @@ export interface paths {
         patch: operations["ScheduleController_update"];
         trace?: never;
     };
+    "/api/spot/{spotId}/override": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["OverrideController_findActive"];
+        put?: never;
+        post: operations["OverrideController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/spot/{spotId}/override/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["OverrideController_end"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/{buildingId}/document/{docId}": {
         parameters: {
             query?: never;
@@ -507,6 +539,13 @@ export interface components {
             dayOfWeek?: number;
             startMinute?: number;
             endMinute?: number;
+        };
+        /** @enum {string} */
+        OverrideType: "FREE" | "BUSY";
+        CreateOverrideDto: {
+            type: components["schemas"]["OverrideType"];
+            /** Format: date-time */
+            endsAt?: string;
         };
         CreateBuildingDto: {
             name: string;
@@ -1025,6 +1064,68 @@ export interface operations {
         };
         responses: {
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    OverrideController_findActive: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                spotId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    OverrideController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                spotId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateOverrideDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    OverrideController_end: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                spotId: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };

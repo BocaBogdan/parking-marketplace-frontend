@@ -10,6 +10,7 @@ import {
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
+import { OverrideControls } from '@/components/spots/override-controls'
 import { ScheduleTable } from '@/components/spots/schedule-table'
 import { SpotStatusBadge } from '@/components/spots/spot-status-badge'
 import { WithdrawSpotButton } from '@/components/spots/withdraw-spot-button'
@@ -23,7 +24,7 @@ interface SpotCardProps {
 }
 
 // A spot is bookable once an admin approves it; the owner can set its hours before that.
-// The "Free now" / "Busy" overrides (components/spots/override-controls.tsx) wait for their API
+// "Free now" / "Busy now" only make sense once it's bookable
 export function SpotCard({ spot, onEdit, onManageAvailability }: SpotCardProps) {
   const { t, i18n } = useTranslation()
 
@@ -74,6 +75,8 @@ export function SpotCard({ spot, onEdit, onManageAvailability }: SpotCardProps) 
       {spot.description && (
         <p className="text-sm whitespace-pre-line text-muted-foreground">{spot.description}</p>
       )}
+
+      {spot.status === 'CONFIRMED' && <OverrideControls spot={spot} />}
 
       <section className="grid gap-2">
         <h3 className="text-sm font-semibold">{t('availability.weekly')}</h3>
