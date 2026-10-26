@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Must match the Worker's name in the Cloudflare dashboard
+  "name": "parking-marketplace-frontend",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    // Client-side routes (/spots, /building/…) have no file of their own: serve index.html
+    // so a refresh or a shared link boots the app and the router takes over
+    "not_found_handling": "single-page-application"
+  }
+}
