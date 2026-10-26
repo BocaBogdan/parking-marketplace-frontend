@@ -63,6 +63,17 @@ export const ro = {
     notifications: 'Notificări',
     accountMenu: 'Meniu cont',
     myBuilding: 'Blocul meu',
+    feedback: 'Trimite feedback',
+    donate: 'Cumpără-mi o cafea',
+  },
+  feedback: {
+    title: 'Feedback',
+    description:
+      'Spune-ne ce merge, ce nu merge și ce ți-ai dori mai departe. Durează câteva minute.',
+    loading: 'Se încarcă formularul…',
+    openInNewTab: 'Deschide într-un tab nou',
+    donate: 'Îți place aplicația?',
+    donateLink: 'Cumpără-mi o cafea ☕',
   },
   home: {
     greeting: 'Salut, {{name}}',

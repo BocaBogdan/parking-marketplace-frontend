@@ -1,6 +1,13 @@
 import { useClerk, useUser } from '@clerk/react'
 import { useQueryClient } from '@tanstack/react-query'
-import { LanguagesIcon, LogOutIcon } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
+import {
+  CoffeeIcon,
+  ExternalLinkIcon,
+  LanguagesIcon,
+  LogOutIcon,
+  MessageSquareTextIcon,
+} from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -14,6 +21,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { languages } from '@/i18n'
+import { env } from '@/lib/env'
 
 function initials(name: string) {
   return name
@@ -72,6 +80,23 @@ export function AccountMenu() {
           ))}
         </DropdownMenuRadioGroup>
         <DropdownMenuSeparator />
+        {env.feedbackFormUrl && (
+          <DropdownMenuItem asChild>
+            <Link to="/feedback">
+              <MessageSquareTextIcon />
+              {t('nav.feedback')}
+            </Link>
+          </DropdownMenuItem>
+        )}
+        {env.donationUrl && (
+          <DropdownMenuItem asChild>
+            <a href={env.donationUrl} target="_blank" rel="noreferrer">
+              <CoffeeIcon />
+              {t('nav.donate')}
+              <ExternalLinkIcon className="ml-auto text-muted-foreground" />
+            </a>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem variant="destructive" onSelect={() => void logout()}>
           <LogOutIcon />
           {t('auth.logout')}

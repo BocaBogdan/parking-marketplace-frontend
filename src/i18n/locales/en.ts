@@ -56,6 +56,17 @@ export const en = {
     notifications: 'Notifications',
     accountMenu: 'Account menu',
     myBuilding: 'My Building',
+    feedback: 'Send feedback',
+    donate: 'Buy me a coffee',
+  },
+  feedback: {
+    title: 'Feedback',
+    description:
+      'Tell us what works, what doesn’t and what you’d like next. It takes a few minutes.',
+    loading: 'Loading the form…',
+    openInNewTab: 'Open in a new tab',
+    donate: 'Enjoying the app?',
+    donateLink: 'Buy me a coffee ☕',
   },
   home: {
     greeting: 'Hello, {{name}}',

@@ -13,4 +13,8 @@ export const env = {
   googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || undefined,
   // Advanced markers need a Map ID; Google's demo one is fine outside production
   googleMapsMapId: import.meta.env.VITE_GOOGLE_MAPS_MAP_ID || 'DEMO_MAP_ID',
+  // Optional: without it the feedback page and its menu item are hidden
+  feedbackFormUrl: import.meta.env.VITE_FEEDBACK_FORM_URL || undefined,
+  // Optional: without it the "Buy me a coffee" links are hidden
+  donationUrl: import.meta.env.VITE_DONATION_URL || undefined,
 }

@@ -16,6 +16,7 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/_admin'
 import { Route as AuthenticatedBookingsRouteImport } from './routes/_authenticated/bookings'
 import { Route as AuthenticatedCarsRouteImport } from './routes/_authenticated/cars'
+import { Route as AuthenticatedFeedbackRouteImport } from './routes/_authenticated/feedback'
 import { Route as AuthenticatedFindRouteImport } from './routes/_authenticated/find'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedAdminBuildingsRouteImport } from './routes/_authenticated/_admin/buildings'
@@ -56,6 +57,11 @@ const AuthenticatedBookingsRoute = AuthenticatedBookingsRouteImport.update({
 const AuthenticatedCarsRoute = AuthenticatedCarsRouteImport.update({
   id: '/cars',
   path: '/cars',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedFeedbackRoute = AuthenticatedFeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedFindRoute = AuthenticatedFindRouteImport.update({
@@ -110,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/bookings': typeof AuthenticatedBookingsRoute
   '/cars': typeof AuthenticatedCarsRoute
+  '/feedback': typeof AuthenticatedFeedbackRoute
   '/find': typeof AuthenticatedFindRoute
   '/home': typeof AuthenticatedHomeRoute
   '/buildings': typeof AuthenticatedAdminBuildingsRoute
@@ -125,6 +132,7 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/bookings': typeof AuthenticatedBookingsRoute
   '/cars': typeof AuthenticatedCarsRoute
+  '/feedback': typeof AuthenticatedFeedbackRoute
   '/find': typeof AuthenticatedFindRoute
   '/home': typeof AuthenticatedHomeRoute
   '/buildings': typeof AuthenticatedAdminBuildingsRoute
@@ -143,6 +151,7 @@ export interface FileRoutesById {
   '/_authenticated/_admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/bookings': typeof AuthenticatedBookingsRoute
   '/_authenticated/cars': typeof AuthenticatedCarsRoute
+  '/_authenticated/feedback': typeof AuthenticatedFeedbackRoute
   '/_authenticated/find': typeof AuthenticatedFindRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/_admin/buildings': typeof AuthenticatedAdminBuildingsRoute
@@ -160,6 +169,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/bookings'
     | '/cars'
+    | '/feedback'
     | '/find'
     | '/home'
     | '/buildings'
@@ -175,6 +185,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/bookings'
     | '/cars'
+    | '/feedback'
     | '/find'
     | '/home'
     | '/buildings'
@@ -192,6 +203,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_admin'
     | '/_authenticated/bookings'
     | '/_authenticated/cars'
+    | '/_authenticated/feedback'
     | '/_authenticated/find'
     | '/_authenticated/home'
     | '/_authenticated/_admin/buildings'
@@ -258,6 +270,13 @@ declare module '@tanstack/react-router' {
       path: '/cars'
       fullPath: '/cars'
       preLoaderRoute: typeof AuthenticatedCarsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/feedback': {
+      id: '/_authenticated/feedback'
+      path: '/feedback'
+      fullPath: '/feedback'
+      preLoaderRoute: typeof AuthenticatedFeedbackRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/find': {
@@ -334,6 +353,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedBookingsRoute: typeof AuthenticatedBookingsRoute
   AuthenticatedCarsRoute: typeof AuthenticatedCarsRoute
+  AuthenticatedFeedbackRoute: typeof AuthenticatedFeedbackRoute
   AuthenticatedFindRoute: typeof AuthenticatedFindRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
   AuthenticatedBuildingBuildingIdRoute: typeof AuthenticatedBuildingBuildingIdRoute
@@ -347,6 +367,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedBookingsRoute: AuthenticatedBookingsRoute,
   AuthenticatedCarsRoute: AuthenticatedCarsRoute,
+  AuthenticatedFeedbackRoute: AuthenticatedFeedbackRoute,
   AuthenticatedFindRoute: AuthenticatedFindRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
   AuthenticatedBuildingBuildingIdRoute: AuthenticatedBuildingBuildingIdRoute,
