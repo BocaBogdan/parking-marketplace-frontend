@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { SpotReviewActions } from '@/components/buildings/spot-review-actions'
 import { SpotStatusBadge } from '@/components/spots/spot-status-badge'
+import { UndergroundBadge } from '@/components/spots/underground-badge'
 import { formatDate } from '@/lib/format'
 import { displayName } from '@/lib/users'
 import type { AdminSpot, Spot } from '@/types/models'
@@ -92,7 +93,10 @@ export function SpotReviewTable({ buildingId, spots, onViewDocument }: SpotRevie
                 <OwnerCell owner={spot.owner} />
               </td>
               <td className="px-4 py-3">
-                <SpotStatusBadge status={spot.status} />
+                <div className="flex flex-wrap gap-1.5">
+                  <SpotStatusBadge status={spot.status} />
+                  {spot.underground && <UndergroundBadge />}
+                </div>
               </td>
               <td className="px-4 py-3 whitespace-nowrap text-muted-foreground tabular-nums">
                 {formatDate(spot.updatedAt, language)}

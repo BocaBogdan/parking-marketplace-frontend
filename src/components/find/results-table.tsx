@@ -1,6 +1,7 @@
 import { SearchXIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
+import { UndergroundBadge } from '@/components/spots/underground-badge'
 import type { Spot } from '@/types/models'
 
 interface ResultsTableProps {
@@ -48,6 +49,7 @@ export function ResultsTable({ spots, onReserve }: ResultsTableProps) {
                 </span>
               </th>
               <td className="px-4 py-3 text-muted-foreground">
+                {spot.underground && <UndergroundBadge />}
                 <span className="line-clamp-2">
                   {spot.description || t('find.table.noDetails')}
                 </span>

@@ -13,6 +13,7 @@ import { z } from 'zod'
 import { SpotReviewActions } from '@/components/buildings/spot-review-actions'
 import { ReservationList } from '@/components/spots/reservation-list'
 import { SpotStatusBadge } from '@/components/spots/spot-status-badge'
+import { UndergroundBadge } from '@/components/spots/underground-badge'
 import { canManageBuilding } from '@/lib/auth'
 import { formatDate } from '@/lib/format'
 import { displayTime, sortSchedules, weekdayName, type DayOfWeek } from '@/lib/schedule'
@@ -89,7 +90,10 @@ function BuildingSpotPage() {
               <h1 className="text-2xl font-bold tracking-tight">
                 {t('spots.name', { number: spot.number })}
               </h1>
-              <SpotStatusBadge status={spot.status} />
+              <div className="flex flex-wrap gap-1.5">
+                <SpotStatusBadge status={spot.status} />
+                {spot.underground && <UndergroundBadge />}
+              </div>
             </div>
           </div>
           <SpotReviewActions buildingId={buildingId} spot={spot} />

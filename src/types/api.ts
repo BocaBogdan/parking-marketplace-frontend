@@ -522,6 +522,8 @@ export interface components {
             number?: number;
             description?: string;
             location?: components["schemas"]["LocationDto"];
+            /** @description Defaults to false */
+            underground?: boolean;
             /** @enum {string} */
             status?: "PENDING" | "CONFIRMED" | "REJECTED";
         };
@@ -529,6 +531,8 @@ export interface components {
             number: number;
             description: string;
             location: components["schemas"]["LocationDto"];
+            /** @description Defaults to false */
+            underground?: boolean;
         };
         CreateScheduleDto: {
             dayOfWeek: number;

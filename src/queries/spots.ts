@@ -53,7 +53,7 @@ export function currentSlotAvailabilityQuery(now: number) {
   return availableSpotsQuery(start, start + SLOT_MS)
 }
 
-type SpotFields = Pick<Spot, 'number' | 'description'>
+type SpotFields = Pick<Spot, 'number' | 'description' | 'underground'>
 
 /**
  * Registers a spot for review. The body is multipart: the proof PDF is the `file` part, and
@@ -66,6 +66,7 @@ export function createSpot(
   const form = new FormData()
   form.append('number', String(fields.number))
   form.append('description', fields.description)
+  form.append('underground', String(fields.underground))
   form.append('location[lat]', fields.location.lat)
   form.append('location[long]', fields.location.long)
   form.append('file', fields.document, fields.document.name)

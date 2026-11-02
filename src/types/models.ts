@@ -19,6 +19,8 @@ export interface Spot {
   description: string
   long: string
   lat: string
+  /** Only offered to owners of an approved underground spot (the backend filters search) */
+  underground: boolean
   /** R2 key of the PDF proving the owner has the right to the spot */
   fileId: string
   /** New and edited spots wait for an admin; only CONFIRMED ones can be booked */

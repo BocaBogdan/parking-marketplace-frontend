@@ -37,6 +37,7 @@ const spotFormSchema = (isNew: boolean) =>
       .trim()
       .regex(/^[1-9]\d{0,8}$/, 'validation.spotNumber'),
     description: z.string().trim().min(1, 'validation.notesRequired').max(255, 'validation.max255'),
+    underground: z.boolean(),
     lat: isNew ? coordinate(90, 'validation.latitude') : z.string(),
     long: isNew ? coordinate(180, 'validation.longitude') : z.string(),
     document: isNew
@@ -73,7 +74,11 @@ function SpotForm({ spot, onDone }: { spot?: Spot; onDone: () => void }) {
 
   const save = useMutation({
     mutationFn: (values: SpotFormValues) => {
-      const fields = { number: Number(values.number), description: values.description.trim() }
+      const fields = {
+        number: Number(values.number),
+        description: values.description.trim(),
+        underground: values.underground,
+      }
       if (spot) return updateSpot(spot.id, fields)
       return createSpot({
         ...fields,
@@ -93,6 +98,7 @@ function SpotForm({ spot, onDone }: { spot?: Spot; onDone: () => void }) {
   const defaultValues: SpotFormValues = {
     number: spot ? String(spot.number) : '',
     description: spot?.description ?? '',
+    underground: spot?.underground ?? false,
     lat: spot?.lat ?? '',
     long: spot?.long ?? '',
     document: null,
@@ -156,6 +162,14 @@ function SpotForm({ spot, onDone }: { spot?: Spot; onDone: () => void }) {
               placeholder={t('spots.form.notesPlaceholder')}
               hint={t('spots.form.notesHint')}
               maxLength={255}
+            />
+          )}
+        </form.AppField>
+        <form.AppField name="underground">
+          {(field) => (
+            <field.CheckboxField
+              label={t('spots.form.underground')}
+              hint={t('spots.form.undergroundHint')}
             />
           )}
         </form.AppField>

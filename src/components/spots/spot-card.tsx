@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { OverrideControls } from '@/components/spots/override-controls'
 import { ScheduleTable } from '@/components/spots/schedule-table'
 import { SpotStatusBadge } from '@/components/spots/spot-status-badge'
+import { UndergroundBadge } from '@/components/spots/underground-badge'
 import { WithdrawSpotButton } from '@/components/spots/withdraw-spot-button'
 import { formatDate } from '@/lib/format'
 import type { Spot } from '@/types/models'
@@ -33,7 +34,10 @@ export function SpotCard({ spot, onEdit, onManageAvailability }: SpotCardProps) 
       <header className="flex items-start justify-between gap-3">
         <div className="grid justify-items-start gap-1.5">
           <h2 className="text-xl font-bold">{t('spots.name', { number: spot.number })}</h2>
-          <SpotStatusBadge status={spot.status} />
+          <div className="flex flex-wrap gap-1.5">
+            <SpotStatusBadge status={spot.status} />
+            {spot.underground && <UndergroundBadge />}
+          </div>
         </div>
         <Button
           variant="ghost"
