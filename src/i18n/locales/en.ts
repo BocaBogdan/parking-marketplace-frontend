@@ -543,5 +543,6 @@ export const en = {
   errors: {
     network: "Couldn't reach the server. Check your connection and try again.",
     generic: 'Something went wrong. Please try again.',
+    wakingUp: 'Our server is waking up, this can take up to a minute',
   },
 }

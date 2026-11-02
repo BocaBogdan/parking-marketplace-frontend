@@ -1,5 +1,7 @@
 import { getToken } from '@clerk/react'
 import createClient from 'openapi-fetch'
+import { toast } from 'sonner'
+import i18n from '@/i18n'
 import { env } from '@/lib/env'
 import type { paths } from '@/types/api'
 
@@ -32,7 +34,58 @@ export async function unwrap<T>(
   return data as T
 }
 
-export const api = createClient<paths>({ baseUrl: env.apiUrl })
+// The API host sleeps when idle, so the first requests after a pause can be slow or fail
+const TIMEOUT_MS = 90_000
+const RETRIES = 2
+const SLOW_NOTICE_MS = 3_000
+const WAKING_UP_TOAST_ID = 'api-waking-up'
+
+let slowRequests = 0
+
+/** Shows the "waking up" notice while at least one request has been pending for 3 s. */
+async function withSlowNotice(response: Promise<Response>): Promise<Response> {
+  let isSlow = false
+  const timer = setTimeout(() => {
+    isSlow = true
+    if (slowRequests++ === 0) {
+      toast.loading(i18n.t('errors.wakingUp'), { id: WAKING_UP_TOAST_ID, duration: Infinity })
+    }
+  }, SLOW_NOTICE_MS)
+  try {
+    return await response
+  } finally {
+    clearTimeout(timer)
+    if (isSlow && --slowRequests === 0) toast.dismiss(WAKING_UP_TOAST_ID)
+  }
+}
+
+/** Fetch with a 90 s timeout per attempt, retrying twice on 502/503 and timeouts. */
+async function fetchWithRetry(request: Request): Promise<Response> {
+  for (let attempt = 0; ; attempt++) {
+    const isLastAttempt = attempt === RETRIES
+    try {
+      const response = await fetch(
+        // Clone so the body can be sent again on a retry
+        new Request(request.clone(), {
+          signal: AbortSignal.any([request.signal, AbortSignal.timeout(TIMEOUT_MS)]),
+        }),
+      )
+      if (isLastAttempt || (response.status !== 502 && response.status !== 503)) return response
+    } catch (error) {
+      if (isLastAttempt || (error as Error).name !== 'TimeoutError') throw error
+    }
+  }
+}
+
+export const api = createClient<paths>({
+  baseUrl: env.apiUrl,
+  fetch: (request) => withSlowNotice(fetchWithRetry(request)),
+})
+
+/** Wakes the API on app load so it's ready by the time the user needs it. Fire-and-forget. */
+export function warmUpApi() {
+  fetch(`${env.apiUrl}/api/health`).catch(() => {})
+}
 
 // Clerk caches the session token and refreshes it before it expires
 api.use({

@@ -5,8 +5,11 @@ import { createRouter, RouterProvider } from '@tanstack/react-router'
 import './index.css'
 import '@/i18n'
 import { AuthProvider } from '@/components/auth-provider'
+import { warmUpApi } from '@/lib/api'
 import { queryClient } from '@/lib/query-client'
 import { routeTree } from './routeTree.gen'
+
+warmUpApi()
 
 const router = createRouter({
   routeTree,

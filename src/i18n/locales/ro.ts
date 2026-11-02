@@ -574,5 +574,6 @@ export const ro = {
   errors: {
     network: 'Serverul nu poate fi contactat. Verifică conexiunea și încearcă din nou.',
     generic: 'A apărut o eroare. Încearcă din nou.',
+    wakingUp: 'Serverul pornește, poate dura până la un minut',
   },
 } satisfies Locale<typeof en>
