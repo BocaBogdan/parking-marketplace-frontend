@@ -93,7 +93,11 @@ export function SpotReviewTable({ buildingId, spots, onViewDocument }: SpotRevie
                 <OwnerCell owner={spot.owner} />
               </td>
               <td className="px-4 py-3">
-                <div className="flex flex-wrap gap-1.5">
+                <div
+                  className="flex flex-wrap gap-1.5"
+                  // The full reason is on the spot's page; a hover is enough in the list
+                  title={spot.rejectionReason ?? undefined}
+                >
                   <SpotStatusBadge status={spot.status} />
                   {spot.underground && <UndergroundBadge />}
                 </div>

@@ -42,7 +42,8 @@ function MySpotsPage() {
   const { data: spots } = useSuspenseQuery(mySpotsQuery)
 
   const editing = spots.find((spot) => spot.id === dialog)
-  const managing = spots.find((spot) => spot.id === availability)
+  // Only an approved spot takes weekly hours, even when linked to with ?availability=
+  const managing = spots.find((spot) => spot.id === availability && spot.status === 'CONFIRMED')
   const openDialog = (spot: 'new' | string) =>
     void navigate({ search: { spot }, replace: true, resetScroll: false })
   const openAvailability = (spotId: string) =>

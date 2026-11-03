@@ -94,6 +94,14 @@ function BuildingSpotPage() {
                 <SpotStatusBadge status={spot.status} />
                 {spot.underground && <UndergroundBadge />}
               </div>
+              {spot.status === 'REJECTED' && spot.rejectionReason && (
+                <p className="max-w-prose text-sm whitespace-pre-line text-muted-foreground">
+                  <span className="font-semibold text-foreground">
+                    {t('spots.rejectionReason')}:
+                  </span>{' '}
+                  {spot.rejectionReason}
+                </p>
+              )}
             </div>
           </div>
           <SpotReviewActions buildingId={buildingId} spot={spot} />

@@ -113,6 +113,7 @@ export const en = {
     waitingApproval: 'Waiting for admin approval',
     submitted: 'Submitted {{date}}',
     rejected: 'An admin rejected this spot',
+    rejectionReason: 'Reason',
     actionRequired: 'Action required to relist',
     editDetails: 'Edit Details',
     editResubmit: 'Edit & Resubmit',
@@ -215,6 +216,7 @@ export const en = {
     empty: 'No hours yet. Add your first ones below.',
     remove: 'Remove {{days}}, {{from}} – {{to}}',
     add: 'Add hours',
+    afterApproval: 'You can add weekly hours once an admin approves the spot.',
     days: 'Days',
     presets: { weekdays: 'Weekdays', weekend: 'Weekend', everyDay: 'Every day' },
     from: 'From',
@@ -488,7 +490,10 @@ export const en = {
         action: 'Reject',
         title: 'Reject spot {{number}}?',
         description:
-          "It won't be bookable. The owner sees it as rejected and can edit and resubmit it.",
+          "It won't be bookable. The owner sees it as rejected, with your reason, and can edit and resubmit it.",
+        reason: 'Reason',
+        reasonPlaceholder: "e.g. The document doesn't show this spot number",
+        reasonHint: 'The owner sees this on their spot.',
       },
       toast: {
         approved: 'Spot {{number}} approved',

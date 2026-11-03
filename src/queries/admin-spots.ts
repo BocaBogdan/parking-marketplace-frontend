@@ -54,12 +54,20 @@ export function buildingSpotReservationsQuery(buildingId: string, spotId: string
   })
 }
 
-/** Approve (CONFIRMED) or reject (REJECTED) a spot; responds with no spot, so refetch */
-export function setSpotStatus(buildingId: string, spotId: string, status: SpotStatus) {
+/**
+ * Approve (CONFIRMED) or reject (REJECTED) a spot; a rejection needs the reason the owner
+ * will see. Responds with no spot, so refetch
+ */
+export function setSpotStatus(
+  buildingId: string,
+  spotId: string,
+  status: Exclude<SpotStatus, 'PENDING'>,
+  reason?: string,
+) {
   return unwrap(
     api.PATCH('/api/admin/{buildingId}/spot/{id}/status', {
       params: { path: { buildingId, id: spotId } },
-      body: { status },
+      body: { status, reason },
     }),
   )
 }

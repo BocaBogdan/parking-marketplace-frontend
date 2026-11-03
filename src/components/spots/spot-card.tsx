@@ -24,8 +24,8 @@ interface SpotCardProps {
   onManageAvailability: () => void
 }
 
-// A spot is bookable once an admin approves it; the owner can set its hours before that.
-// "Free now" / "Busy now" only make sense once it's bookable
+// A spot is bookable once an admin approves it, and only then can the owner add weekly
+// hours or use "Free now" / "Busy now". Hours kept from before an edit can still be removed
 export function SpotCard({ spot, onEdit, onManageAvailability }: SpotCardProps) {
   const { t, i18n } = useTranslation()
 
@@ -68,6 +68,12 @@ export function SpotCard({ spot, onEdit, onManageAvailability }: SpotCardProps) 
           <CircleAlertIcon className="size-4 shrink-0 text-destructive" />
           <span className="grid flex-1">
             <span className="font-semibold text-destructive">{t('spots.rejected')}</span>
+            {spot.rejectionReason && (
+              <span className="whitespace-pre-line">
+                <span className="sr-only">{t('spots.rejectionReason')}: </span>
+                {spot.rejectionReason}
+              </span>
+            )}
             <span className="text-muted-foreground">{t('spots.actionRequired')}</span>
           </span>
           <Button size="sm" variant="outline" onClick={onEdit}>
@@ -95,14 +101,20 @@ export function SpotCard({ spot, onEdit, onManageAvailability }: SpotCardProps) 
           <ScheduleTable spot={spot} />
         </Suspense>
       </section>
-      <Button
-        variant="ghost"
-        className="h-11 w-full bg-primary-50 text-primary hover:bg-primary-100 hover:text-primary dark:bg-primary-950"
-        onClick={onManageAvailability}
-      >
-        <PlusIcon />
-        {t('availability.add')}
-      </Button>
+      {spot.status === 'CONFIRMED' ? (
+        <Button
+          variant="ghost"
+          className="h-11 w-full bg-primary-50 text-primary hover:bg-primary-100 hover:text-primary dark:bg-primary-950"
+          onClick={onManageAvailability}
+        >
+          <PlusIcon />
+          {t('availability.add')}
+        </Button>
+      ) : (
+        <p className="rounded-lg bg-muted px-3 py-2.5 text-center text-sm text-muted-foreground">
+          {t('availability.afterApproval')}
+        </p>
+      )}
 
       <footer className="flex flex-wrap items-center justify-between gap-2">
         <Link

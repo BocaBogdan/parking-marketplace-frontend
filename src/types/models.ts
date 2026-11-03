@@ -25,6 +25,8 @@ export interface Spot {
   fileId: string
   /** New and edited spots wait for an admin; only CONFIRMED ones can be booked */
   status: SpotStatus
+  /** The admin's reason, set only while the spot is REJECTED */
+  rejectionReason: string | null
   createdAt: string
   updatedAt: string
 }

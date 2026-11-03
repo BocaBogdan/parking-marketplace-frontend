@@ -123,6 +123,7 @@ export const ro = {
     waitingApproval: 'Se așteaptă aprobarea administratorului',
     submitted: 'Trimis pe {{date}}',
     rejected: 'Un administrator a respins acest loc',
+    rejectionReason: 'Motiv',
     actionRequired: 'Necesită modificări pentru relistare',
     editDetails: 'Editează detaliile',
     editResubmit: 'Editează și retrimite',
@@ -233,6 +234,7 @@ export const ro = {
     empty: 'Nu ai adăugat încă ore. Adaugă-le mai jos.',
     remove: 'Șterge {{days}}, {{from}} – {{to}}',
     add: 'Adaugă ore',
+    afterApproval: 'Poți adăuga ore săptămânale după ce un administrator aprobă locul.',
     days: 'Zile',
     presets: { weekdays: 'Zile lucrătoare', weekend: 'Weekend', everyDay: 'Zilnic' },
     from: 'De la',
@@ -515,7 +517,10 @@ export const ro = {
         action: 'Respinge',
         title: 'Respingi locul {{number}}?',
         description:
-          'Nu va putea fi rezervat. Proprietarul îl vede ca respins și îl poate edita și retrimite.',
+          'Nu va putea fi rezervat. Proprietarul îl vede ca respins, împreună cu motivul, și îl poate edita și retrimite.',
+        reason: 'Motiv',
+        reasonPlaceholder: 'ex. Documentul nu arată numărul acestui loc',
+        reasonHint: 'Proprietarul vede acest motiv la locul său.',
       },
       toast: {
         approved: 'Locul {{number}} a fost aprobat',

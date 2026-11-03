@@ -4,14 +4,14 @@
  */
 
 export interface paths {
-    "/api": {
+    "/api/health": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["AppController_getHello"];
+        get: operations["AppController_health"];
         put?: never;
         post?: never;
         delete?: never;
@@ -514,9 +514,22 @@ export interface components {
         InviteUsersDto: {
             invites: components["schemas"]["InviteUserDto"][];
         };
+        UpdateSpotStatusDto: {
+            /** @enum {string} */
+            status: "CONFIRMED" | "REJECTED";
+            /** @description Required when rejecting */
+            reason?: string;
+        };
         LocationDto: {
             long: string;
             lat: string;
+        };
+        CreateSpotDto: {
+            number: number;
+            description: string;
+            location: components["schemas"]["LocationDto"];
+            /** @description Defaults to false */
+            underground?: boolean;
         };
         UpdateSpotDto: {
             number?: number;
@@ -526,13 +539,6 @@ export interface components {
             underground?: boolean;
             /** @enum {string} */
             status?: "PENDING" | "CONFIRMED" | "REJECTED";
-        };
-        CreateSpotDto: {
-            number: number;
-            description: string;
-            location: components["schemas"]["LocationDto"];
-            /** @description Defaults to false */
-            underground?: boolean;
         };
         CreateScheduleDto: {
             dayOfWeek: number;
@@ -594,7 +600,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    AppController_getHello: {
+    AppController_health: {
         parameters: {
             query?: never;
             header?: never;
@@ -722,7 +728,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["UpdateSpotDto"];
+                "application/json": components["schemas"]["UpdateSpotStatusDto"];
             };
         };
         responses: {
@@ -1036,8 +1042,8 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                id: string;
                 spotId: string;
+                id: string;
             };
             cookie?: never;
         };
