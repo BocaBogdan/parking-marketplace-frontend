@@ -449,7 +449,7 @@ export interface paths {
         delete: operations["BookingController_remove"];
         options?: never;
         head?: never;
-        patch: operations["BookingController_update"];
+        patch?: never;
         trace?: never;
     };
     "/api/car": {
@@ -572,14 +572,6 @@ export interface components {
             startsAt: string;
             /** Format: date-time */
             endsAt: string;
-        };
-        UpdateBookingDto: {
-            spotId?: string;
-            carId?: string;
-            /** Format: date-time */
-            startsAt?: string;
-            /** Format: date-time */
-            endsAt?: string;
         };
         CreateCarDto: {
             phone: string;
@@ -1386,29 +1378,6 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    BookingController_update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateBookingDto"];
-            };
-        };
         responses: {
             200: {
                 headers: {

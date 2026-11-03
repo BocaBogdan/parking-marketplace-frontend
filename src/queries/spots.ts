@@ -1,6 +1,5 @@
 import { queryOptions } from '@tanstack/react-query'
 import { api, unwrap } from '@/lib/api'
-import { currentBuildingId } from '@/lib/auth'
 import { SLOT_MS } from '@/lib/booking-window'
 import type { components } from '@/types/api'
 import type { Spot, SpotStats, StatsRange } from '@/types/models'
@@ -14,25 +13,21 @@ export const mySpotsQuery = queryOptions({
 })
 
 /**
- * Approved spots whose schedule covers the whole window (even past midnight) and that
- * nobody has booked for any part of it, by spot number.
- * TODO: the backend doesn't limit results to the user's building yet, so that's filtered here.
+ * Approved spots of the user's building whose schedule covers the whole window (even past
+ * midnight) and that nobody has booked for any part of it, by spot number. The backend
+ * limits results to the user's building.
  */
 export function availableSpotsQuery(start: number, end: number) {
   return queryOptions({
     queryKey: ['spots', 'available', { start, end }],
-    queryFn: async () => {
-      const spots = await unwrap<Spot[]>(
+    queryFn: () =>
+      unwrap<Spot[]>(
         api.GET('/api/spot/available', {
           params: {
             query: { startsAt: new Date(start).toISOString(), endsAt: new Date(end).toISOString() },
           },
         }),
-      )
-      // Residents share spots within their own building only
-      const buildingId = currentBuildingId()
-      return spots.filter((spot) => !buildingId || spot.buildingId === buildingId)
-    },
+      ),
   })
 }
 
