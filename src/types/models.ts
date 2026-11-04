@@ -126,7 +126,6 @@ export interface BuildingMembership {
   buildingId: string
   role: MembershipRole
   apartment: string
-  eBlocUserID: string
   createdAt: string
 }
 
@@ -147,7 +146,6 @@ export interface BuildingInvite {
   email: string
   role: MembershipRole
   apartment: string
-  eBlocUserID: string
   /** Clerk user id of whoever sent it */
   invitedBy: string
   status: 'PENDING' | 'ACCEPTED' | 'REVOKED'

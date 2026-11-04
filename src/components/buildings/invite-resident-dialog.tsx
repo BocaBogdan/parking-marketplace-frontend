@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { DoorOpenIcon, IdCardIcon, MailIcon } from 'lucide-react'
+import { DoorOpenIcon, MailIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -18,7 +18,6 @@ import { inviteResident } from '@/queries/invites'
 const inviteFormSchema = z.object({
   email: z.string().trim().pipe(z.email('validation.email')),
   apartment: z.string().trim().min(1, 'validation.apartmentRequired'),
-  eBlocUserID: z.string().trim().min(1, 'validation.eBlocRequired'),
   isBuildingAdmin: z.boolean(),
 })
 
@@ -27,7 +26,6 @@ type InviteFormValues = z.input<typeof inviteFormSchema>
 const defaultValues: InviteFormValues = {
   email: '',
   apartment: '',
-  eBlocUserID: '',
   isBuildingAdmin: false,
 }
 
@@ -83,11 +81,10 @@ function InviteForm({ buildingId, canInviteBuildingAdmin, onDone }: InviteFormPr
 
   const invite = useMutation({
     mutationFn: (values: InviteFormValues) => {
-      const { email, apartment, eBlocUserID, isBuildingAdmin } = inviteFormSchema.parse(values)
+      const { email, apartment, isBuildingAdmin } = inviteFormSchema.parse(values)
       return inviteResident(buildingId, {
         email,
         apartment,
-        eBlocUserID,
         ...(canInviteBuildingAdmin && isBuildingAdmin && { role: 'BUILDING_ADMIN' }),
       })
     },
@@ -143,16 +140,6 @@ function InviteForm({ buildingId, canInviteBuildingAdmin, onDone }: InviteFormPr
               icon={DoorOpenIcon}
               autoComplete="off"
               placeholder={t('buildings.invite.fields.apartmentPlaceholder')}
-            />
-          )}
-        </form.AppField>
-        <form.AppField name="eBlocUserID">
-          {(field) => (
-            <field.TextField
-              label={t('buildings.invite.fields.eBloc')}
-              icon={IdCardIcon}
-              autoComplete="off"
-              placeholder={t('buildings.invite.fields.eBlocPlaceholder')}
             />
           )}
         </form.AppField>

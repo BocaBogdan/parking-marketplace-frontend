@@ -49,9 +49,6 @@ export function BuildingMembers({ members, invites }: BuildingMembersProps) {
                   {t('buildings.users.columns.apartment')}
                 </th>
                 <th scope="col" className="px-4 py-3">
-                  {t('buildings.users.columns.eBloc')}
-                </th>
-                <th scope="col" className="px-4 py-3">
                   {t('buildings.users.columns.role')}
                 </th>
                 <th scope="col" className="px-4 py-3">
@@ -73,9 +70,6 @@ export function BuildingMembers({ members, invites }: BuildingMembersProps) {
                     </span>
                   </th>
                   <td className="px-4 py-3">{member.apartment || '—'}</td>
-                  <td className="px-4 py-3 text-muted-foreground tabular-nums">
-                    {member.eBlocUserID || '—'}
-                  </td>
                   <td className="px-4 py-3">
                     <RoleBadge role={member.role} />
                   </td>

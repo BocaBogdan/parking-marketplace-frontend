@@ -39,8 +39,7 @@ export const en = {
     phone: 'Use international format, e.g. +40712345678',
     email: 'Enter a valid email address',
     apartmentRequired: 'Enter the apartment',
-    eBlocRequired: 'Enter the eBloc user ID',
-    inviteColumns: 'Expected email, apartment and eBloc user ID',
+    inviteColumns: 'Expected email and apartment',
     inviteDuplicate: 'This email appears more than once',
     buildingNameRequired: 'Enter the building name',
     buildingDescriptionRequired: 'Add a short description, e.g. the address',
@@ -445,7 +444,6 @@ export const en = {
       columns: {
         name: 'Name',
         apartment: 'Apartment',
-        eBloc: 'eBloc ID',
         role: 'Role',
         joined: 'Joined',
       },
@@ -520,8 +518,8 @@ export const en = {
         description:
           'Everyone listed gets an email with a link to create their {{building}} account.',
         label: 'Residents',
-        placeholder: 'ana@example.com, 12, 4821\nmihai@example.com, 14B, 4822',
-        hint: 'One resident per line: email, apartment, eBloc user ID. Paste from a spreadsheet or import a CSV.',
+        placeholder: 'ana@example.com, 12\nmihai@example.com, 14B',
+        hint: 'One resident per line: email, apartment. Paste from a spreadsheet or import a CSV.',
         import: 'Import CSV',
         lineError: 'Line {{line}}: {{reason}}',
         ready_one: '{{count}} resident ready to invite',
@@ -534,8 +532,6 @@ export const en = {
         emailPlaceholder: 'name@example.com',
         apartment: 'Apartment',
         apartmentPlaceholder: '12B',
-        eBloc: 'eBloc user ID',
-        eBlocPlaceholder: '4821',
         buildingAdmin: 'Make them the building admin (can review spots and invite residents)',
       },
       toast: {

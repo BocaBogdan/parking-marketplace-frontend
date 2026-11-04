@@ -506,7 +506,6 @@ export interface components {
     schemas: {
         InviteUserDto: {
             email: string;
-            eBlocUserID: string;
             apartment: string;
             /** @enum {string} */
             role?: "BUILDING_ADMIN";

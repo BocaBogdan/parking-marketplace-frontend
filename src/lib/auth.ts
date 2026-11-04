@@ -71,6 +71,5 @@ declare global {
     role?: 'ADMIN' | 'BUILDING_ADMIN'
     buildingId?: string
     apartment?: string
-    eBlocUserID?: string
   }
 }

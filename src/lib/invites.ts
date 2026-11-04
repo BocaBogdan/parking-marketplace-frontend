@@ -4,7 +4,6 @@ import type { TranslationKey } from '@/i18n'
 export interface InviteRow {
   email: string
   apartment: string
-  eBlocUserID: string
 }
 
 export interface InviteLineError {
@@ -16,7 +15,7 @@ export interface InviteLineError {
 const isEmail = (value: string) => z.email().safeParse(value).success
 
 /**
- * Parses pasted residents, one per line: `email, apartment, eBloc user ID`. Commas,
+ * Parses pasted residents, one per line: `email, apartment`. Commas,
  * semicolons and tabs all separate columns, so rows copied from a spreadsheet or a CSV
  * export work as-is. Blank lines and a leading header row are skipped.
  */
@@ -31,9 +30,9 @@ export function parseInvites(text: string) {
     const cells = raw.split(/[,;\t]/).map((cell) => cell.trim())
     if (rows.length === 0 && errors.length === 0 && cells[0].toLowerCase() === 'email') return
 
-    const [email = '', apartment = '', eBlocUserID = ''] = cells
+    const [email = '', apartment = ''] = cells
     const reason: TranslationKey | undefined =
-      cells.length !== 3 || !apartment || !eBlocUserID
+      cells.length !== 2 || !apartment
         ? 'validation.inviteColumns'
         : !isEmail(email)
           ? 'validation.email'
@@ -44,7 +43,7 @@ export function parseInvites(text: string) {
     if (reason) errors.push({ line, reason })
     else {
       seen.add(email.toLowerCase())
-      rows.push({ email, apartment, eBlocUserID })
+      rows.push({ email, apartment })
     }
   })
 

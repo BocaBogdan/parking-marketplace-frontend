@@ -46,8 +46,7 @@ export const ro = {
     phone: 'Folosește formatul internațional, de ex. +40712345678',
     email: 'Introdu o adresă de email validă',
     apartmentRequired: 'Introdu apartamentul',
-    eBlocRequired: 'Introdu ID-ul de utilizator eBloc',
-    inviteColumns: 'Se așteaptă email, apartament și ID eBloc',
+    inviteColumns: 'Se așteaptă email și apartament',
     inviteDuplicate: 'Acest email apare de mai multe ori',
     buildingNameRequired: 'Introdu numele clădirii',
     buildingDescriptionRequired: 'Adaugă o scurtă descriere, de ex. adresa',
@@ -472,7 +471,6 @@ export const ro = {
       columns: {
         name: 'Nume',
         apartment: 'Apartament',
-        eBloc: 'ID eBloc',
         role: 'Rol',
         joined: 'Înscris',
       },
@@ -547,8 +545,8 @@ export const ro = {
         description:
           'Fiecare persoană din listă primește un email cu un link pentru a-și crea contul în {{building}}.',
         label: 'Locatari',
-        placeholder: 'ana@exemplu.ro, 12, 4821\nmihai@exemplu.ro, 14B, 4822',
-        hint: 'Câte un locatar pe rând: email, apartament, ID eBloc. Lipește dintr-un tabel sau importă un CSV.',
+        placeholder: 'ana@exemplu.ro, 12\nmihai@exemplu.ro, 14B',
+        hint: 'Câte un locatar pe rând: email, apartament. Lipește dintr-un tabel sau importă un CSV.',
         import: 'Importă CSV',
         lineError: 'Rândul {{line}}: {{reason}}',
         ready_one: '{{count}} locatar pregătit pentru invitare',
@@ -563,8 +561,6 @@ export const ro = {
         emailPlaceholder: 'nume@exemplu.ro',
         apartment: 'Apartament',
         apartmentPlaceholder: '12B',
-        eBloc: 'ID utilizator eBloc',
-        eBlocPlaceholder: '4821',
         buildingAdmin:
           'Numește ca administrator al blocului (poate verifica locuri și invita locatari)',
       },
