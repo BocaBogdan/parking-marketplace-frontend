@@ -137,9 +137,9 @@ export function TermsRo({ appName }: { appName: string }) {
           </li>
           <li>Mașinile: numărul de înmatriculare, un număr de telefon și o descriere.</li>
           <li>
-            Locurile de parcare: numărul, descrierea, coordonatele, dacă e subteran, documentul PDF
-            care dovedește dreptul asupra locului, statusul aprobării și, dacă e cazul, motivul
-            respingerii.
+            Locurile de parcare: numărul, descrierea, coordonatele, dacă e subteran, statusul
+            aprobării și, dacă e cazul, motivul respingerii. Documentul PDF care dovedește dreptul
+            asupra locului îl păstrăm doar până când locul e aprobat; atunci îl ștergem.
           </li>
           <li>
             Disponibilitatea și rezervările: orele în care un loc e liber; cine a rezervat ce loc,
@@ -175,8 +175,8 @@ export function TermsRo({ appName }: { appName: string }) {
           </li>
           <li>
             Administratorul clădirii tale vede numele, emailul și apartamentul locatarilor,
-            documentele PDF ale locurilor din clădire și statistici despre rezervări, inclusiv
-            numere de înmatriculare.
+            documentele PDF ale locurilor din clădire care așteaptă aprobarea sau au fost respinse
+            și statistici despre rezervări, inclusiv numere de înmatriculare.
           </li>
           <li>
             Administratorul aplicației ({OPERATOR}) are acces la toate datele, ca să aprobe locuri
@@ -204,9 +204,9 @@ export function TermsRo({ appName }: { appName: string }) {
         <p>
           Nu ștergem automat datele după o anumită perioadă: ele rămân până când le ștergi tu, acolo
           unde aplicația permite, sau până ne ceri să le ștergem. Rezervările anulate și mașinile
-          șterse dispar din baza noastră de date. Când ștergi un loc, documentul PDF rămâne
-          deocamdată stocat; îl ștergem la cerere. Copii ale datelor pot rămâne o vreme în
-          backup-urile și jurnalele furnizorilor de mai sus.
+          șterse dispar din baza noastră de date. Documentul PDF al unui loc se șterge când locul e
+          aprobat sau când ștergi locul. Copii ale datelor pot rămâne o vreme în backup-urile și
+          jurnalele furnizorilor de mai sus.
         </p>
       </Section>
 
@@ -280,8 +280,9 @@ export function TermsEn({ appName }: { appName: string }) {
           <li>Building: your building, apartment and role (resident or building administrator).</li>
           <li>Cars: plate number, a phone number and a description.</li>
           <li>
-            Parking spots: number, description, coordinates, whether it's underground, the PDF
-            proving your right to the spot, approval status and, if any, the rejection reason.
+            Parking spots: number, description, coordinates, whether it's underground, approval
+            status and, if any, the rejection reason. The PDF proving your right to the spot is kept
+            only until the spot is approved; then we delete it.
           </li>
           <li>
             Availability and bookings: the hours a spot is free; who booked which spot, with which
@@ -315,7 +316,8 @@ export function TermsEn({ appName }: { appName: string }) {
           </li>
           <li>
             Your building administrator sees residents' names, emails and apartments, the PDFs of
-            the building's spots and booking statistics, including plate numbers.
+            the building's spots that are waiting for approval or were rejected, and booking
+            statistics, including plate numbers.
           </li>
           <li>
             The app administrator ({OPERATOR}) has access to all data, to approve spots and fix
@@ -343,8 +345,8 @@ export function TermsEn({ appName }: { appName: string }) {
         <p>
           We don't delete data automatically after a set time: it stays until you delete it, where
           the app lets you, or until you ask us to. Cancelled bookings and deleted cars are removed
-          from our database. When you delete a spot, its PDF currently stays stored; we delete it on
-          request. Copies may remain for a while in the backups and logs of the providers above.
+          from our database. A spot's PDF is deleted when the spot is approved or when you delete
+          the spot. Copies may remain for a while in the backups and logs of the providers above.
         </p>
       </Section>
 
