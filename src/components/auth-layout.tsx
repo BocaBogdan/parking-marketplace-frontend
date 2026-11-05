@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
 import { ShieldCheckIcon } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { LanguageSwitcher } from '@/components/language-switcher'
-import { useComingSoon } from '@/lib/coming-soon'
 
 /** Branded frame around Clerk's sign-in and sign-up cards */
 export function AuthLayout({ children }: { children: ReactNode }) {
@@ -36,27 +36,10 @@ export function AuthLayout({ children }: { children: ReactNode }) {
           <ShieldCheckIcon className="size-4 text-secondary" />
           {t('common.secureBayLocks')}
         </span>
-        <nav className="flex items-center gap-3 font-medium text-muted-foreground">
-          <ComingSoonLink label={t('common.help')} />
-          <span aria-hidden>•</span>
-          <ComingSoonLink label={t('common.terms')} />
-        </nav>
+        <Link to="/terms" className="font-medium text-muted-foreground hover:text-foreground">
+          {t('common.terms')}
+        </Link>
       </footer>
     </div>
-  )
-}
-
-/** Placeholder for pages that don't exist yet — shows a toast instead of navigating */
-function ComingSoonLink({ label, className }: { label: string; className?: string }) {
-  const comingSoon = useComingSoon()
-
-  return (
-    <button
-      type="button"
-      onClick={() => comingSoon(label)}
-      className={className ?? 'hover:text-foreground'}
-    >
-      {label}
-    </button>
   )
 }

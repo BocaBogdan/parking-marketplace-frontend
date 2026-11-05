@@ -12,8 +12,7 @@ import {
 interface NavItem {
   key: 'home' | 'findSpot' | 'mySpots' | 'myCars' | 'bookings' | 'buildings' | 'myBuilding'
   icon: LucideIcon
-  /** Omitted until the page exists — the item shows a "coming soon" toast instead */
-  to?: '/home' | '/find' | '/spots' | '/cars' | '/bookings' | '/buildings' | '/building/$buildingId'
+  to: '/home' | '/find' | '/spots' | '/cars' | '/bookings' | '/buildings' | '/building/$buildingId'
   /** Shown only to admins, or only to building admins (who get their building as `buildingId`) */
   audience?: 'admin' | 'buildingAdmin'
 }

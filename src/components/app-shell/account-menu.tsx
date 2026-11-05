@@ -4,6 +4,7 @@ import { Link } from '@tanstack/react-router'
 import {
   CoffeeIcon,
   ExternalLinkIcon,
+  FileTextIcon,
   LanguagesIcon,
   LogOutIcon,
   MessageSquareTextIcon,
@@ -97,6 +98,12 @@ export function AccountMenu() {
             </a>
           </DropdownMenuItem>
         )}
+        <DropdownMenuItem asChild>
+          <Link to="/terms">
+            <FileTextIcon />
+            {t('common.terms')}
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem variant="destructive" onSelect={() => void logout()}>
           <LogOutIcon />
           {t('auth.logout')}

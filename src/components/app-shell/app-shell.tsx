@@ -1,18 +1,14 @@
 import { Link, Outlet, useLocation } from '@tanstack/react-router'
-import { BellIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { Button } from '@/components/ui/button'
 import { AccountMenu } from '@/components/app-shell/account-menu'
 import { LogoMark } from '@/components/app-shell/logo-mark'
 import { navItems } from '@/components/app-shell/nav-items'
 import { NavLinks } from '@/components/app-shell/nav-link'
-import { useComingSoon } from '@/lib/coming-soon'
 
 export function AppShell() {
   const { t } = useTranslation()
-  const comingSoon = useComingSoon()
   const pathname = useLocation({ select: (location) => location.pathname })
-  const current = navItems.find((item) => item.to && pathname.startsWith(item.to))
+  const current = navItems.find((item) => pathname.startsWith(item.to))
 
   return (
     <div className="min-h-svh bg-background">
@@ -34,14 +30,6 @@ export function AppShell() {
             <NavLinks variant="inline" />
           </nav>
           <div className="ml-auto flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon-lg"
-              aria-label={t('nav.notifications')}
-              onClick={() => comingSoon(t('nav.notifications'))}
-            >
-              <BellIcon className="size-5" />
-            </Button>
             <AccountMenu />
           </div>
         </div>

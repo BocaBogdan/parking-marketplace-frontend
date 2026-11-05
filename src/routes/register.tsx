@@ -1,5 +1,6 @@
 import { SignUp } from '@clerk/react'
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute, Link, redirect } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 import { AuthLayout } from '@/components/auth-layout'
 import { isAuthenticated } from '@/lib/auth'
 
@@ -14,9 +15,20 @@ export const Route = createFileRoute('/register')({
 })
 
 function RegisterPage() {
+  const { t } = useTranslation()
+
   return (
     <AuthLayout>
-      <SignUp routing="hash" forceRedirectUrl="/home" />
+      <div className="grid justify-items-center gap-4">
+        <SignUp routing="hash" forceRedirectUrl="/home" />
+        <p className="max-w-sm text-center text-sm text-muted-foreground">
+          {t('terms.registerNotice')}{' '}
+          <Link to="/terms" className="font-medium text-primary hover:underline">
+            {t('terms.title').toLowerCase()}
+          </Link>
+          .
+        </p>
+      </div>
     </AuthLayout>
   )
 }
