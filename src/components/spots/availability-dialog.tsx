@@ -43,7 +43,7 @@ export function AvailabilityDialog({ spot, onOpenChange }: AvailabilityDialogPro
 
   return (
     <Dialog open={spot !== undefined} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[calc(100svh-2rem)] overflow-y-auto sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg">
         {spot && (
           <>
             <DialogHeader>
