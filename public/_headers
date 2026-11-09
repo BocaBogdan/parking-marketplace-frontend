@@ -1,0 +1,7 @@
+# Applied by Cloudflare to every page. HSTS is set in the Cloudflare dashboard instead.
+# Keep a Referrer-Policy that sends the origin: the Google Maps key is restricted by referrer.
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(self), camera=(), microphone=()
