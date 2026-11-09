@@ -179,7 +179,7 @@ export function TermsRo({ appName }: { appName: string }) {
             și statistici despre rezervări, inclusiv numere de înmatriculare.
           </li>
           <li>
-            Administratorul aplicației ({OPERATOR}) are acces la toate datele, ca să aprobe locuri
+            Administratorul aplicației are acces la toate datele, ca să aprobe locuri
             și să rezolve probleme.
           </li>
         </List>
@@ -320,7 +320,7 @@ export function TermsEn({ appName }: { appName: string }) {
             statistics, including plate numbers.
           </li>
           <li>
-            The app administrator ({OPERATOR}) has access to all data, to approve spots and fix
+            The app administrator has access to all data, to approve spots and fix
             problems.
           </li>
         </List>

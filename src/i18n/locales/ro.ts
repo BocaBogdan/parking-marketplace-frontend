@@ -7,7 +7,7 @@ type Locale<T> = { [K in keyof T]: T[K] extends string ? string : Locale<T[K]> }
 
 export const ro = {
   common: {
-    appName: 'ParkSpot',
+    appName: 'ResidentialParking',
     tagline: 'Schimb de locuri de parcare între vecini',
     verificationBadge: 'Vecini verificați',
     secureBayLocks: 'Locuri securizate',

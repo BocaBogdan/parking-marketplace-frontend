@@ -1,6 +1,6 @@
 export const en = {
   common: {
-    appName: 'ParkSpot',
+    appName: 'ResidentialParking',
     tagline: 'Residential Parking Exchange',
     verificationBadge: 'Safe Neighbor Verification',
     secureBayLocks: 'Secure Bay Locks',
