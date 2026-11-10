@@ -21,8 +21,11 @@ export interface Spot {
   lat: string
   /** Only offered to owners of an approved underground spot (the backend filters search) */
   underground: boolean
-  /** R2 key of the PDF proving the owner has the right to the spot */
-  fileId: string
+  /**
+   * R2 key of the PDF proving the owner has the right to the spot. Null when the building
+   * doesn't require one, or once the spot is approved (approval deletes it).
+   */
+  fileId: string | null
   /** New and edited spots wait for an admin; only CONFIRMED ones can be booked */
   status: SpotStatus
   /** The admin's reason, set only while the spot is REJECTED */
@@ -62,6 +65,13 @@ export interface Building {
   description: string
   createdAt: string
   updatedAt: string
+}
+
+/** A feature flag defined in the backend, and whether one building has it on */
+export interface BuildingFeatureFlag {
+  key: string
+  description: string
+  enabled: boolean
 }
 
 export type OverrideType = 'FREE' | 'BUSY'

@@ -34,7 +34,7 @@ export function SpotDocumentDialog({ spot, onOpenChange }: SpotDocumentDialogPro
               </DialogTitle>
               <DialogDescription>{t('buildings.spots.document.description')}</DialogDescription>
             </DialogHeader>
-            <DocumentPreview spot={spot} />
+            {spot.fileId && <DocumentPreview spot={spot} fileId={spot.fileId} />}
           </>
         )}
       </DialogContent>
@@ -42,9 +42,10 @@ export function SpotDocumentDialog({ spot, onOpenChange }: SpotDocumentDialogPro
   )
 }
 
-function DocumentPreview({ spot }: { spot: Spot }) {
+/** `fileId` is the spot's, narrowed to one that exists */
+function DocumentPreview({ spot, fileId }: { spot: Spot; fileId: string }) {
   const { t } = useTranslation()
-  const { data: url, error, isPending } = useQuery(documentUrlQuery(spot.buildingId, spot.fileId))
+  const { data: url, error, isPending } = useQuery(documentUrlQuery(spot.buildingId, fileId))
 
   if (isPending) {
     return (

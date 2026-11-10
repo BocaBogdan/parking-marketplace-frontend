@@ -51,12 +51,13 @@ export function currentSlotAvailabilityQuery(now: number) {
 type SpotFields = Pick<Spot, 'number' | 'description' | 'underground'>
 
 /**
- * Registers a spot for review. The body is multipart: the proof PDF is the `file` part, and
+ * Registers a spot. The body is multipart: the proof PDF is the `file` part, and
  * `location[lat]` / `location[long]` arrive as the nested `location` object (multer parses
- * the brackets).
+ * the brackets). Buildings with SPOT_DOCUMENT_NOT_REQUIRED take no document and approve
+ * the spot at once; everywhere else the document is required and the spot waits for review.
  */
 export function createSpot(
-  fields: SpotFields & { location: components['schemas']['LocationDto']; document: File },
+  fields: SpotFields & { location: components['schemas']['LocationDto']; document?: File },
 ) {
   const form = new FormData()
   form.append('number', String(fields.number))
@@ -64,7 +65,7 @@ export function createSpot(
   form.append('underground', String(fields.underground))
   form.append('location[lat]', fields.location.lat)
   form.append('location[long]', fields.location.long)
-  form.append('file', fields.document, fields.document.name)
+  if (fields.document) form.append('file', fields.document, fields.document.name)
   return unwrap<Spot>(
     api.POST('/api/spot', {
       // openapi-fetch sends FormData as is, letting the browser set the multipart boundary
@@ -74,7 +75,8 @@ export function createSpot(
 }
 
 /**
- * Fields left out stay as they are. Any edit sends the spot back to PENDING for review.
+ * Fields left out stay as they are. Any edit sends the spot back to PENDING for review,
+ * except in buildings with SPOT_DOCUMENT_NOT_REQUIRED, where only a rejected spot goes back.
  * TODO: the backend spreads the body straight into the entity, so `location` (not a column)
  * would fail, and PATCH takes no file. Add both once the endpoint maps them.
  */

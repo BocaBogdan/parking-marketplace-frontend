@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { HashIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -16,6 +16,7 @@ import { DocumentInput } from '@/components/spots/document-input'
 import { LocationPicker } from '@/components/spots/location-picker'
 import { setServerErrors, useAppForm } from '@/lib/form'
 import { documentSchema } from '@/lib/spot-document'
+import { currentFeatureFlagsQuery, SPOT_DOCUMENT_NOT_REQUIRED } from '@/queries/feature-flags'
 import { createSpot, updateSpot } from '@/queries/spots'
 import type { Spot } from '@/types/models'
 
@@ -29,8 +30,8 @@ const coordinate = (max: number, message: 'validation.latitude' | 'validation.lo
 
 // Mirrors CreateSpotDto in the backend (description is a varchar(255)); messages are
 // translation keys. Location and document are only sent on create (see updateSpot), so an
-// edit doesn't check them.
-const spotFormSchema = (isNew: boolean) =>
+// edit doesn't check them; buildings that don't require a document skip it altogether.
+const spotFormSchema = (isNew: boolean, documentRequired: boolean) =>
   z.object({
     number: z
       .string()
@@ -40,7 +41,7 @@ const spotFormSchema = (isNew: boolean) =>
     underground: z.boolean(),
     lat: isNew ? coordinate(90, 'validation.latitude') : z.string(),
     long: isNew ? coordinate(180, 'validation.longitude') : z.string(),
-    document: isNew
+    document: documentRequired
       ? documentSchema.refine((file) => file !== null, 'validation.documentRequired')
       : documentSchema,
   })
@@ -69,8 +70,14 @@ function SpotForm({ spot, onDone }: { spot?: Spot; onDone: () => void }) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
 
-  // Saving any edit sends the spot back for review; only a pending spot loses nothing by it
-  const resubmits = spot !== undefined && spot.status !== 'PENDING'
+  const { data: flags } = useQuery(currentFeatureFlagsQuery)
+  // The building approves spots without a document, so only rejected ones go back to an admin
+  const documentOptional = flags?.includes(SPOT_DOCUMENT_NOT_REQUIRED) ?? false
+
+  // Saving an edit sends the spot back for review; only a pending spot loses nothing by it
+  const resubmits =
+    spot !== undefined &&
+    (documentOptional ? spot.status === 'REJECTED' : spot.status !== 'PENDING')
 
   const save = useMutation({
     mutationFn: (values: SpotFormValues) => {
@@ -83,13 +90,19 @@ function SpotForm({ spot, onDone }: { spot?: Spot; onDone: () => void }) {
       return createSpot({
         ...fields,
         location: { lat: values.lat.trim(), long: values.long.trim() },
-        // The schema requires it for a new spot
-        document: values.document!,
+        // The schema requires it unless the building doesn't
+        document: documentOptional ? undefined : (values.document ?? undefined),
       })
     },
     onSuccess: async (saved) => {
       await queryClient.invalidateQueries({ queryKey: ['spots'] })
-      const key = !spot ? 'created' : resubmits ? 'resubmitted' : 'updated'
+      const key = !spot
+        ? documentOptional
+          ? 'createdLive'
+          : 'created'
+        : resubmits
+          ? 'resubmitted'
+          : 'updated'
       toast.success(t(`spots.toast.${key}`, { number: saved.number }))
       onDone()
     },
@@ -106,7 +119,7 @@ function SpotForm({ spot, onDone }: { spot?: Spot; onDone: () => void }) {
 
   const form = useAppForm({
     defaultValues,
-    validators: { onChange: spotFormSchema(spot === undefined) },
+    validators: { onChange: spotFormSchema(spot === undefined, !spot && !documentOptional) },
     onSubmit: async ({ value, formApi }) => {
       try {
         await save.mutateAsync(value)
@@ -128,7 +141,11 @@ function SpotForm({ spot, onDone }: { spot?: Spot; onDone: () => void }) {
         </DialogTitle>
         <DialogDescription>
           {!spot
-            ? t('spots.form.createDescription')
+            ? t(
+                documentOptional
+                  ? 'spots.form.createDescriptionNoReview'
+                  : 'spots.form.createDescription',
+              )
             : t(resubmits ? 'spots.form.resubmitDescription' : 'spots.form.editDescription')}
         </DialogDescription>
       </DialogHeader>
@@ -219,25 +236,27 @@ function SpotForm({ spot, onDone }: { spot?: Spot; onDone: () => void }) {
                 />
               )}
             </form.Subscribe>
-            <form.Field name="document">
-              {(field) => (
-                <form.Subscribe selector={(state) => state.submissionAttempts > 0}>
-                  {(submitted) => (
-                    <DocumentInput
-                      file={field.state.value}
-                      hasDocumentOnFile={false}
-                      onChange={(file) => field.handleChange(file)}
-                      // Shown right away for a wrong file; "required" only once they submit
-                      error={
-                        field.state.value || submitted
-                          ? firstErrorMessage(field.state.meta.errors)
-                          : undefined
-                      }
-                    />
-                  )}
-                </form.Subscribe>
-              )}
-            </form.Field>
+            {!documentOptional && (
+              <form.Field name="document">
+                {(field) => (
+                  <form.Subscribe selector={(state) => state.submissionAttempts > 0}>
+                    {(submitted) => (
+                      <DocumentInput
+                        file={field.state.value}
+                        hasDocumentOnFile={false}
+                        onChange={(file) => field.handleChange(file)}
+                        // Shown right away for a wrong file; "required" only once they submit
+                        error={
+                          field.state.value || submitted
+                            ? firstErrorMessage(field.state.meta.errors)
+                            : undefined
+                        }
+                      />
+                    )}
+                  </form.Subscribe>
+                )}
+              </form.Field>
+            )}
           </>
         )}
         <form.AppForm>

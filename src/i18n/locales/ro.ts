@@ -147,6 +147,8 @@ export const ro = {
     form: {
       createTitle: 'Înregistrează un loc',
       createDescription: 'Vecinii îl pot rezerva imediat ce îi adaugi orele săptămânale.',
+      createDescriptionNoReview:
+        'Nu e nevoie de document: locul este aprobat imediat, iar vecinii îl pot rezerva imediat ce îi adaugi orele săptămânale.',
       editTitle: 'Editează locul {{number}}',
       editDescription: 'Actualizează detaliile locului tău.',
       resubmitTitle: 'Editează și retrimite locul {{number}}',
@@ -223,6 +225,7 @@ export const ro = {
     },
     toast: {
       created: 'Locul {{number}} a fost înregistrat',
+      createdLive: 'Locul {{number}} a fost înregistrat și aprobat',
       updated: 'Locul {{number}} a fost actualizat',
       resubmitted: 'Locul {{number}} a fost retrimis spre aprobare',
       withdrawn: 'Locul {{number}} a fost retras',
@@ -454,6 +457,19 @@ export const ro = {
     detail: {
       added: 'Adăugată pe {{date}}',
       description: 'Descriere',
+    },
+    features: {
+      title: 'Funcționalități',
+      hint: 'Activează sau dezactivează funcționalități pentru această clădire.',
+      empty: 'Nu există încă funcționalități definite.',
+      flags: {
+        SPOT_DOCUMENT_NOT_REQUIRED: {
+          label: 'Locuri fără document',
+          description:
+            'Locatarii înregistrează locuri fără să încarce un document doveditor, iar locurile sunt aprobate imediat. Le poți respinge în continuare.',
+        },
+      },
+      toast: { on: '„{{name}}” a fost activată', off: '„{{name}}” a fost dezactivată' },
     },
     form: {
       title: 'Creează o clădire',

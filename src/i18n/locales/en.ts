@@ -136,6 +136,8 @@ export const en = {
     form: {
       createTitle: 'Register a spot',
       createDescription: 'Neighbours can book it as soon as you add its weekly hours.',
+      createDescriptionNoReview:
+        'No document needed: it’s approved right away, and neighbours can book it as soon as you add its weekly hours.',
       editTitle: 'Edit spot {{number}}',
       editDescription: 'Update the details of your spot.',
       resubmitTitle: 'Edit & resubmit spot {{number}}',
@@ -206,6 +208,7 @@ export const en = {
     },
     toast: {
       created: 'Spot {{number}} registered',
+      createdLive: 'Spot {{number}} registered and approved',
       updated: 'Spot {{number}} updated',
       resubmitted: 'Spot {{number}} resubmitted for review',
       withdrawn: 'Spot {{number}} withdrawn',
@@ -428,6 +431,19 @@ export const en = {
     detail: {
       added: 'Added {{date}}',
       description: 'Description',
+    },
+    features: {
+      title: 'Features',
+      hint: 'Turn features on or off for this building.',
+      empty: 'No feature flags are defined yet.',
+      flags: {
+        SPOT_DOCUMENT_NOT_REQUIRED: {
+          label: 'Spots without a document',
+          description:
+            'Residents register spots without uploading a proof document, and the spots are approved right away. You can still reject them.',
+        },
+      },
+      toast: { on: '“{{name}}” turned on', off: '“{{name}}” turned off' },
     },
     form: {
       title: 'Create a building',

@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { BuildingMembers } from '@/components/buildings/building-members'
+import { BuildingFeatures } from '@/components/buildings/building-features'
 import { BulkInviteDialog } from '@/components/buildings/bulk-invite-dialog'
 import { InviteResidentDialog } from '@/components/buildings/invite-resident-dialog'
 import { SpotDocumentDialog } from '@/components/buildings/spot-document-dialog'
@@ -67,7 +68,8 @@ function BuildingPage() {
   const countOf = (tab: (typeof statusTabs)[number]) =>
     tab === 'ALL' ? spots.length : spots.filter((spot) => spot.status === tab).length
   const shown = status === 'ALL' ? spots : spots.filter((spot) => spot.status === status)
-  const viewing = spots.find((spot) => spot.id === document)
+  // Approved spots and buildings without document review have nothing to preview
+  const viewing = spots.find((spot) => spot.id === document && spot.fileId)
 
   const setSearch = (next: { invite?: 'single' | 'bulk'; document?: string }) =>
     void navigate({ search: { tab, status, range, ...next }, replace: true, resetScroll: false })
@@ -123,6 +125,8 @@ function BuildingPage() {
         </h2>
         <p className="whitespace-pre-line">{building.description}</p>
       </section>
+
+      {isAdmin && <BuildingFeatures buildingId={building.id} />}
 
       <nav aria-label={building.name} className="flex gap-6 border-b text-sm font-semibold">
         {sections.map((key) => (

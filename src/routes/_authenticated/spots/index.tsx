@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { AvailabilityDialog } from '@/components/spots/availability-dialog'
 import { SpotCard } from '@/components/spots/spot-card'
 import { SpotFormDialog } from '@/components/spots/spot-form-dialog'
+import { currentFeatureFlagsQuery } from '@/queries/feature-flags'
 import { spotSchedulesQuery } from '@/queries/schedules'
 import { mySpotsQuery } from '@/queries/spots'
 
@@ -24,7 +25,11 @@ const searchSchema = z.object({
 export const Route = createFileRoute('/_authenticated/spots/')({
   validateSearch: searchSchema,
   loader: async ({ context: { queryClient } }) => {
-    const spots = await queryClient.query({ ...mySpotsQuery, staleTime: 'static' })
+    const [spots] = await Promise.all([
+      queryClient.query({ ...mySpotsQuery, staleTime: 'static' }),
+      // The spot form depends on them (whether a document is needed)
+      queryClient.query({ ...currentFeatureFlagsQuery, staleTime: 'static' }),
+    ])
     // Every card shows the spot's weekly hours
     await Promise.all(
       spots.map((spot) =>
