@@ -38,7 +38,7 @@ export function BuildingMembers({ members, invites }: BuildingMembersProps) {
       {members.length === 0 ? (
         <BuildingSpotsEmpty message={t('buildings.users.empty')} />
       ) : (
-        <div className="overflow-x-auto rounded-2xl border bg-card shadow-xs">
+        <div className="overflow-x-auto rounded-2xl border bg-card shadow-xs relative">
           <table className="w-full min-w-2xl text-left text-sm">
             <thead className="border-b bg-muted/60 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
               <tr>

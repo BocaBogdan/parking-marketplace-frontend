@@ -34,7 +34,7 @@ export function SpotReviewTable({ buildingId, spots, onViewDocument }: SpotRevie
 
   return (
     // Eight columns don't fit a phone; the table scrolls sideways inside its card
-    <div className="overflow-x-auto rounded-2xl border bg-card shadow-xs">
+    <div className="overflow-x-auto rounded-2xl border bg-card shadow-xs relative">
       <table className="w-full min-w-4xl text-left text-sm">
         <thead className="border-b bg-muted/60 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
           <tr>
