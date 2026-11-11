@@ -8,7 +8,7 @@ type Variant = 'tab' | 'inline'
 const styles: Record<Variant, { base: string; active: string }> = {
   // Bottom tab bar on mobile: icon above label
   tab: {
-    base: 'flex flex-1 flex-col items-center gap-1 py-2 text-[11px] font-medium text-muted-foreground',
+    base: 'flex flex-1 flex-col items-center gap-1 py-2 text-[11px] font-medium text-muted-foreground text-center',
     active: 'text-primary [&_svg]:fill-primary/15',
   },
   // Header links on wider screens
