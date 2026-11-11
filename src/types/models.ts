@@ -22,7 +22,7 @@ export interface Spot {
   /** Only offered to owners of an approved underground spot (the backend filters search) */
   underground: boolean
   /**
-   * R2 key of the PDF proving the owner has the right to the spot. Null when the building
+   * R2 key of the document (PDF or photo) proving the owner has the right to the spot. Null when the building
    * doesn't require one, or once the spot is approved (approval deletes it).
    */
   fileId: string | null

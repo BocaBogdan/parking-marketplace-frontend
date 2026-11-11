@@ -51,7 +51,7 @@ export function currentSlotAvailabilityQuery(now: number) {
 type SpotFields = Pick<Spot, 'number' | 'description' | 'underground'>
 
 /**
- * Registers a spot. The body is multipart: the proof PDF is the `file` part, and
+ * Registers a spot. The body is multipart: the proof document (PDF or photo) is the `file` part, and
  * `location[lat]` / `location[long]` arrive as the nested `location` object (multer parses
  * the brackets). Buildings with SPOT_DOCUMENT_NOT_REQUIRED take no document and approve
  * the spot at once; everywhere else the document is required and the spot waits for review.

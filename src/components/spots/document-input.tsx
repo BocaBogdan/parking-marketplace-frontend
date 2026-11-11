@@ -1,6 +1,6 @@
 import { FileCheckIcon, FileUpIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { MAX_DOCUMENT_MB } from '@/lib/spot-document'
+import { DOCUMENT_ACCEPT, MAX_DOCUMENT_MB } from '@/lib/spot-document'
 import { cn } from '@/lib/utils'
 
 interface DocumentInputProps {
@@ -11,7 +11,7 @@ interface DocumentInputProps {
   error: string | undefined
 }
 
-/** Picks the PDF proving the owner has the right to the spot */
+/** Picks the PDF or photo proving the owner has the right to the spot */
 export function DocumentInput({ file, hasDocumentOnFile, onChange, error }: DocumentInputProps) {
   const { t, i18n } = useTranslation()
   const size = (bytes: number) =>
@@ -57,7 +57,7 @@ export function DocumentInput({ file, hasDocumentOnFile, onChange, error }: Docu
         )}
         <input
           type="file"
-          accept="application/pdf,.pdf"
+          accept={DOCUMENT_ACCEPT}
           className="sr-only"
           aria-invalid={error ? true : undefined}
           onChange={(e) => {

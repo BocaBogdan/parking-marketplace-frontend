@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { serverErrorMessage } from '@/lib/form'
+import { isImageDocument } from '@/lib/spot-document'
 import { documentUrlQuery } from '@/queries/admin-spots'
 import type { Spot } from '@/types/models'
 
@@ -19,7 +20,7 @@ interface SpotDocumentDialogProps {
   onOpenChange: (open: boolean) => void
 }
 
-/** Previews a spot's proof-of-ownership PDF, so the admin can check it before deciding */
+/** Previews a spot's proof-of-ownership document (PDF or photo), so the admin can check it before deciding */
 export function SpotDocumentDialog({ spot, onOpenChange }: SpotDocumentDialogProps) {
   const { t } = useTranslation()
 
@@ -69,11 +70,19 @@ function DocumentPreview({ spot, fileId }: { spot: Spot; fileId: string }) {
 
   return (
     <>
-      <iframe
-        src={url}
-        title={t('buildings.spots.document.title', { number: spot.number })}
-        className="min-h-0 w-full flex-1 rounded-lg border bg-muted"
-      />
+      {isImageDocument(fileId) ? (
+        <img
+          src={url}
+          alt={t('buildings.spots.document.title', { number: spot.number })}
+          className="min-h-0 w-full flex-1 rounded-lg border bg-muted object-contain"
+        />
+      ) : (
+        <iframe
+          src={url}
+          title={t('buildings.spots.document.title', { number: spot.number })}
+          className="min-h-0 w-full flex-1 rounded-lg border bg-muted"
+        />
+      )}
       {/* Most phone browsers can't show a PDF inside a page */}
       <Button asChild variant="outline" className="self-start">
         <a href={url} target="_blank" rel="noreferrer">
