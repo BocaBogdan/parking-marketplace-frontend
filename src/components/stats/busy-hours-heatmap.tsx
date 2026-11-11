@@ -137,6 +137,8 @@ export function BusyHoursTable({ cells, asShare = false }: HeatmapProps) {
       rows={busy.map((cell) => ({
         key: `${cell.dayOfWeek}-${cell.hour}`,
         cells: [text.day(cell), text.hour(cell), text.value(cell)],
+        // Monday first, like the heatmap
+        values: [(cell.dayOfWeek + 6) % 7, cell.hour, cell.avgSpotsInUse],
       }))}
     />
   )

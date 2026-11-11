@@ -11,19 +11,28 @@ import {
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 import { SpotReviewActions } from '@/components/buildings/spot-review-actions'
+import { DataTable } from '@/components/data-table/data-table'
+import { columnHelper } from '@/components/data-table/features'
 import { ReservationList } from '@/components/spots/reservation-list'
 import { SpotStatusBadge } from '@/components/spots/spot-status-badge'
 import { UndergroundBadge } from '@/components/spots/underground-badge'
 import { canManageBuilding } from '@/lib/auth'
 import { formatDate } from '@/lib/format'
-import { displayTime, sortSchedules, weekdayName, type DayOfWeek } from '@/lib/schedule'
+import {
+  dayOrder,
+  displayTime,
+  hoursSortValue,
+  sortSchedules,
+  weekdayName,
+  type DayOfWeek,
+} from '@/lib/schedule'
 import { useNow } from '@/lib/use-now'
 import { displayName } from '@/lib/users'
 import { cn } from '@/lib/utils'
 import { buildingSpotQuery, buildingSpotReservationsQuery } from '@/queries/admin-spots'
 import { buildingQuery } from '@/queries/buildings'
 import { buildingMembersQuery } from '@/queries/members'
-import type { AdminSpotDetail, BuildingMember } from '@/types/models'
+import type { AdminSpotDetail, BuildingMember, Schedule } from '@/types/models'
 
 const tabs = ['upcoming', 'past'] as const
 
@@ -220,6 +229,8 @@ function DetailsCard({ spot }: { spot: AdminSpotDetail }) {
   )
 }
 
+const scheduleCol = columnHelper<Schedule>()
+
 /** The owner's weekly hours, read-only: one row per day, Monday first */
 function WeeklyHours({ spot }: { spot: AdminSpotDetail }) {
   const { t, i18n } = useTranslation()
@@ -235,32 +246,21 @@ function WeeklyHours({ spot }: { spot: AdminSpotDetail }) {
     )
   }
 
-  return (
-    <div className="overflow-hidden rounded-2xl border bg-card shadow-xs">
-      <table className="w-full text-left text-sm">
-        <thead className="border-b bg-muted/60 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-          <tr>
-            <th scope="col" className="px-4 py-2.5">
-              {t('availability.columns.day')}
-            </th>
-            <th scope="col" className="px-4 py-2.5">
-              {t('availability.columns.hours')}
-            </th>
-          </tr>
-        </thead>
-        <tbody className="divide-y">
-          {schedules.map((schedule) => (
-            <tr key={schedule.id}>
-              <th scope="row" className="px-4 py-2.5 font-semibold">
-                {weekdayName(schedule.dayOfWeek as DayOfWeek, language, 'long')}
-              </th>
-              <td className="px-4 py-2.5 tabular-nums">
-                {displayTime(schedule.startMinute)} – {displayTime(schedule.endMinute)}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )
+  const columns = scheduleCol.columns([
+    scheduleCol.accessor((schedule) => dayOrder(schedule.dayOfWeek as DayOfWeek), {
+      id: 'day',
+      header: t('availability.columns.day'),
+      meta: { rowHeader: true, cellClassName: 'py-2.5 font-semibold' },
+      cell: ({ row }) => weekdayName(row.original.dayOfWeek as DayOfWeek, language, 'long'),
+    }),
+    scheduleCol.accessor(hoursSortValue, {
+      id: 'hours',
+      header: t('availability.columns.hours'),
+      meta: { cellClassName: 'py-2.5 tabular-nums' },
+      cell: ({ row }) =>
+        `${displayTime(row.original.startMinute)} – ${displayTime(row.original.endMinute)}`,
+    }),
+  ])
+
+  return <DataTable data={schedules} columns={columns} getRowId={(schedule) => schedule.id} />
 }

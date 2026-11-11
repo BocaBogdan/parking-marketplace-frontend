@@ -1,7 +1,10 @@
+import type { SortingState } from '@tanstack/react-table'
 import { MailIcon, ShieldCheckIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 import { BuildingSpotsEmpty } from '@/components/buildings/spot-review-table'
+import { DataTable } from '@/components/data-table/data-table'
+import { columnHelper } from '@/components/data-table/features'
 import { formatDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { displayName } from '@/lib/users'
@@ -26,61 +29,67 @@ function RoleBadge({ role }: { role: MembershipRole }) {
 interface BuildingMembersProps {
   members: BuildingMember[]
   invites: BuildingInvite[]
+  sorting: SortingState
+  onSortingChange: (sorting: SortingState) => void
 }
 
+const col = columnHelper<BuildingMember>()
+
 /** The Users tab: who lives in the building, and who's invited but hasn't signed up */
-export function BuildingMembers({ members, invites }: BuildingMembersProps) {
+export function BuildingMembers({
+  members,
+  invites,
+  sorting,
+  onSortingChange,
+}: BuildingMembersProps) {
   const { t, i18n } = useTranslation()
   const language = i18n.resolvedLanguage ?? 'en'
+
+  const columns = col.columns([
+    col.accessor((member) => displayName(member.user) || member.user.email, {
+      id: 'name',
+      header: t('buildings.users.columns.name'),
+      meta: { rowHeader: true },
+      cell: ({ row: { original: member } }) => (
+        <span className="grid">
+          <span className="font-semibold">{displayName(member.user) || member.user.email}</span>
+          {displayName(member.user) && (
+            <span className="text-muted-foreground">{member.user.email}</span>
+          )}
+        </span>
+      ),
+    }),
+    // No apartment sorts last
+    col.accessor((member) => member.apartment || undefined, {
+      id: 'apartment',
+      header: t('buildings.users.columns.apartment'),
+      cell: ({ getValue }) => getValue() ?? '—',
+    }),
+    col.accessor((member) => t(`buildings.users.role.${member.role}`), {
+      id: 'role',
+      header: t('buildings.users.columns.role'),
+      cell: ({ row }) => <RoleBadge role={row.original.role} />,
+    }),
+    col.accessor('createdAt', {
+      header: t('buildings.users.columns.joined'),
+      meta: { cellClassName: 'whitespace-nowrap text-muted-foreground tabular-nums' },
+      cell: ({ getValue }) => formatDate(getValue(), language),
+    }),
+  ])
 
   return (
     <div className="grid gap-5">
       {members.length === 0 ? (
         <BuildingSpotsEmpty message={t('buildings.users.empty')} />
       ) : (
-        <div className="overflow-x-auto rounded-2xl border bg-card shadow-xs relative">
-          <table className="w-full min-w-2xl text-left text-sm">
-            <thead className="border-b bg-muted/60 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-              <tr>
-                <th scope="col" className="px-4 py-3">
-                  {t('buildings.users.columns.name')}
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  {t('buildings.users.columns.apartment')}
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  {t('buildings.users.columns.role')}
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  {t('buildings.users.columns.joined')}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {members.map((member) => (
-                <tr key={member.id} className="align-middle">
-                  <th scope="row" className="px-4 py-3 font-normal">
-                    <span className="grid">
-                      <span className="font-semibold">
-                        {displayName(member.user) || member.user.email}
-                      </span>
-                      {displayName(member.user) && (
-                        <span className="text-muted-foreground">{member.user.email}</span>
-                      )}
-                    </span>
-                  </th>
-                  <td className="px-4 py-3">{member.apartment || '—'}</td>
-                  <td className="px-4 py-3">
-                    <RoleBadge role={member.role} />
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-muted-foreground tabular-nums">
-                    {formatDate(member.createdAt, language)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          data={members}
+          columns={columns}
+          getRowId={(member) => member.id}
+          sorting={sorting}
+          onSortingChange={onSortingChange}
+          className="min-w-2xl"
+        />
       )}
 
       {invites.length > 0 && (

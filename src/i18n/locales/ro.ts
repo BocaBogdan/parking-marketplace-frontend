@@ -591,6 +591,9 @@ export const ro = {
       },
     },
   },
+  table: {
+    sortBy: 'Sortează după {{column}}',
+  },
   errors: {
     network: 'Serverul nu poate fi contactat. Verifică conexiunea și încearcă din nou.',
     generic: 'A apărut o eroare. Încearcă din nou.',

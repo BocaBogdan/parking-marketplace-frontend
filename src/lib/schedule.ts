@@ -37,7 +37,8 @@ export function weekdayName(day: DayOfWeek, language: string, width: 'short' | '
   )
 }
 
-const dayOrder = (day: DayOfWeek) => DAYS.indexOf(day)
+/** Position in the week, Monday first */
+export const dayOrder = (day: DayOfWeek) => DAYS.indexOf(day)
 
 /** "Mon – Fri", "Sat, Sun", "Mon, Wed – Fri": runs of 3+ consecutive days are collapsed */
 export function formatDays(days: DayOfWeek[], language: string) {
@@ -86,6 +87,10 @@ export function groupSchedules(schedules: Schedule[]): ScheduleGroup[] {
     (a, b) => dayOrder(a.days[0]) - dayOrder(b.days[0]) || a.startMinute - b.startMinute,
   )
 }
+
+/** A row's hours as one number that sorts by start, then end (ends go up to 1440) */
+export const hoursSortValue = (schedule: Schedule) =>
+  schedule.startMinute * 1441 + schedule.endMinute
 
 /** One row per day, in week order (Monday first), earliest hours first */
 export function sortSchedules(schedules: Schedule[]) {

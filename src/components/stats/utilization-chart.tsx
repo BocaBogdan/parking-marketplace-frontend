@@ -81,6 +81,7 @@ export function UtilizationTable({ rows }: { rows: Row[] }) {
           text.hours(row.bookedMinutes),
           text.hours(row.offeredMinutes),
         ],
+        values: [row.number, utilizationOf(row) ?? null, row.bookedMinutes, row.offeredMinutes],
       }))}
     />
   )

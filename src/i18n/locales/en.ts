@@ -561,6 +561,9 @@ export const en = {
       },
     },
   },
+  table: {
+    sortBy: 'Sort by {{column}}',
+  },
   errors: {
     network: "Couldn't reach the server. Check your connection and try again.",
     generic: 'Something went wrong. Please try again.',

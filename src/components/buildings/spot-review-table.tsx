@@ -1,7 +1,10 @@
 import { Link, useNavigate } from '@tanstack/react-router'
+import type { SortingState } from '@tanstack/react-table'
 import { FileTextIcon, MapPinIcon, SquareParkingIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
+import { DataTable } from '@/components/data-table/data-table'
+import { columnHelper } from '@/components/data-table/features'
 import { SpotReviewActions } from '@/components/buildings/spot-review-actions'
 import { SpotStatusBadge } from '@/components/spots/spot-status-badge'
 import { UndergroundBadge } from '@/components/spots/underground-badge'
@@ -13,136 +16,139 @@ interface SpotReviewTableProps {
   buildingId: string
   spots: AdminSpot[]
   onViewDocument: (spot: Spot) => void
+  sorting: SortingState
+  onSortingChange: (sorting: SortingState) => void
 }
 
 const mapsUrl = (spot: Spot) =>
   `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${spot.lat},${spot.long}`)}`
 
+// Review order, the same as the status tabs
+const statusOrder: Spot['status'][] = ['PENDING', 'CONFIRMED', 'REJECTED']
+
+const col = columnHelper<AdminSpot>()
+
 /**
  * The admin's review table: owner, status, proof document, map link and approve/reject.
  * Clicking a row opens the spot's page with its schedule and reservations.
  */
-export function SpotReviewTable({ buildingId, spots, onViewDocument }: SpotReviewTableProps) {
+export function SpotReviewTable({
+  buildingId,
+  spots,
+  onViewDocument,
+  sorting,
+  onSortingChange,
+}: SpotReviewTableProps) {
   const { t, i18n } = useTranslation()
   const language = i18n.resolvedLanguage ?? 'en'
   const navigate = useNavigate()
-  const open = (spot: Spot) =>
-    void navigate({
-      to: '/building/$buildingId/spots/$spotId',
-      params: { buildingId, spotId: spot.id },
-    })
+
+  const columns = col.columns([
+    col.accessor('number', {
+      header: t('buildings.spots.columns.number'),
+      meta: { rowHeader: true },
+      cell: ({ row: { original: spot } }) => (
+        // The keyboard-reachable way into the spot; the row click is a mouse shortcut
+        <Link
+          to="/building/$buildingId/spots/$spotId"
+          params={{ buildingId, spotId: spot.id }}
+          aria-label={t('buildings.spots.open', { number: spot.number })}
+          className="inline-flex size-10 items-center justify-center rounded-lg bg-primary-50 text-base font-bold text-primary outline-none hover:bg-primary-100 focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-primary-950"
+        >
+          {spot.number}
+        </Link>
+      ),
+    }),
+    col.accessor('description', {
+      header: t('buildings.spots.columns.description'),
+      meta: { cellClassName: 'max-w-56 text-muted-foreground' },
+      cell: ({ getValue }) => <span className="line-clamp-2">{getValue()}</span>,
+    }),
+    col.accessor((spot) => (spot.owner ? displayName(spot.owner) || spot.owner.email : undefined), {
+      id: 'owner',
+      header: t('buildings.spots.columns.owner'),
+      meta: { cellClassName: 'max-w-56' },
+      cell: ({ row }) => <OwnerCell owner={row.original.owner} />,
+    }),
+    col.accessor((spot) => statusOrder.indexOf(spot.status), {
+      id: 'status',
+      header: t('buildings.spots.columns.status'),
+      cell: ({ row: { original: spot } }) => (
+        <div
+          className="flex flex-wrap gap-1.5"
+          // The full reason is on the spot's page; a hover is enough in the list
+          title={spot.rejectionReason ?? undefined}
+        >
+          <SpotStatusBadge status={spot.status} />
+          {spot.underground && <UndergroundBadge />}
+        </div>
+      ),
+    }),
+    col.accessor('updatedAt', {
+      header: t('buildings.spots.columns.submitted'),
+      meta: { cellClassName: 'whitespace-nowrap text-muted-foreground tabular-nums' },
+      cell: ({ getValue }) => formatDate(getValue(), language),
+    }),
+    // Spots with a document to check come first
+    col.accessor((spot) => (spot.status === 'PENDING' && spot.fileId ? 0 : 1), {
+      id: 'document',
+      header: t('buildings.spots.columns.document'),
+      cell: ({ row: { original: spot } }) =>
+        spot.status === 'PENDING' && spot.fileId ? (
+          <Button
+            size="sm"
+            variant="ghost"
+            className="bg-primary-50 text-primary hover:bg-primary-100 hover:text-primary dark:bg-primary-950"
+            aria-label={t('buildings.spots.document.view', { number: spot.number })}
+            onClick={() => onViewDocument(spot)}
+          >
+            <FileTextIcon />
+            {t('buildings.spots.document.action')}
+          </Button>
+        ) : (
+          <span className="text-muted-foreground">{t('buildings.spots.document.none')}</span>
+        ),
+    }),
+    col.display({
+      id: 'location',
+      header: t('buildings.spots.columns.location'),
+      cell: ({ row: { original: spot } }) => (
+        <a
+          href={mapsUrl(spot)}
+          target="_blank"
+          rel="noreferrer"
+          aria-label={t('buildings.spots.location', { number: spot.number })}
+          className="inline-flex items-center gap-1 font-semibold text-primary hover:underline"
+        >
+          <MapPinIcon className="size-4" />
+          {t('buildings.spots.map')}
+        </a>
+      ),
+    }),
+    col.display({
+      id: 'actions',
+      header: t('buildings.spots.columns.actions'),
+      meta: { srOnlyHeader: true },
+      cell: ({ row }) => <SpotReviewActions buildingId={buildingId} spot={row.original} />,
+    }),
+  ])
 
   return (
     // Eight columns don't fit a phone; the table scrolls sideways inside its card
-    <div className="overflow-x-auto rounded-2xl border bg-card shadow-xs relative">
-      <table className="w-full min-w-4xl text-left text-sm">
-        <thead className="border-b bg-muted/60 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-          <tr>
-            <th scope="col" className="px-4 py-3">
-              {t('buildings.spots.columns.number')}
-            </th>
-            <th scope="col" className="px-4 py-3">
-              {t('buildings.spots.columns.description')}
-            </th>
-            <th scope="col" className="px-4 py-3">
-              {t('buildings.spots.columns.owner')}
-            </th>
-            <th scope="col" className="px-4 py-3">
-              {t('buildings.spots.columns.status')}
-            </th>
-            <th scope="col" className="px-4 py-3">
-              {t('buildings.spots.columns.submitted')}
-            </th>
-            <th scope="col" className="px-4 py-3">
-              {t('buildings.spots.columns.document')}
-            </th>
-            <th scope="col" className="px-4 py-3">
-              {t('buildings.spots.columns.location')}
-            </th>
-            <th scope="col" className="px-4 py-3">
-              <span className="sr-only">{t('buildings.spots.columns.actions')}</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody className="divide-y">
-          {spots.map((spot) => (
-            <tr
-              key={spot.id}
-              // The number is the keyboard-reachable link; the rest of the row is a mouse shortcut.
-              // React bubbles clicks out of portals too, so ignore ones from the review dialogs.
-              onClick={(e) => {
-                const target = e.target as HTMLElement
-                if (e.currentTarget.contains(target) && !target.closest('a, button')) open(spot)
-              }}
-              className="cursor-pointer align-middle transition-colors hover:bg-muted/40"
-            >
-              <th scope="row" className="px-4 py-3">
-                <Link
-                  to="/building/$buildingId/spots/$spotId"
-                  params={{ buildingId, spotId: spot.id }}
-                  aria-label={t('buildings.spots.open', { number: spot.number })}
-                  className="inline-flex size-10 items-center justify-center rounded-lg bg-primary-50 text-base font-bold text-primary outline-none hover:bg-primary-100 focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-primary-950"
-                >
-                  {spot.number}
-                </Link>
-              </th>
-              <td className="max-w-56 px-4 py-3 text-muted-foreground">
-                <span className="line-clamp-2">{spot.description}</span>
-              </td>
-              <td className="max-w-56 px-4 py-3">
-                <OwnerCell owner={spot.owner} />
-              </td>
-              <td className="px-4 py-3">
-                <div
-                  className="flex flex-wrap gap-1.5"
-                  // The full reason is on the spot's page; a hover is enough in the list
-                  title={spot.rejectionReason ?? undefined}
-                >
-                  <SpotStatusBadge status={spot.status} />
-                  {spot.underground && <UndergroundBadge />}
-                </div>
-              </td>
-              <td className="px-4 py-3 whitespace-nowrap text-muted-foreground tabular-nums">
-                {formatDate(spot.updatedAt, language)}
-              </td>
-              <td className="px-4 py-3">
-                {spot.status === 'PENDING' && spot.fileId ? (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="bg-primary-50 text-primary hover:bg-primary-100 hover:text-primary dark:bg-primary-950"
-                    aria-label={t('buildings.spots.document.view', { number: spot.number })}
-                    onClick={() => onViewDocument(spot)}
-                  >
-                    <FileTextIcon />
-                    {t('buildings.spots.document.action')}
-                  </Button>
-                ) : (
-                  <span className="text-muted-foreground">
-                    {t('buildings.spots.document.none')}
-                  </span>
-                )}
-              </td>
-              <td className="px-4 py-3">
-                <a
-                  href={mapsUrl(spot)}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label={t('buildings.spots.location', { number: spot.number })}
-                  className="inline-flex items-center gap-1 font-semibold text-primary hover:underline"
-                >
-                  <MapPinIcon className="size-4" />
-                  {t('buildings.spots.map')}
-                </a>
-              </td>
-              <td className="px-4 py-3">
-                <SpotReviewActions buildingId={buildingId} spot={spot} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <DataTable
+      data={spots}
+      columns={columns}
+      getRowId={(spot) => spot.id}
+      sorting={sorting}
+      onSortingChange={onSortingChange}
+      onRowClick={(spot) =>
+        void navigate({
+          to: '/building/$buildingId/spots/$spotId',
+          params: { buildingId, spotId: spot.id },
+        })
+      }
+      className="min-w-4xl"
+    />
   )
 }
 

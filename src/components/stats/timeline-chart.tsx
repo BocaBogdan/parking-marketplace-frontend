@@ -90,6 +90,7 @@ export function TimelineTable({ buckets, unit }: { buckets: StatsBucket[]; unit:
       rows={buckets.map((bucket) => ({
         key: bucket.bucketStart,
         cells: [long(bucket.bucketStart), bucket.bookings, formatHours(bucket.minutes, language)],
+        values: [bucket.bucketStart, bucket.bookings, bucket.minutes],
       }))}
     />
   )

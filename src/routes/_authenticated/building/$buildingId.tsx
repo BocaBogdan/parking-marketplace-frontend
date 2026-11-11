@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link, redirect } from '@tanstack/react-router'
+import type { SortingState } from '@tanstack/react-table'
 import { ArrowLeftIcon, Loader2Icon, MailPlusIcon, UsersIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
@@ -14,6 +15,7 @@ import { BuildingSpotsEmpty, SpotReviewTable } from '@/components/buildings/spot
 import { canManageBuilding, useIsAdmin } from '@/lib/auth'
 import { formatDate } from '@/lib/format'
 import { STATS_RANGES } from '@/lib/stats'
+import { fromSorting, sortSearchSchema, toSorting } from '@/lib/table-sort'
 import { cn } from '@/lib/utils'
 import { buildingSpotsQuery } from '@/queries/admin-spots'
 import { buildingQuery } from '@/queries/buildings'
@@ -36,6 +38,8 @@ const searchSchema = z.object({
   invite: z.enum(['single', 'bulk']).optional().catch(undefined),
   document: z.uuid().optional().catch(undefined),
   range: z.enum(STATS_RANGES).optional().catch(undefined),
+  // The open tab's table order
+  ...sortSearchSchema,
 })
 
 // Not under _admin: a building admin opens their own building here too
@@ -57,7 +61,15 @@ export const Route = createFileRoute('/_authenticated/building/$buildingId')({
 function BuildingPage() {
   const { t, i18n } = useTranslation()
   const { buildingId } = Route.useParams()
-  const { tab = 'spots', status = 'PENDING', invite, document, range = '30d' } = Route.useSearch()
+  const {
+    tab = 'spots',
+    status = 'PENDING',
+    invite,
+    document,
+    range = '30d',
+    sort,
+    dir,
+  } = Route.useSearch()
   const navigate = Route.useNavigate()
   const isAdmin = useIsAdmin()
   const { data: building } = useSuspenseQuery(buildingQuery(buildingId))
@@ -72,7 +84,18 @@ function BuildingPage() {
   const viewing = spots.find((spot) => spot.id === document && spot.fileId)
 
   const setSearch = (next: { invite?: 'single' | 'bulk'; document?: string }) =>
-    void navigate({ search: { tab, status, range, ...next }, replace: true, resetScroll: false })
+    void navigate({
+      search: { tab, status, range, sort, dir, ...next },
+      replace: true,
+      resetScroll: false,
+    })
+  const sorting = toSorting({ sort, dir })
+  const setSorting = (next: SortingState) =>
+    void navigate({
+      search: (prev) => ({ ...prev, ...fromSorting(next) }),
+      replace: true,
+      resetScroll: false,
+    })
   const setInvite = (next: 'single' | 'bulk' | undefined) => setSearch({ invite: next })
   const closeOnDismiss = (open: boolean) => !open && setInvite(undefined)
 
@@ -160,7 +183,7 @@ function BuildingPage() {
                 <Link
                   key={key}
                   from={Route.fullPath}
-                  search={{ tab: 'spots', status: key }}
+                  search={{ tab: 'spots', status: key, sort, dir }}
                   replace
                   resetScroll={false}
                   aria-current={status === key ? 'page' : undefined}
@@ -181,11 +204,18 @@ function BuildingPage() {
                 buildingId={building.id}
                 spots={shown}
                 onViewDocument={(spot) => setSearch({ document: spot.id })}
+                sorting={sorting}
+                onSortingChange={setSorting}
               />
             )}
           </>
         ) : tab === 'users' ? (
-          <BuildingMembers members={members} invites={invites} />
+          <BuildingMembers
+            members={members}
+            invites={invites}
+            sorting={sorting}
+            onSortingChange={setSorting}
+          />
         ) : (
           <Suspense
             fallback={

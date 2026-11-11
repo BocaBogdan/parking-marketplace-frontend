@@ -7,6 +7,7 @@ import { ReserveDialog } from '@/components/find/reserve-dialog'
 import { ResultsTable } from '@/components/find/results-table'
 import { WindowFilter } from '@/components/find/window-filter'
 import { resolveWindow, toSearch } from '@/lib/booking-window'
+import { fromSorting, sortSearchSchema, toSorting } from '@/lib/table-sort'
 import { useNow } from '@/lib/use-now'
 import { myCarsQuery } from '@/queries/cars'
 import { availableSpotsQuery, mySpotsQuery } from '@/queries/spots'
@@ -19,6 +20,8 @@ const searchSchema = z.object({
   to: z.string().optional().catch(undefined),
   toNextDay: z.boolean().optional().catch(undefined),
   reserve: z.uuid().optional().catch(undefined),
+  // Order of the results table
+  ...sortSearchSchema,
 })
 
 export const Route = createFileRoute('/_authenticated/find')({
@@ -69,7 +72,12 @@ function FindSpotPage() {
         window={window}
         now={now}
         onChange={(next) =>
-          void navigate({ search: toSearch(next, now), replace: true, resetScroll: false })
+          void navigate({
+            // A new window keeps the chosen order
+            search: { ...toSearch(next, now), sort: search.sort, dir: search.dir },
+            replace: true,
+            resetScroll: false,
+          })
         }
       />
 
@@ -89,6 +97,14 @@ function FindSpotPage() {
         )}
         <ResultsTable
           spots={spots}
+          sorting={toSorting(search)}
+          onSortingChange={(next) =>
+            void navigate({
+              search: (prev) => ({ ...prev, ...fromSorting(next) }),
+              replace: true,
+              resetScroll: false,
+            })
+          }
           onReserve={(spot) =>
             void navigate({
               search: (prev) => ({ ...prev, reserve: spot.id }),

@@ -5,6 +5,8 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
+import { DataTable } from '@/components/data-table/data-table'
+import { columnHelper } from '@/components/data-table/features'
 import {
   Dialog,
   DialogContent,
@@ -18,8 +20,10 @@ import { DaySelect, TimeSelect } from '@/components/spots/schedule-selects'
 import { serverErrorMessage, setServerErrors, useAppForm } from '@/lib/form'
 import {
   DAYS,
+  dayOrder,
   displayTime,
   END_TIMES,
+  hoursSortValue,
   overlapsExisting,
   sortSchedules,
   START_TIMES,
@@ -39,9 +43,12 @@ function useInvalidateSchedules(spotId: string) {
     ])
 }
 
+const col = columnHelper<Schedule>()
+
 /** A spot's weekly hours, one row per day, each editable and removable */
 export function ScheduleTable({ spot }: { spot: Spot }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const language = i18n.resolvedLanguage ?? 'en'
   const { data } = useSuspenseQuery(spotSchedulesQuery(spot.id))
   const schedules = sortSchedules(data)
   const [editing, setEditing] = useState<Schedule>()
@@ -55,36 +62,43 @@ export function ScheduleTable({ spot }: { spot: Spot }) {
     )
   }
 
+  const columns = col.columns([
+    col.accessor((schedule) => dayOrder(schedule.dayOfWeek as DayOfWeek), {
+      id: 'day',
+      header: t('availability.columns.day'),
+      meta: { rowHeader: true, cellClassName: 'py-1.5 font-semibold capitalize' },
+      cell: ({ row }) => weekdayName(row.original.dayOfWeek as DayOfWeek, language, 'long'),
+    }),
+    col.accessor(hoursSortValue, {
+      id: 'hours',
+      header: t('availability.columns.hours'),
+      meta: { cellClassName: 'py-1.5 whitespace-nowrap text-muted-foreground tabular-nums' },
+      cell: ({ row }) =>
+        `${displayTime(row.original.startMinute)} – ${displayTime(row.original.endMinute)}`,
+    }),
+    col.display({
+      id: 'actions',
+      header: t('availability.columns.actions'),
+      meta: { srOnlyHeader: true, cellClassName: 'px-1 py-1.5' },
+      cell: ({ row }) => (
+        <ScheduleActions
+          spotId={spot.id}
+          schedule={row.original}
+          onEdit={() => setEditing(row.original)}
+        />
+      ),
+    }),
+  ])
+
   return (
     <>
-      <div className="overflow-hidden rounded-xl border">
-        <table className="w-full text-left text-sm">
-          <caption className="sr-only">{t('availability.weekly')}</caption>
-          <thead className="bg-muted/60 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-            <tr>
-              <th scope="col" className="px-3 py-2">
-                {t('availability.columns.day')}
-              </th>
-              <th scope="col" className="px-3 py-2">
-                {t('availability.columns.hours')}
-              </th>
-              <th scope="col" className="px-3 py-2">
-                <span className="sr-only">{t('availability.columns.actions')}</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y">
-            {schedules.map((schedule) => (
-              <ScheduleRow
-                key={schedule.id}
-                spotId={spot.id}
-                schedule={schedule}
-                onEdit={() => setEditing(schedule)}
-              />
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <DataTable
+        data={schedules}
+        columns={columns}
+        getRowId={(schedule) => schedule.id}
+        variant="compact"
+        caption={t('availability.weekly')}
+      />
       <EditScheduleDialog
         spotId={spot.id}
         schedule={editing}
@@ -95,13 +109,14 @@ export function ScheduleTable({ spot }: { spot: Spot }) {
   )
 }
 
-interface ScheduleRowProps {
+interface ScheduleActionsProps {
   spotId: string
   schedule: Schedule
   onEdit: () => void
 }
 
-function ScheduleRow({ spotId, schedule, onEdit }: ScheduleRowProps) {
+/** Edit and remove for one row */
+function ScheduleActions({ spotId, schedule, onEdit }: ScheduleActionsProps) {
   const { t, i18n } = useTranslation()
   const invalidate = useInvalidateSchedules(spotId)
   const day = weekdayName(schedule.dayOfWeek as DayOfWeek, i18n.resolvedLanguage ?? 'en', 'long')
@@ -116,37 +131,27 @@ function ScheduleRow({ spotId, schedule, onEdit }: ScheduleRowProps) {
   })
 
   return (
-    <tr className="align-middle">
-      <th scope="row" className="px-3 py-1.5 font-semibold capitalize">
-        {day}
-      </th>
-      <td className="px-3 py-1.5 whitespace-nowrap text-muted-foreground tabular-nums">
-        {from} – {to}
-      </td>
-      <td className="px-1 py-1.5">
-        <div className="flex justify-end">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-muted-foreground"
-            aria-label={t('availability.edit', { day, from, to })}
-            onClick={onEdit}
-          >
-            <PencilIcon />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-muted-foreground hover:text-destructive"
-            aria-label={t('availability.remove', { days: day, from, to })}
-            disabled={remove.isPending}
-            onClick={() => remove.mutate()}
-          >
-            {remove.isPending ? <Loader2Icon className="animate-spin" /> : <Trash2Icon />}
-          </Button>
-        </div>
-      </td>
-    </tr>
+    <div className="flex justify-end">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="text-muted-foreground"
+        aria-label={t('availability.edit', { day, from, to })}
+        onClick={onEdit}
+      >
+        <PencilIcon />
+      </Button>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="text-muted-foreground hover:text-destructive"
+        aria-label={t('availability.remove', { days: day, from, to })}
+        disabled={remove.isPending}
+        onClick={() => remove.mutate()}
+      >
+        {remove.isPending ? <Loader2Icon className="animate-spin" /> : <Trash2Icon />}
+      </Button>
+    </div>
   )
 }
 

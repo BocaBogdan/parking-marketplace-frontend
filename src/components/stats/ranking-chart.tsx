@@ -114,6 +114,13 @@ export function RankingTable({
           item.bookings,
           formatHours(item.minutes, language),
         ],
+        values: [
+          index + 1,
+          item.label,
+          ...(detailHeading ? [item.detail ?? null] : []),
+          item.bookings,
+          item.minutes,
+        ],
       }))}
     />
   )

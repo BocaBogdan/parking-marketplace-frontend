@@ -2,6 +2,8 @@ import { useState, type ReactNode } from 'react'
 import { ChartColumnIcon, ChartNoAxesColumnIcon, TableIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
+import { DataTable } from '@/components/data-table/data-table'
+import { columnHelper } from '@/components/data-table/features'
 import { cn } from '@/lib/utils'
 
 interface ChartCardProps {
@@ -64,42 +66,40 @@ export function ChartCard({
   )
 }
 
-/** A compact table for a chart's table view. Columns after the first two are numbers. */
+type StatsRow = {
+  key: string
+  cells: ReactNode[]
+  /** The raw value of each cell to sort by (cells are formatted); null sorts last */
+  values?: (string | number | null)[]
+}
+
+const statsCol = columnHelper<StatsRow>()
+
+/**
+ * A compact table for a chart's table view. Columns after the first two are numbers.
+ * Columns sort by `values` when the rows give them.
+ */
 export function StatsTable({
   head,
   rows,
   numericFrom = 2,
 }: {
   head: string[]
-  rows: { key: string; cells: ReactNode[] }[]
+  rows: StatsRow[]
   /** Index of the first right-aligned (numeric) column */
   numericFrom?: number
 }) {
-  const align = (index: number) => (index >= numericFrom ? 'text-right tabular-nums' : '')
-  return (
-    <table className="w-full text-left text-sm">
-      <thead className="sticky top-0 bg-muted text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-        <tr>
-          {head.map((label, index) => (
-            <th key={label} scope="col" className={cn('px-3 py-2', align(index))}>
-              {label}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody className="divide-y">
-        {rows.map((row) => (
-          <tr key={row.key}>
-            {row.cells.map((cell, index) => (
-              <td key={index} className={cn('px-3 py-2', align(index))}>
-                {cell}
-              </td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
+  const sortable = rows.length > 0 && rows.every((row) => row.values !== undefined)
+  const columns = head.map((label, index) =>
+    statsCol.accessor((row) => row.values?.[index] ?? undefined, {
+      id: String(index),
+      header: label,
+      enableSorting: sortable,
+      meta: index >= numericFrom ? { align: 'right' as const } : undefined,
+      cell: ({ row }) => row.original.cells[index],
+    }),
   )
+  return <DataTable data={rows} columns={columns} getRowId={(row) => row.key} variant="embedded" />
 }
 
 /** The hover card of a chart mark: what it is, then its values */
