@@ -17,6 +17,8 @@ interface TextFieldProps extends Omit<
   /** Rendered at the end of the label row, e.g. a "Forgot password?" link */
   labelAction?: ReactNode
   hint?: string
+  /** Rewrites what's typed or pasted before it's stored, e.g. stripping spaces */
+  normalize?: (value: string) => string
 }
 
 export function TextField({
@@ -24,6 +26,7 @@ export function TextField({
   icon: Icon,
   labelAction,
   hint,
+  normalize,
   type = 'text',
   className,
   ...props
@@ -58,7 +61,9 @@ export function TextField({
           name={field.name}
           type={isPassword && isPasswordVisible ? 'text' : type}
           value={field.state.value}
-          onChange={(e) => field.handleChange(e.target.value)}
+          onChange={(e) =>
+            field.handleChange(normalize ? normalize(e.target.value) : e.target.value)
+          }
           onBlur={field.handleBlur}
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy}

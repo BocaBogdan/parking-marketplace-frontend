@@ -12,17 +12,19 @@ import {
 } from '@/components/ui/dialog'
 import { FormError } from '@/components/form/form-error'
 import { setServerErrors, useAppForm } from '@/lib/form'
+import { normalizePlate } from '@/lib/plate'
 import { createCar, updateCar } from '@/queries/cars'
 import type { Car } from '@/types/models'
 
-// Mirrors CreateCarDto in the backend; the plate is upper-cased before saving
+// Mirrors CreateCarDto in the backend. The plate field strips spaces and dashes as they're
+// typed (normalizePlate), so what's left must be letters and digits.
 const carFormSchema = z.object({
   plate: z
     .string()
     .trim()
     .min(1, 'validation.plateRequired')
     .max(20, 'validation.plateMax')
-    .regex(/^[\p{L}\d][\p{L}\d -]*$/u, 'validation.plate'),
+    .regex(/^[\p{L}\d]+$/u, 'validation.plate'),
   description: z
     .string()
     .trim()
@@ -60,7 +62,7 @@ function CarForm({ car, onDone }: { car?: Car; onDone: () => void }) {
   const save = useMutation({
     mutationFn: (values: CarFormValues) => {
       const body = {
-        plate: values.plate.trim().toUpperCase(),
+        plate: normalizePlate(values.plate),
         description: values.description.trim(),
         phone: values.phone.trim(),
       }
@@ -121,6 +123,7 @@ function CarForm({ car, onDone }: { car?: Car; onDone: () => void }) {
               autoCapitalize="characters"
               spellCheck={false}
               placeholder={t('cars.form.platePlaceholder')}
+              normalize={normalizePlate}
               className="font-mono tracking-wider uppercase placeholder:font-sans placeholder:tracking-normal placeholder:normal-case"
             />
           )}
