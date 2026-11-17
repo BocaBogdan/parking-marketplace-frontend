@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="512" height="512">
+  <!-- favicon.svg without rounded corners: phones round home-screen icons themselves -->
+  <rect width="64" height="64" fill="#2563EB"/>
+  <path d="M21 48V16h12a10 10 0 0 1 0 20H21" fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="45" cy="47" r="5" fill="#FBBF24"/>
+</svg>
