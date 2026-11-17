@@ -1,6 +1,6 @@
 import { useClerk, useUser } from '@clerk/react'
 import { useQueryClient } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import {
   Building2Icon,
   CoffeeIcon,
@@ -24,7 +24,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { languages } from '@/i18n'
-import { useCurrentMembership, useMemberships } from '@/lib/auth'
+import { useCurrentMembership, useIsAdmin, useMemberships } from '@/lib/auth'
 import { env } from '@/lib/env'
 import { useBuildingStore } from '@/stores/building-store'
 
@@ -47,11 +47,22 @@ export function AccountMenu() {
   const memberships = useMemberships()
   const current = useCurrentMembership()
   const selectBuilding = useBuildingStore((state) => state.select)
+  const isAdmin = useIsAdmin()
+  const navigate = useNavigate()
+  // Set only on a building's admin pages (/building/$buildingId and its spot pages)
+  const openBuildingId = useParams({ strict: false }).buildingId
 
-  const switchBuilding = (buildingId: string) => {
+  const switchBuilding = async (buildingId: string) => {
     const membership = memberships.find((m) => m.buildingId === buildingId)
     if (!membership || buildingId === current?.buildingId) return
     selectBuilding(buildingId)
+    // On the admin pages of the building being left, follow the switch: the new building's
+    // admin page if they manage it, else home. Other buildings (an admin browsing) stay open.
+    if (openBuildingId && openBuildingId === current?.buildingId) {
+      await (isAdmin || membership.role === 'BUILDING_ADMIN'
+        ? navigate({ to: '/building/$buildingId', params: { buildingId } })
+        : navigate({ to: '/home' }))
+    }
     // Spots, bookings and flags all depend on the building. Reset rather than invalidate:
     // loaders read the cache with staleTime 'static', which would keep the old building's data
     void queryClient.resetQueries({ predicate: (query) => query.queryKey[0] !== 'me' })
@@ -89,7 +100,10 @@ export function AccountMenu() {
               <Building2Icon className="size-4" />
               {t('account.building.title')}
             </DropdownMenuLabel>
-            <DropdownMenuRadioGroup value={current?.buildingId} onValueChange={switchBuilding}>
+            <DropdownMenuRadioGroup
+              value={current?.buildingId}
+              onValueChange={(buildingId) => void switchBuilding(buildingId)}
+            >
               {memberships.map((membership) => (
                 <DropdownMenuRadioItem key={membership.buildingId} value={membership.buildingId}>
                   <span className="truncate">{membership.building.name}</span>
