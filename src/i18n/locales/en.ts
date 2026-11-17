@@ -70,9 +70,16 @@ export const en = {
     donate: 'Enjoying the app?',
     donateLink: 'Buy me a coffee ☕',
   },
+  account: {
+    building: {
+      title: 'Building',
+      switched: 'Switched to {{name}}',
+    },
+  },
   home: {
     greeting: 'Hello, {{name}}',
     apartment: 'Apartment {{number}}',
+    apartmentIn: 'Apartment {{number}}, {{building}}',
     verified: 'Verified neighbour',
     stats: { mySpots: 'My Spots', myCars: 'My Cars', active: 'Active' },
     registerSpot: {
@@ -482,6 +489,20 @@ export const en = {
         apartment: 'Apartment',
         role: 'Role',
         joined: 'Joined',
+        actions: 'Actions',
+      },
+      roleChange: {
+        actions: 'Actions for {{name}}',
+        makeAdmin: 'Make building admin',
+        makeResident: 'Make resident',
+        confirmAdminTitle: 'Make {{name}} a building admin of {{building}}?',
+        confirmAdminBody: "They'll be able to manage the building's spots, users and invitations.",
+        confirmResidentTitle: 'Make {{name}} a resident of {{building}}?',
+        confirmResidentBody:
+          "They'll no longer be able to manage the building. Their spots and bookings stay.",
+        confirm: 'Change role',
+        cancel: 'Cancel',
+        saved: "{{name}}'s role was changed",
       },
     },
     spots: {

@@ -420,6 +420,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/{buildingId}/member/{membershipId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["MemberController_updateRole"];
+        trace?: never;
+    };
     "/api/admin/{buildingId}/stats": {
         parameters: {
             query?: never;
@@ -660,6 +676,10 @@ export interface components {
         SetFeatureFlagDto: {
             enabled: boolean;
         };
+        UpdateMemberRoleDto: {
+            /** @enum {string} */
+            role: "RESIDENT" | "BUILDING_ADMIN";
+        };
         CreateBuildingDto: {
             name: string;
             description: string;
@@ -678,11 +698,19 @@ export interface components {
         };
         CreateCarDto: {
             phone: string;
+            /**
+             * @description Spaces and dashes are removed and letters upper-cased
+             * @example TM54ATM
+             */
             plate: string;
             description: string;
         };
         UpdateCarDto: {
             phone?: string;
+            /**
+             * @description Spaces and dashes are removed and letters upper-cased
+             * @example TM54ATM
+             */
             plate?: string;
             description?: string;
         };
@@ -1385,6 +1413,30 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MemberController_updateRole: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                buildingId: string;
+                membershipId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateMemberRoleDto"];
+            };
+        };
         responses: {
             200: {
                 headers: {

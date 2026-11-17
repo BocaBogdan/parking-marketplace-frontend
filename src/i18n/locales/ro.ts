@@ -77,9 +77,16 @@ export const ro = {
     donate: 'Îți place aplicația?',
     donateLink: 'Cumpără-mi o cafea ☕',
   },
+  account: {
+    building: {
+      title: 'Bloc',
+      switched: 'Ai trecut la {{name}}',
+    },
+  },
   home: {
     greeting: 'Salut, {{name}}',
     apartment: 'Apartament {{number}}',
+    apartmentIn: 'Apartament {{number}}, {{building}}',
     verified: 'Vecin verificat',
     stats: { mySpots: 'Locurile mele', myCars: 'Mașinile mele', active: 'Active' },
     registerSpot: {
@@ -508,6 +515,19 @@ export const ro = {
         apartment: 'Apartament',
         role: 'Rol',
         joined: 'Înscris',
+        actions: 'Acțiuni',
+      },
+      roleChange: {
+        actions: 'Acțiuni pentru {{name}}',
+        makeAdmin: 'Fă-l administrator de bloc',
+        makeResident: 'Fă-l locatar',
+        confirmAdminTitle: 'Faci din {{name}} administrator al blocului {{building}}?',
+        confirmAdminBody: 'Va putea gestiona locurile, utilizatorii și invitațiile blocului.',
+        confirmResidentTitle: 'Faci din {{name}} locatar în {{building}}?',
+        confirmResidentBody: 'Nu va mai putea gestiona blocul. Locurile și rezervările lui rămân.',
+        confirm: 'Schimbă rolul',
+        cancel: 'Renunță',
+        saved: 'Rolul pentru {{name}} a fost schimbat',
       },
     },
     spots: {

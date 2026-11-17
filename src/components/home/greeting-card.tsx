@@ -1,12 +1,14 @@
 import { useUser } from '@clerk/react'
 import { Building2Icon, ShieldCheckIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { useCurrentMembership, useMemberships } from '@/lib/auth'
 
 export function GreetingCard() {
   const { t } = useTranslation()
   const { user } = useUser()
-  // Invited residents get their apartment from the invitation (public metadata)
-  const apartment = user?.publicMetadata.apartment
+  const current = useCurrentMembership()
+  // Someone in several buildings also sees which one they're acting in
+  const showBuilding = useMemberships().length > 1
   const firstName =
     user?.firstName || user?.fullName || user?.primaryEmailAddress?.emailAddress.split('@')[0]
 
@@ -22,10 +24,17 @@ export function GreetingCard() {
             👋
           </span>
         </h1>
-        {apartment && (
+        {current && (current.apartment || showBuilding) && (
           <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
             <Building2Icon className="size-4 text-primary" />
-            {t('home.apartment', { number: apartment })}
+            {showBuilding
+              ? current.apartment
+                ? t('home.apartmentIn', {
+                    number: current.apartment,
+                    building: current.building.name,
+                  })
+                : current.building.name
+              : t('home.apartment', { number: current.apartment })}
           </p>
         )}
       </div>

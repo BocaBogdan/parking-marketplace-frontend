@@ -246,6 +246,8 @@ function BuildingPage() {
             invites={invites}
             sorting={sorting}
             onSortingChange={setSorting}
+            canEditRoles={isAdmin}
+            buildingName={building.name}
           />
         ) : (
           <Suspense

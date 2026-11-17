@@ -4,8 +4,8 @@ import type { Me } from '@/types/models'
 
 /**
  * The signed-in user and their buildings. The first call also creates their account in
- * the backend and turns their pending invites into memberships.
- * TODO: route guards still read roles from Clerk metadata; switch them to this.
+ * the backend and turns their pending invites into memberships. Roles come from here
+ * (see lib/auth), not from Clerk.
  */
 export const meQuery = queryOptions({
   queryKey: ['me'],

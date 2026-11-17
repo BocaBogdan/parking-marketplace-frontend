@@ -1,5 +1,10 @@
-import { useUser, type useClerk } from '@clerk/react'
+import { type useClerk } from '@clerk/react'
+import { useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
+import { queryClient } from '@/lib/query-client'
+import { meQuery } from '@/queries/me'
+import { useBuildingStore } from '@/stores/building-store'
+import type { Me } from '@/types/models'
 
 type Clerk = ReturnType<typeof useClerk>
 
@@ -22,37 +27,67 @@ export function currentUserId(): string {
   return userId
 }
 
-/** The building the user was invited to (invitation public metadata), if any */
-export function currentBuildingId(): string | undefined {
-  return clerk()?.user?.publicMetadata.buildingId
+/*
+ * Clerk only signs people in. What they may do comes from GET /user/me, which the
+ * _authenticated layout loads before any child guard runs:
+ * - admins (`isAdmin`, set by hand in the database) manage every building;
+ * - building admins manage each building where their membership has that role;
+ * - anyone can belong to several buildings and act in one at a time (the switcher).
+ * These only hide pages; the backend enforces the same rules.
+ */
+
+export type Membership = Me['memberships'][number]
+
+/** For guards outside React; the _authenticated layout has loaded it by then */
+function cachedMe() {
+  return queryClient.getQueryData(meQuery.queryKey)
 }
 
-/**
- * Admins manage every building and are marked by hand in the Clerk dashboard (Users → user →
- * Public metadata: `{ "role": "ADMIN" }`). Building admins manage only the building they live
- * in (`buildingId`) and get the role through their invitation. These only hide pages; the
- * backend enforces the same rules.
- */
+/** Oldest first, the order the API picks its default building in */
+function sortedMemberships(me: Me | undefined) {
+  return [...(me?.memberships ?? [])].sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+}
+
+function managedBuildingIds(me: Me | undefined) {
+  return sortedMemberships(me)
+    .filter((membership) => membership.role === 'BUILDING_ADMIN')
+    .map((membership) => membership.buildingId)
+}
+
 export function isAdmin() {
-  return clerk()?.user?.publicMetadata.role === 'ADMIN'
+  return cachedMe()?.isAdmin ?? false
 }
 
 export function useIsAdmin() {
-  return useUser().user?.publicMetadata.role === 'ADMIN'
-}
-
-function managedBuilding(metadata: UserPublicMetadata | undefined) {
-  return metadata?.role === 'BUILDING_ADMIN' ? metadata.buildingId : undefined
-}
-
-/** The building a building admin manages; undefined for everyone else, admins included */
-export function useManagedBuildingId() {
-  return managedBuilding(useUser().user?.publicMetadata)
+  return useQuery(meQuery).data?.isAdmin ?? false
 }
 
 /** Whether the signed-in user may open a building's admin page */
 export function canManageBuilding(buildingId: string) {
-  return isAdmin() || managedBuilding(clerk()?.user?.publicMetadata) === buildingId
+  const me = cachedMe()
+  return !!me && (me.isAdmin || managedBuildingIds(me).includes(buildingId))
+}
+
+/** The user's buildings, oldest first */
+export function useMemberships() {
+  return sortedMemberships(useQuery(meQuery).data)
+}
+
+/** The building the user acts in: the switcher's pick while it's still theirs, else the oldest */
+export function useCurrentMembership(): Membership | undefined {
+  const memberships = useMemberships()
+  const selected = useBuildingStore((state) => state.selectedBuildingId)
+  return memberships.find((m) => m.buildingId === selected) ?? memberships[0]
+}
+
+/**
+ * The building "My building" opens: the current one if they manage it, else the first they
+ * manage; undefined for anyone who manages none (admins reach buildings from the list).
+ */
+export function useManagedBuildingId() {
+  const current = useCurrentMembership()
+  const managed = managedBuildingIds(useQuery(meQuery).data)
+  return current?.role === 'BUILDING_ADMIN' ? current.buildingId : managed[0]
 }
 
 // Only follow same-origin paths so ?redirect= can't bounce users to another site
@@ -63,13 +98,3 @@ export const authSearchSchema = z.object({
     .optional()
     .catch(undefined),
 })
-
-// What the backend's invite endpoint stores on the Clerk user (InviteUserDto minus email),
-// where `role` is BUILDING_ADMIN or absent; ADMIN is set by hand
-declare global {
-  interface UserPublicMetadata {
-    role?: 'ADMIN' | 'BUILDING_ADMIN'
-    buildingId?: string
-    apartment?: string
-  }
-}

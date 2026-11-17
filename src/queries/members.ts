@@ -1,6 +1,6 @@
 import { queryOptions } from '@tanstack/react-query'
 import { api, unwrap } from '@/lib/api'
-import type { BuildingInvite, BuildingMember } from '@/types/models'
+import type { BuildingInvite, BuildingMember, MembershipRole } from '@/types/models'
 
 /** A building's residents, earliest first (admins and its building admin) */
 export function buildingMembersQuery(buildingId: string) {
@@ -22,4 +22,14 @@ export function pendingInvitesQuery(buildingId: string) {
         api.GET('/api/admin/{buildingId}/invite', { params: { path: { buildingId } } }),
       ),
   })
+}
+
+/** Makes a member building admin or resident (admins only) */
+export function updateMemberRole(buildingId: string, membershipId: string, role: MembershipRole) {
+  return unwrap<BuildingMember>(
+    api.PATCH('/api/admin/{buildingId}/member/{membershipId}', {
+      params: { path: { buildingId, membershipId } },
+      body: { role },
+    }),
+  )
 }

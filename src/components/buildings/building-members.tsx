@@ -3,6 +3,7 @@ import { MailIcon, ShieldCheckIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 import { BuildingSpotsEmpty } from '@/components/buildings/spot-review-table'
+import { MemberRoleAction } from '@/components/buildings/member-role-action'
 import { DataTable } from '@/components/data-table/data-table'
 import { columnHelper } from '@/components/data-table/features'
 import { formatDate } from '@/lib/format'
@@ -31,6 +32,9 @@ interface BuildingMembersProps {
   invites: BuildingInvite[]
   sorting: SortingState
   onSortingChange: (sorting: SortingState) => void
+  /** Admins can make members building admins and back; building admins only see roles */
+  canEditRoles?: boolean
+  buildingName: string
 }
 
 const col = columnHelper<BuildingMember>()
@@ -41,6 +45,8 @@ export function BuildingMembers({
   invites,
   sorting,
   onSortingChange,
+  canEditRoles = false,
+  buildingName,
 }: BuildingMembersProps) {
   const { t, i18n } = useTranslation()
   const language = i18n.resolvedLanguage ?? 'en'
@@ -75,6 +81,18 @@ export function BuildingMembers({
       meta: { cellClassName: 'whitespace-nowrap text-muted-foreground tabular-nums' },
       cell: ({ getValue }) => formatDate(getValue(), language),
     }),
+    ...(canEditRoles
+      ? [
+          col.display({
+            id: 'actions',
+            header: t('buildings.users.columns.actions'),
+            meta: { srOnlyHeader: true, align: 'right' },
+            cell: ({ row }) => (
+              <MemberRoleAction member={row.original} buildingName={buildingName} />
+            ),
+          }),
+        ]
+      : []),
   ])
 
   return (

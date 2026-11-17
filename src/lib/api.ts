@@ -3,6 +3,7 @@ import createClient from 'openapi-fetch'
 import { toast } from 'sonner'
 import i18n from '@/i18n'
 import { env } from '@/lib/env'
+import { useBuildingStore } from '@/stores/building-store'
 import type { paths } from '@/types/api'
 
 /**
@@ -92,6 +93,9 @@ api.use({
   async onRequest({ request }) {
     const token = await getToken()
     if (token) request.headers.set('Authorization', `Bearer ${token}`)
+    // Without it the API acts in the user's oldest building
+    const buildingId = useBuildingStore.getState().selectedBuildingId
+    if (buildingId) request.headers.set('X-Building-Id', buildingId)
     return request
   },
 })

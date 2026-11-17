@@ -2,6 +2,7 @@ import { useClerk, useUser } from '@clerk/react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import {
+  Building2Icon,
   CoffeeIcon,
   ExternalLinkIcon,
   FileTextIcon,
@@ -10,6 +11,7 @@ import {
   MessageSquareTextIcon,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -22,7 +24,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { languages } from '@/i18n'
+import { useCurrentMembership, useMemberships } from '@/lib/auth'
 import { env } from '@/lib/env'
+import { useBuildingStore } from '@/stores/building-store'
 
 function initials(name: string) {
   return name
@@ -40,6 +44,19 @@ export function AccountMenu() {
   const { signOut } = useClerk()
   const queryClient = useQueryClient()
   const name = user?.fullName || user?.primaryEmailAddress?.emailAddress || ''
+  const memberships = useMemberships()
+  const current = useCurrentMembership()
+  const selectBuilding = useBuildingStore((state) => state.select)
+
+  const switchBuilding = (buildingId: string) => {
+    const membership = memberships.find((m) => m.buildingId === buildingId)
+    if (!membership || buildingId === current?.buildingId) return
+    selectBuilding(buildingId)
+    // Spots, bookings and flags all depend on the building. Reset rather than invalidate:
+    // loaders read the cache with staleTime 'static', which would keep the old building's data
+    void queryClient.resetQueries({ predicate: (query) => query.queryKey[0] !== 'me' })
+    toast.success(t('account.building.switched', { name: membership.building.name }))
+  }
 
   const logout = async () => {
     await signOut({ redirectUrl: '/login' })
@@ -66,6 +83,22 @@ export function AccountMenu() {
           <span className="truncate font-normal">{user?.primaryEmailAddress?.emailAddress}</span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        {memberships.length > 1 && (
+          <>
+            <DropdownMenuLabel className="flex items-center gap-2">
+              <Building2Icon className="size-4" />
+              {t('account.building.title')}
+            </DropdownMenuLabel>
+            <DropdownMenuRadioGroup value={current?.buildingId} onValueChange={switchBuilding}>
+              {memberships.map((membership) => (
+                <DropdownMenuRadioItem key={membership.buildingId} value={membership.buildingId}>
+                  <span className="truncate">{membership.building.name}</span>
+                </DropdownMenuRadioItem>
+              ))}
+            </DropdownMenuRadioGroup>
+            <DropdownMenuSeparator />
+          </>
+        )}
         <DropdownMenuLabel className="flex items-center gap-2">
           <LanguagesIcon className="size-4" />
           {t('common.language')}
