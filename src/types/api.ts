@@ -436,6 +436,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/{buildingId}/car": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdminCarController_findByBuilding"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/building": {
         parameters: {
             query?: never;
@@ -1382,6 +1398,32 @@ export interface operations {
         parameters: {
             query?: {
                 range?: "30d" | "90d" | "12m" | "all";
+            };
+            header?: never;
+            path: {
+                buildingId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminCarController_findByBuilding: {
+        parameters: {
+            query?: {
+                /** @description Matches plate (ignoring spaces and dashes), owner name or email, apartment, phone and description */
+                q?: string;
+                page?: number;
+                pageSize?: number;
+                sort?: "plate" | "owner" | "apartment" | "createdAt";
+                dir?: "asc" | "desc";
             };
             header?: never;
             path: {

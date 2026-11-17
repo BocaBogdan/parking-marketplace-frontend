@@ -481,6 +481,22 @@ export const ro = {
       descriptionPlaceholder: 'ex. Str. Lalelelor 12, Cluj-Napoca',
       submit: 'Creează clădirea',
     },
+    cars: {
+      title: 'Mașini',
+      search: 'Caută mașini',
+      searchPlaceholder: 'Număr, proprietar, apartament sau telefon',
+      empty: 'Nimeni din această clădire nu a adăugat încă o mașină',
+      noMatches: 'Nicio mașină nu corespunde cu „{{query}}”',
+      unknownOwner: 'Proprietarul nu s-a autentificat încă',
+      columns: {
+        plate: 'Număr',
+        owner: 'Proprietar',
+        apartment: 'Apartament',
+        phone: 'Telefon',
+        description: 'Descriere',
+        added: 'Adăugată',
+      },
+    },
     users: {
       title: 'Utilizatori',
       empty: 'Nimeni nu s-a alăturat încă acestui bloc',
@@ -593,6 +609,12 @@ export const ro = {
   },
   table: {
     sortBy: 'Sortează după {{column}}',
+    pagination: {
+      label: 'Pagini',
+      showing: '{{from}}–{{to}} din {{total}}',
+      previous: 'Înapoi',
+      next: 'Înainte',
+    },
   },
   errors: {
     network: 'Serverul nu poate fi contactat. Verifică conexiunea și încearcă din nou.',

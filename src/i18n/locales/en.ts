@@ -455,6 +455,22 @@ export const en = {
       descriptionPlaceholder: 'e.g. Str. Lalelelor 12, Cluj-Napoca',
       submit: 'Create building',
     },
+    cars: {
+      title: 'Cars',
+      search: 'Search cars',
+      searchPlaceholder: 'Plate, owner, apartment or phone',
+      empty: 'No one in this building has added a car yet',
+      noMatches: 'No cars match “{{query}}”',
+      unknownOwner: 'Owner not signed in yet',
+      columns: {
+        plate: 'Plate',
+        owner: 'Owner',
+        apartment: 'Apartment',
+        phone: 'Phone',
+        description: 'Description',
+        added: 'Added',
+      },
+    },
     users: {
       title: 'Users',
       empty: 'No one has joined this building yet',
@@ -563,6 +579,12 @@ export const en = {
   },
   table: {
     sortBy: 'Sort by {{column}}',
+    pagination: {
+      label: 'Pages',
+      showing: 'Showing {{from}}–{{to}} of {{total}}',
+      previous: 'Previous',
+      next: 'Next',
+    },
   },
   errors: {
     network: "Couldn't reach the server. Check your connection and try again.",

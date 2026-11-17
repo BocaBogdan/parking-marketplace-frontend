@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { BuildingMembers } from '@/components/buildings/building-members'
+import { BuildingCars } from '@/components/buildings/building-cars'
 import { BuildingFeatures } from '@/components/buildings/building-features'
 import { BulkInviteDialog } from '@/components/buildings/bulk-invite-dialog'
 import { InviteResidentDialog } from '@/components/buildings/invite-resident-dialog'
@@ -21,7 +22,7 @@ import { buildingSpotsQuery } from '@/queries/admin-spots'
 import { buildingQuery } from '@/queries/buildings'
 import { buildingMembersQuery, pendingInvitesQuery } from '@/queries/members'
 
-const sections = ['spots', 'users', 'stats'] as const
+const sections = ['spots', 'users', 'cars', 'stats'] as const
 
 // Charts are the heaviest code on the page: load them only when the tab opens
 const BuildingStats = lazy(() => import('@/components/stats/building-stats'))
@@ -30,14 +31,16 @@ const BuildingStats = lazy(() => import('@/components/stats/building-stats'))
 const statusTabs = ['PENDING', 'CONFIRMED', 'REJECTED', 'ALL'] as const
 
 // `?invite=single` / `?invite=bulk` open the invite dialogs and `?document=<spotId>` a spot's
-// proof, so they can be linked to; `?tab=` picks Spots, Users or Statistics, `?status=` the
-// review tab and `?range=` the statistics period
+// proof, so they can be linked to; `?tab=` picks Spots, Users, Cars or Statistics, `?status=`
+// the review tab, `?range=` the statistics period and `?q=` / `?page=` the cars search
 const searchSchema = z.object({
   tab: z.enum(sections).optional().catch(undefined),
   status: z.enum(statusTabs).optional().catch(undefined),
   invite: z.enum(['single', 'bulk']).optional().catch(undefined),
   document: z.uuid().optional().catch(undefined),
   range: z.enum(STATS_RANGES).optional().catch(undefined),
+  q: z.string().max(100).optional().catch(undefined),
+  page: z.coerce.number().int().min(1).optional().catch(undefined),
   // The open tab's table order
   ...sortSearchSchema,
 })
@@ -67,6 +70,8 @@ function BuildingPage() {
     invite,
     document,
     range = '30d',
+    q = '',
+    page = 1,
     sort,
     dir,
   } = Route.useSearch()
@@ -92,7 +97,8 @@ function BuildingPage() {
   const sorting = toSorting({ sort, dir })
   const setSorting = (next: SortingState) =>
     void navigate({
-      search: (prev) => ({ ...prev, ...fromSorting(next) }),
+      // A new order starts from the first page
+      search: (prev) => ({ ...prev, ...fromSorting(next), page: undefined }),
       replace: true,
       resetScroll: false,
     })
@@ -167,7 +173,10 @@ function BuildingPage() {
           >
             {key === 'stats'
               ? t('stats.title')
-              : `${t(`buildings.${key}.title`)} · ${key === 'spots' ? spots.length : members.length}`}
+              : key === 'cars'
+                ? // Counted by the API once the tab loads, so it isn't fetched up front
+                  t('buildings.cars.title')
+                : `${t(`buildings.${key}.title`)} · ${key === 'spots' ? spots.length : members.length}`}
           </Link>
         ))}
       </nav>
@@ -209,6 +218,28 @@ function BuildingPage() {
               />
             )}
           </>
+        ) : tab === 'cars' ? (
+          <BuildingCars
+            buildingId={building.id}
+            query={q}
+            page={page}
+            sorting={sorting}
+            onSortingChange={setSorting}
+            onSearch={(next) =>
+              void navigate({
+                search: (prev) => ({ ...prev, q: next || undefined, page: undefined }),
+                replace: true,
+                resetScroll: false,
+              })
+            }
+            onPageChange={(next) =>
+              void navigate({
+                search: (prev) => ({ ...prev, page: next > 1 ? next : undefined }),
+                replace: true,
+                resetScroll: false,
+              })
+            }
+          />
         ) : tab === 'users' ? (
           <BuildingMembers
             members={members}

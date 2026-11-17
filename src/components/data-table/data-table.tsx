@@ -30,6 +30,8 @@ interface DataTableProps<T extends RowData> {
   /** Controlled sorting (e.g. from the URL); leave out to keep it in the table */
   sorting?: SortingState
   onSortingChange?: (sorting: SortingState) => void
+  /** The rows arrive sorted (by the API); headers only change `sorting` */
+  manualSorting?: boolean
   /** Clicking a row, outside its links and buttons */
   onRowClick?: (row: T) => void
   variant?: keyof typeof variants
@@ -51,6 +53,7 @@ export function DataTable<T extends RowData>({
   getRowId,
   sorting: controlledSorting,
   onSortingChange,
+  manualSorting = false,
   onRowClick,
   variant = 'card',
   className,
@@ -72,6 +75,7 @@ export function DataTable<T extends RowData>({
     getRowId: (row) => getRowId(row),
     defaultColumn: { sortFn: 'smart', sortUndefined: 'last' },
     enableMultiSort: false,
+    manualSorting,
     state: { sorting },
     onSortingChange: setSorting,
   })

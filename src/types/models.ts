@@ -59,6 +59,31 @@ export interface Car {
   updatedAt: string
 }
 
+/** A car as the building's admins see it: with its owner and their apartment */
+export interface AdminCar {
+  id: string
+  /** Clerk user id of the owner */
+  userId: string
+  plate: string
+  phone: string
+  description: string
+  createdAt: string
+  /** The owner's apartment in this building; '' if none */
+  apartment: string
+  /** Null if the owner hasn't signed in since accounts moved to the backend */
+  owner: Pick<AppUser, 'id' | 'email' | 'firstName' | 'lastName'> | null
+}
+
+/** One page of a list the API paginates */
+export interface Page<T> {
+  items: T[]
+  /** Across all pages */
+  total: number
+  /** From 1 */
+  page: number
+  pageSize: number
+}
+
 export interface Building {
   id: string
   name: string
