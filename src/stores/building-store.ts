@@ -2,14 +2,14 @@ import { create } from 'zustand'
 import { createJSONStorage, devtools, persist } from 'zustand/middleware'
 
 interface BuildingState {
-  /** The building picked in the switcher; null means the user's oldest (the API's default) */
+  /** The building picked in the switcher; null means the user's oldest */
   selectedBuildingId: string | null
   select: (buildingId: string | null) => void
 }
 
 /**
- * Which of their buildings someone in several is acting in, remembered on this device.
- * `lib/api` sends it as `X-Building-Id`, and the API checks it against their memberships.
+ * Which of their buildings an admin in several is managing ("My building"), remembered on
+ * this device. Residents don't pick one: each action names its building.
  */
 export const useBuildingStore = create<BuildingState>()(
   devtools(

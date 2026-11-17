@@ -1,5 +1,6 @@
 import { Suspense } from 'react'
 import {
+  Building2Icon,
   ChevronRightIcon,
   CircleAlertIcon,
   ClockIcon,
@@ -10,6 +11,7 @@ import {
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
+import { useBuildingNames } from '@/lib/auth'
 import { OverrideControls } from '@/components/spots/override-controls'
 import { ScheduleTable } from '@/components/spots/schedule-table'
 import { SpotStatusBadge } from '@/components/spots/spot-status-badge'
@@ -28,6 +30,8 @@ interface SpotCardProps {
 // hours or use "Free now" / "Busy now". Hours kept from before an edit can still be removed
 export function SpotCard({ spot, onEdit, onManageAvailability }: SpotCardProps) {
   const { t, i18n } = useTranslation()
+  // Only for people in several buildings
+  const buildings = useBuildingNames()
 
   return (
     <article className="grid gap-4 rounded-2xl border bg-card p-5 shadow-xs">
@@ -38,6 +42,12 @@ export function SpotCard({ spot, onEdit, onManageAvailability }: SpotCardProps) 
             <SpotStatusBadge status={spot.status} />
             {spot.underground && <UndergroundBadge />}
           </div>
+          {buildings.show && (
+            <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+              <Building2Icon className="size-4 text-primary" />
+              {buildings.nameOf(spot.buildingId)}
+            </p>
+          )}
         </div>
         <Button
           variant="ghost"

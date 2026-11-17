@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { DataTable } from '@/components/data-table/data-table'
 import { columnHelper } from '@/components/data-table/features'
 import { UndergroundBadge } from '@/components/spots/underground-badge'
+import { useBuildingNames } from '@/lib/auth'
 import type { Spot } from '@/types/models'
 
 interface ResultsTableProps {
@@ -18,6 +19,8 @@ const col = columnHelper<Spot>()
 
 export function ResultsTable({ spots, onReserve, sorting, onSortingChange }: ResultsTableProps) {
   const { t } = useTranslation()
+  // Find searches every building the user lives in; the column only matters for several
+  const buildings = useBuildingNames()
 
   if (spots.length === 0) {
     return (
@@ -41,6 +44,16 @@ export function ResultsTable({ spots, onReserve, sorting, onSortingChange }: Res
         </span>
       ),
     }),
+    ...(buildings.show
+      ? [
+          col.accessor((spot) => buildings.nameOf(spot.buildingId), {
+            id: 'building',
+            header: t('find.table.building'),
+            meta: { cellClassName: 'whitespace-nowrap' },
+            cell: ({ getValue }) => getValue() ?? '—',
+          }),
+        ]
+      : []),
     // Spots without details sort last
     col.accessor((spot) => spot.description || undefined, {
       id: 'details',

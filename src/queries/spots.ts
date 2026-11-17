@@ -57,9 +57,15 @@ type SpotFields = Pick<Spot, 'number' | 'description' | 'underground'>
  * the spot at once; everywhere else the document is required and the spot waits for review.
  */
 export function createSpot(
-  fields: SpotFields & { location: components['schemas']['LocationDto']; document?: File },
+  fields: SpotFields & {
+    location: components['schemas']['LocationDto']
+    document?: File
+    /** One of the user's buildings; the API defaults to their first */
+    buildingId?: string
+  },
 ) {
   const form = new FormData()
+  if (fields.buildingId) form.append('buildingId', fields.buildingId)
   form.append('number', String(fields.number))
   form.append('description', fields.description)
   form.append('underground', String(fields.underground))

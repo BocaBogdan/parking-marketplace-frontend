@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { HashIcon } from 'lucide-react'
+import { Building2Icon, HashIcon } from 'lucide-react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -16,7 +17,8 @@ import { DocumentInput } from '@/components/spots/document-input'
 import { LocationPicker } from '@/components/spots/location-picker'
 import { setServerErrors, useAppForm } from '@/lib/form'
 import { documentSchema } from '@/lib/spot-document'
-import { currentFeatureFlagsQuery, SPOT_DOCUMENT_NOT_REQUIRED } from '@/queries/feature-flags'
+import { useBuildingNames, useMemberships } from '@/lib/auth'
+import { featureFlagsQuery, SPOT_DOCUMENT_NOT_REQUIRED } from '@/queries/feature-flags'
 import { createSpot, updateSpot } from '@/queries/spots'
 import type { Spot } from '@/types/models'
 
@@ -70,7 +72,12 @@ function SpotForm({ spot, onDone }: { spot?: Spot; onDone: () => void }) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
 
-  const { data: flags } = useQuery(currentFeatureFlagsQuery)
+  const memberships = useMemberships()
+  const buildings = useBuildingNames()
+  // Someone in several buildings picks where a new spot goes; an edit keeps its building
+  const [buildingId, setBuildingId] = useState(spot?.buildingId ?? memberships[0]?.buildingId)
+  // Per building, so the document field follows the building picked
+  const { data: flags } = useQuery(featureFlagsQuery(buildingId))
   // The building approves spots without a document, so only rejected ones go back to an admin
   const documentOptional = flags?.includes(SPOT_DOCUMENT_NOT_REQUIRED) ?? false
 
@@ -90,6 +97,7 @@ function SpotForm({ spot, onDone }: { spot?: Spot; onDone: () => void }) {
       return createSpot({
         ...fields,
         location: { lat: values.lat.trim(), long: values.long.trim() },
+        buildingId,
         // The schema requires it unless the building doesn't
         document: documentOptional ? undefined : (values.document ?? undefined),
       })
@@ -160,6 +168,41 @@ function SpotForm({ spot, onDone }: { spot?: Spot; onDone: () => void }) {
         <form.AppForm>
           <FormError />
         </form.AppForm>
+        {!spot && buildings.show && (
+          <fieldset className="grid gap-2">
+            <legend className="mb-2 text-sm font-medium">{t('spots.form.building')}</legend>
+            {memberships.map((membership) => (
+              <label
+                key={membership.buildingId}
+                className="flex cursor-pointer items-center gap-3 rounded-xl border p-3 text-sm has-checked:border-primary has-checked:bg-primary-50 dark:has-checked:bg-primary-950"
+              >
+                <input
+                  type="radio"
+                  name="building"
+                  value={membership.buildingId}
+                  checked={buildingId === membership.buildingId}
+                  onChange={() => setBuildingId(membership.buildingId)}
+                  className="size-4 accent-primary"
+                />
+                <span className="grid">
+                  <span className="font-semibold">{membership.building.name}</span>
+                  {membership.apartment && (
+                    <span className="text-muted-foreground">
+                      {t('home.apartment', { number: membership.apartment })}
+                    </span>
+                  )}
+                </span>
+              </label>
+            ))}
+            <p className="text-xs text-muted-foreground">{t('spots.form.buildingHint')}</p>
+          </fieldset>
+        )}
+        {spot && buildings.show && (
+          <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+            <Building2Icon className="size-4 text-primary" />
+            {buildings.nameOf(spot.buildingId)}
+          </p>
+        )}
         <form.AppField name="number">
           {(field) => (
             <field.TextField

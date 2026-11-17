@@ -152,6 +152,8 @@ export const ro = {
       description: 'Împarte-l cu vecinii și scapă-i de grija parcării!',
     },
     form: {
+      building: 'Bloc',
+      buildingHint: 'Vecinii din acest bloc îl vor putea rezerva.',
       createTitle: 'Înregistrează un loc',
       createDescription: 'Vecinii îl pot rezerva imediat ce îi adaugi orele săptămânale.',
       createDescriptionNoReview:
@@ -320,7 +322,13 @@ export const ro = {
       'Locurile tale {{numbers}} sunt și ele libere atunci. Nu apar în listă, fiindcă nu îți poți rezerva propriul loc.',
     ownSpotsHidden_other:
       'Locurile tale {{numbers}} sunt și ele libere atunci. Nu apar în listă, fiindcă nu îți poți rezerva propriul loc.',
-    table: { spot: 'Loc', details: 'Detalii', actions: 'Acțiuni', noDetails: 'Fără detalii' },
+    table: {
+      spot: 'Loc',
+      building: 'Bloc',
+      details: 'Detalii',
+      actions: 'Acțiuni',
+      noDetails: 'Fără detalii',
+    },
     empty: {
       title: 'Niciun loc liber pe tot intervalul',
       description: 'Încearcă un interval mai scurt, altă oră de început sau altă zi.',

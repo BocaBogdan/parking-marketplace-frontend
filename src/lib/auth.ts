@@ -32,7 +32,8 @@ export function currentUserId(): string {
  * _authenticated layout loads before any child guard runs:
  * - admins (`isAdmin`, set by hand in the database) manage every building;
  * - building admins manage each building where their membership has that role;
- * - anyone can belong to several buildings and act in one at a time (the switcher).
+ * - anyone can belong to several buildings: they pick one when adding a spot, and Find
+ *   searches all of them. Admins also pick which building "My building" opens.
  * These only hide pages; the backend enforces the same rules.
  */
 
@@ -54,6 +55,11 @@ function managedBuildingIds(me: Me | undefined) {
     .map((membership) => membership.buildingId)
 }
 
+/** The user's first building, where a new spot goes by default; for loaders */
+export function defaultBuildingId() {
+  return sortedMemberships(cachedMe())[0]?.buildingId
+}
+
 export function isAdmin() {
   return cachedMe()?.isAdmin ?? false
 }
@@ -73,11 +79,32 @@ export function useMemberships() {
   return sortedMemberships(useQuery(meQuery).data)
 }
 
-/** The building the user acts in: the switcher's pick while it's still theirs, else the oldest */
+/** The admin switcher's building while it's still theirs, else the oldest */
 export function useCurrentMembership(): Membership | undefined {
   const memberships = useMemberships()
   const selected = useBuildingStore((state) => state.selectedBuildingId)
   return memberships.find((m) => m.buildingId === selected) ?? memberships[0]
+}
+
+/** Building names by id, for labelling spots of people in several buildings */
+export function useBuildingNames() {
+  const memberships = useMemberships()
+  return {
+    /** Whether labels are worth showing: the user is in more than one building */
+    show: memberships.length > 1,
+    nameOf: (buildingId: string) =>
+      memberships.find((m) => m.buildingId === buildingId)?.building.name,
+  }
+}
+
+/** The building switcher is for admins and building admins with more than one building */
+export function useCanSwitchBuilding() {
+  const memberships = useMemberships()
+  const isAdmin = useIsAdmin()
+  return (
+    memberships.length > 1 &&
+    (isAdmin || memberships.some((membership) => membership.role === 'BUILDING_ADMIN'))
+  )
 }
 
 /**

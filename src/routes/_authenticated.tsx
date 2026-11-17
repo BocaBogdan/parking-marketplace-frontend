@@ -13,7 +13,7 @@ export const Route = createFileRoute('/_authenticated')({
     // Before child guards, which read roles and buildings from it. The first call also
     // creates the user's account in the backend.
     const me = await queryClient.query({ ...meQuery, staleTime: 'static' })
-    // A building they've since left would make the API refuse every request
+    // Forget a building they've since left
     const { selectedBuildingId, select } = useBuildingStore.getState()
     if (selectedBuildingId && !me.memberships.some((m) => m.buildingId === selectedBuildingId)) {
       select(null)

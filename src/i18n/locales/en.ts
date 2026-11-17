@@ -141,6 +141,8 @@ export const en = {
       description: 'Share it with your neighbours and keep parking stress-free!',
     },
     form: {
+      building: 'Building',
+      buildingHint: 'Neighbours of this building will be able to book it.',
       createTitle: 'Register a spot',
       createDescription: 'Neighbours can book it as soon as you add its weekly hours.',
       createDescriptionNoReview:
@@ -299,7 +301,13 @@ export const en = {
       'Your spot {{numbers}} is free then too. It isn’t listed, since you can’t reserve your own.',
     ownSpotsHidden_other:
       'Your spots {{numbers}} are free then too. They aren’t listed, since you can’t reserve your own.',
-    table: { spot: 'Spot', details: 'Details', actions: 'Actions', noDetails: 'No details' },
+    table: {
+      spot: 'Spot',
+      building: 'Building',
+      details: 'Details',
+      actions: 'Actions',
+      noDetails: 'No details',
+    },
     empty: {
       title: 'No spots free for this whole time',
       description: 'Try a shorter window, a different start time or another day.',

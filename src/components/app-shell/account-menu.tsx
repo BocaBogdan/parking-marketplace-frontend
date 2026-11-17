@@ -24,7 +24,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { languages } from '@/i18n'
-import { useCurrentMembership, useIsAdmin, useMemberships } from '@/lib/auth'
+import { useCanSwitchBuilding, useCurrentMembership, useIsAdmin, useMemberships } from '@/lib/auth'
 import { env } from '@/lib/env'
 import { useBuildingStore } from '@/stores/building-store'
 
@@ -48,6 +48,7 @@ export function AccountMenu() {
   const current = useCurrentMembership()
   const selectBuilding = useBuildingStore((state) => state.select)
   const isAdmin = useIsAdmin()
+  const canSwitchBuilding = useCanSwitchBuilding()
   const navigate = useNavigate()
   // Set only on a building's admin pages (/building/$buildingId and its spot pages)
   const openBuildingId = useParams({ strict: false }).buildingId
@@ -63,9 +64,6 @@ export function AccountMenu() {
         ? navigate({ to: '/building/$buildingId', params: { buildingId } })
         : navigate({ to: '/home' }))
     }
-    // Spots, bookings and flags all depend on the building. Reset rather than invalidate:
-    // loaders read the cache with staleTime 'static', which would keep the old building's data
-    void queryClient.resetQueries({ predicate: (query) => query.queryKey[0] !== 'me' })
     toast.success(t('account.building.switched', { name: membership.building.name }))
   }
 
@@ -94,7 +92,7 @@ export function AccountMenu() {
           <span className="truncate font-normal">{user?.primaryEmailAddress?.emailAddress}</span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {memberships.length > 1 && (
+        {canSwitchBuilding && (
           <>
             <DropdownMenuLabel className="flex items-center gap-2">
               <Building2Icon className="size-4" />

@@ -636,6 +636,8 @@ export interface components {
             lat: string;
         };
         CreateSpotDto: {
+            /** @description One of the user's buildings; defaults to the one they joined first */
+            buildingId?: string;
             number: number;
             description: string;
             location: components["schemas"]["LocationDto"];
@@ -643,6 +645,8 @@ export interface components {
             underground?: boolean;
         };
         UpdateSpotDto: {
+            /** @description One of the user's buildings; defaults to the one they joined first */
+            buildingId?: string;
             number?: number;
             description?: string;
             location?: components["schemas"]["LocationDto"];
@@ -1306,7 +1310,10 @@ export interface operations {
     };
     FeatureFlagController_current: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description One of the user's buildings; defaults to their first */
+                buildingId?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
