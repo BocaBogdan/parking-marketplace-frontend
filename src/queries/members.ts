@@ -33,3 +33,41 @@ export function updateMemberRole(buildingId: string, membershipId: string, role:
     }),
   )
 }
+
+/** What removing a member changed */
+export interface MemberRemoval {
+  spotsDeleted: number
+  spotsKept: number
+  bookingsCancelled: number
+}
+
+/**
+ * Takes a member out of the building: admins anyone, building admins only residents (not
+ * themselves). Their spots go to a flatmate who stays or are deleted; their upcoming
+ * bookings there are cancelled.
+ */
+export function removeMember(buildingId: string, membershipId: string) {
+  return unwrap<MemberRemoval>(
+    api.DELETE('/api/admin/{buildingId}/member/{membershipId}', {
+      params: { path: { buildingId, membershipId } },
+    }),
+  )
+}
+
+/** Emails a fresh link for a pending invite, e.g. after the old one expired */
+export function resendInvite(buildingId: string, inviteId: string) {
+  return unwrap<BuildingInvite>(
+    api.POST('/api/admin/{buildingId}/invite/{inviteId}/resend', {
+      params: { path: { buildingId, inviteId } },
+    }),
+  )
+}
+
+/** Cancels a pending invite: its link stops working and the email can be invited again */
+export function revokeInvite(buildingId: string, inviteId: string) {
+  return unwrap<unknown>(
+    api.DELETE('/api/admin/{buildingId}/invite/{inviteId}', {
+      params: { path: { buildingId, inviteId } },
+    }),
+  )
+}

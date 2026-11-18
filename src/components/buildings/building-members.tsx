@@ -3,7 +3,8 @@ import { MailIcon, ShieldCheckIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 import { BuildingSpotsEmpty } from '@/components/buildings/spot-review-table'
-import { MemberRoleAction } from '@/components/buildings/member-role-action'
+import { InviteActions } from '@/components/buildings/invite-actions'
+import { MemberActions } from '@/components/buildings/member-actions'
 import { DataTable } from '@/components/data-table/data-table'
 import { columnHelper } from '@/components/data-table/features'
 import { formatDate } from '@/lib/format'
@@ -32,12 +33,17 @@ interface BuildingMembersProps {
   invites: BuildingInvite[]
   sorting: SortingState
   onSortingChange: (sorting: SortingState) => void
-  /** Admins can make members building admins and back; building admins only see roles */
-  canEditRoles?: boolean
+  /** Admins change roles and remove anyone; building admins remove residents */
+  isAdmin: boolean
+  currentUserId: string | undefined
   buildingName: string
 }
 
 const col = columnHelper<BuildingMember>()
+const inviteCol = columnHelper<BuildingInvite>()
+
+/** Clerk no longer accepts the link; the admin can resend it */
+const isExpired = (expiresAt: string) => new Date(expiresAt).getTime() <= Date.now()
 
 /** The Users tab: who lives in the building, and who's invited but hasn't signed up */
 export function BuildingMembers({
@@ -45,11 +51,61 @@ export function BuildingMembers({
   invites,
   sorting,
   onSortingChange,
-  canEditRoles = false,
+  isAdmin,
+  currentUserId,
   buildingName,
 }: BuildingMembersProps) {
   const { t, i18n } = useTranslation()
   const language = i18n.resolvedLanguage ?? 'en'
+
+  const inviteColumns = inviteCol.columns([
+    inviteCol.accessor('email', {
+      header: t('buildings.users.columns.email'),
+      meta: { rowHeader: true },
+      cell: ({ getValue }) => (
+        <span className="inline-flex items-center gap-2 font-semibold">
+          <MailIcon className="size-4 shrink-0 text-muted-foreground" />
+          {getValue()}
+        </span>
+      ),
+    }),
+    inviteCol.accessor((invite) => invite.apartment || undefined, {
+      id: 'apartment',
+      header: t('buildings.users.columns.apartment'),
+      cell: ({ getValue }) => getValue() ?? '—',
+    }),
+    inviteCol.accessor((invite) => t(`buildings.users.role.${invite.role}`), {
+      id: 'role',
+      header: t('buildings.users.columns.role'),
+      cell: ({ row }) => <RoleBadge role={row.original.role} />,
+    }),
+    inviteCol.accessor('createdAt', {
+      header: t('buildings.users.columns.sent'),
+      meta: { cellClassName: 'whitespace-nowrap text-muted-foreground tabular-nums' },
+      cell: ({ getValue }) => formatDate(getValue(), language),
+    }),
+    // Invites without a link (none sent) sort last
+    inviteCol.accessor((invite) => invite.expiresAt ?? undefined, {
+      id: 'expires',
+      header: t('buildings.users.columns.expires'),
+      meta: { cellClassName: 'whitespace-nowrap tabular-nums' },
+      cell: ({ getValue }) => {
+        const expiresAt = getValue()
+        if (!expiresAt) return '—'
+        return isExpired(expiresAt) ? (
+          <Badge variant="destructive">{t('buildings.users.expired')}</Badge>
+        ) : (
+          <span className="text-muted-foreground">{formatDate(expiresAt, language)}</span>
+        )
+      },
+    }),
+    inviteCol.display({
+      id: 'actions',
+      header: t('buildings.users.columns.actions'),
+      meta: { srOnlyHeader: true, align: 'right' },
+      cell: ({ row }) => <InviteActions invite={row.original} isAdmin={isAdmin} />,
+    }),
+  ])
 
   const columns = col.columns([
     col.accessor((member) => displayName(member.user) || member.user.email, {
@@ -81,18 +137,20 @@ export function BuildingMembers({
       meta: { cellClassName: 'whitespace-nowrap text-muted-foreground tabular-nums' },
       cell: ({ getValue }) => formatDate(getValue(), language),
     }),
-    ...(canEditRoles
-      ? [
-          col.display({
-            id: 'actions',
-            header: t('buildings.users.columns.actions'),
-            meta: { srOnlyHeader: true, align: 'right' },
-            cell: ({ row }) => (
-              <MemberRoleAction member={row.original} buildingName={buildingName} />
-            ),
-          }),
-        ]
-      : []),
+    // Everyone here manages the building; the menu shows what each may do to the member
+    col.display({
+      id: 'actions',
+      header: t('buildings.users.columns.actions'),
+      meta: { srOnlyHeader: true, align: 'right' },
+      cell: ({ row }) => (
+        <MemberActions
+          member={row.original}
+          buildingName={buildingName}
+          isAdmin={isAdmin}
+          currentUserId={currentUserId}
+        />
+      ),
+    }),
   ])
 
   return (
@@ -116,23 +174,12 @@ export function BuildingMembers({
             {t('buildings.users.pending')}{' '}
             <span className="font-normal text-muted-foreground">· {invites.length}</span>
           </h3>
-          <ul className="divide-y rounded-2xl border bg-card shadow-xs">
-            {invites.map((invite) => (
-              <li key={invite.id} className="flex flex-wrap items-center gap-3 px-4 py-3 text-sm">
-                <MailIcon className="size-4 shrink-0 text-muted-foreground" />
-                <span className="grid min-w-0 flex-1">
-                  <span className="truncate font-semibold">{invite.email}</span>
-                  <span className="text-muted-foreground">
-                    {t('buildings.users.invited', {
-                      apartment: invite.apartment,
-                      date: formatDate(invite.createdAt, language),
-                    })}
-                  </span>
-                </span>
-                <RoleBadge role={invite.role} />
-              </li>
-            ))}
-          </ul>
+          <DataTable
+            data={invites}
+            columns={inviteColumns}
+            getRowId={(invite) => invite.id}
+            className="min-w-2xl"
+          />
         </section>
       )}
     </div>

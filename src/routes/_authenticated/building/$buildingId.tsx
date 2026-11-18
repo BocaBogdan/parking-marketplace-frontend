@@ -9,11 +9,12 @@ import { Button } from '@/components/ui/button'
 import { BuildingMembers } from '@/components/buildings/building-members'
 import { BuildingCars } from '@/components/buildings/building-cars'
 import { BuildingFeatures } from '@/components/buildings/building-features'
+import { BuildingInviteSettings } from '@/components/buildings/building-invite-settings'
 import { BulkInviteDialog } from '@/components/buildings/bulk-invite-dialog'
 import { InviteResidentDialog } from '@/components/buildings/invite-resident-dialog'
 import { SpotDocumentDialog } from '@/components/buildings/spot-document-dialog'
 import { BuildingSpotsEmpty, SpotReviewTable } from '@/components/buildings/spot-review-table'
-import { canManageBuilding, useIsAdmin } from '@/lib/auth'
+import { canManageBuilding, currentUserId, useIsAdmin } from '@/lib/auth'
 import { formatDate } from '@/lib/format'
 import { STATS_RANGES } from '@/lib/stats'
 import { fromSorting, sortSearchSchema, toSorting } from '@/lib/table-sort'
@@ -156,6 +157,7 @@ function BuildingPage() {
       </section>
 
       {isAdmin && <BuildingFeatures buildingId={building.id} />}
+      {isAdmin && <BuildingInviteSettings key={building.id} building={building} />}
 
       <nav aria-label={building.name} className="flex gap-6 border-b text-sm font-semibold">
         {sections.map((key) => (
@@ -246,7 +248,8 @@ function BuildingPage() {
             invites={invites}
             sorting={sorting}
             onSortingChange={setSorting}
-            canEditRoles={isAdmin}
+            isAdmin={isAdmin}
+            currentUserId={currentUserId()}
             buildingName={building.name}
           />
         ) : (

@@ -92,6 +92,8 @@ export interface Building {
   description: string
   /** Residents also see and book spots of the other buildings in this community */
   communityId: string | null
+  /** How long an invitation link stays valid */
+  inviteExpiryDays: number
   createdAt: string
   updatedAt: string
 }
@@ -197,6 +199,9 @@ export interface BuildingInvite {
   /** Clerk user id of whoever sent it */
   invitedBy: string
   status: 'PENDING' | 'ACCEPTED' | 'REVOKED'
+  /** When the current link stops working; null for invites that never had one */
+  expiresAt: string | null
+  /** When the current link was sent (a resend moves it) */
   createdAt: string
 }
 

@@ -32,3 +32,8 @@ export function buildingQuery(buildingId: string) {
 export function createBuilding(body: components['schemas']['CreateBuildingDto']) {
   return unwrap<Building>(api.POST('/api/building', { body }))
 }
+
+/** Admins only; a new invite validity applies to invites sent from then on */
+export function updateBuilding(id: string, body: components['schemas']['UpdateBuildingDto']) {
+  return unwrap<Building>(api.PATCH('/api/building/{id}', { params: { path: { id } }, body }))
+}
