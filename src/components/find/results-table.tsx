@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button'
 import { DataTable } from '@/components/data-table/data-table'
 import { columnHelper } from '@/components/data-table/features'
 import { UndergroundBadge } from '@/components/spots/underground-badge'
-import { useBuildingNames } from '@/lib/auth'
+import { Badge } from '@/components/ui/badge'
+import { useBuildingNames, useMemberships } from '@/lib/auth'
 import type { Spot } from '@/types/models'
 
 interface ResultsTableProps {
@@ -19,8 +20,13 @@ const col = columnHelper<Spot>()
 
 export function ResultsTable({ spots, onReserve, sorting, onSortingChange }: ResultsTableProps) {
   const { t } = useTranslation()
-  // Find searches every building the user lives in; the column only matters for several
+  // Find searches every building the user lives in plus their community's; the column
+  // matters once results can come from more than one
   const buildings = useBuildingNames()
+  const memberships = useMemberships()
+  const isPartner = (spot: Spot) =>
+    !memberships.some((membership) => membership.buildingId === spot.buildingId)
+  const showBuilding = buildings.show || spots.some(isPartner)
 
   if (spots.length === 0) {
     return (
@@ -44,13 +50,22 @@ export function ResultsTable({ spots, onReserve, sorting, onSortingChange }: Res
         </span>
       ),
     }),
-    ...(buildings.show
+    ...(showBuilding
       ? [
-          col.accessor((spot) => buildings.nameOf(spot.buildingId), {
+          col.accessor((spot) => spot.building?.name ?? buildings.nameOf(spot.buildingId), {
             id: 'building',
             header: t('find.table.building'),
             meta: { cellClassName: 'whitespace-nowrap' },
-            cell: ({ getValue }) => getValue() ?? '—',
+            cell: ({ getValue, row: { original: spot } }) => (
+              <span className="inline-flex flex-wrap items-center gap-1.5">
+                {getValue() ?? '—'}
+                {isPartner(spot) && (
+                  <Badge variant="secondary" title={t('find.table.partnerHint')}>
+                    {t('find.table.partner')}
+                  </Badge>
+                )}
+              </span>
+            ),
           }),
         ]
       : []),

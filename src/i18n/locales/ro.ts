@@ -49,6 +49,9 @@ export const ro = {
     buildingNameRequired: 'Introdu numele clădirii',
     buildingDescriptionRequired: 'Adaugă o scurtă descriere, de ex. adresa',
     max255: 'Folosește cel mult 255 de caractere',
+    max100: 'Folosește cel mult 100 de caractere',
+    communityNameRequired: 'Dă un nume comunității',
+    communityBuildings: 'Alege cel puțin două clădiri',
   },
   nav: {
     home: 'Acasă',
@@ -57,6 +60,7 @@ export const ro = {
     myCars: 'Mașinile mele',
     bookings: 'Rezervări',
     buildings: 'Clădiri',
+    communities: 'Comunități',
     accountMenu: 'Meniu cont',
     myBuilding: 'Blocul meu',
     feedback: 'Trimite feedback',
@@ -325,6 +329,8 @@ export const ro = {
     table: {
       spot: 'Loc',
       building: 'Bloc',
+      partner: 'Partener',
+      partnerHint: 'Dintr-o clădire din comunitatea ta',
       details: 'Detalii',
       actions: 'Acțiuni',
       noDetails: 'Fără detalii',
@@ -335,6 +341,7 @@ export const ro = {
     },
     dialog: {
       title: 'Rezervă locul {{number}}',
+      titleIn: 'Rezervă locul {{number}} din {{building}}',
       description: 'Alege mașina pe care o vei parca.',
       chooseCar: 'Ce mașină vei parca?',
       noCars:
@@ -455,6 +462,54 @@ export const ro = {
       past: 'Nicio rezervare trecută încă',
     },
     toast: { cancelled: 'Rezervarea a fost anulată' },
+  },
+  communities: {
+    title: 'Comunități',
+    subtitle: 'Locatarii unei comunități văd și rezervă locuri în toate clădirile ei',
+    create: 'Comunitate nouă',
+    actions: 'Acțiuni pentru {{name}}',
+    rename: 'Redenumește',
+    delete: 'Șterge',
+    remove: 'Scoate',
+    cancel: 'Anulează',
+    addBuilding: 'Adaugă clădire',
+    freeBuildings: 'Clădiri fără comunitate',
+    removeBuilding: 'Scoate {{name}} din comunitate',
+    empty: {
+      title: 'Nicio comunitate încă',
+      description:
+        'Când administratorii clădirilor sunt de acord să împartă locurile, grupează clădirile într-o comunitate.',
+    },
+    form: {
+      title: 'Creează o comunitate',
+      description: 'Locatarii acestor clădiri vor vedea și rezerva locurile celorlalte.',
+      renameTitle: 'Redenumește comunitatea',
+      renameDescription: 'Se schimbă doar numele; clădirile rămân.',
+      name: 'Nume',
+      namePlaceholder: 'ex. Riverside',
+      buildings: 'Clădiri',
+      buildingsHint: 'Alege cel puțin două. O clădire poate fi într-o singură comunitate.',
+      noFreeBuildings: 'Toate clădirile sunt deja într-o comunitate',
+      submit: 'Creează comunitatea',
+      rename: 'Salvează',
+    },
+    confirmRemove: {
+      title: 'Scoți {{building}} din {{community}}?',
+      body: 'Locatarii ei nu mai văd locurile celorlalte clădiri, iar ceilalți nu mai văd locurile ei. Rezervările deja făcute rămân.',
+      bodyLast:
+        'Ar rămâne o singură clădire, așa că și comunitatea va fi ștearsă. Rezervările deja făcute rămân.',
+    },
+    confirmDelete: {
+      title: 'Ștergi {{name}}?',
+      body: 'Clădirile ei nu mai împart locurile. Clădirile, locurile și rezervările deja făcute rămân.',
+    },
+    toast: {
+      created: 'Comunitatea „{{name}}” a fost creată',
+      renamed: 'Redenumită „{{name}}”',
+      deleted: 'Comunitatea „{{name}}” a fost ștearsă',
+      added: '{{building}} s-a alăturat comunității {{community}}',
+      removed: '{{building}} a ieșit din {{community}}',
+    },
   },
   buildings: {
     title: 'Clădiri',

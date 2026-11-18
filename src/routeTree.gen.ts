@@ -21,6 +21,7 @@ import { Route as AuthenticatedFeedbackRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedFindRouteImport } from './routes/_authenticated/find'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedAdminBuildingsRouteImport } from './routes/_authenticated/_admin/buildings'
+import { Route as AuthenticatedAdminCommunitiesRouteImport } from './routes/_authenticated/_admin/communities'
 import { Route as AuthenticatedBuildingBuildingIdRouteImport } from './routes/_authenticated/building/$buildingId'
 import { Route as AuthenticatedSpotsIndexRouteImport } from './routes/_authenticated/spots/index'
 import { Route as AuthenticatedSpotsSpotIdReservationsRouteImport } from './routes/_authenticated/spots/$spotId/reservations'
@@ -86,6 +87,12 @@ const AuthenticatedAdminBuildingsRoute =
     path: '/buildings',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminCommunitiesRoute =
+  AuthenticatedAdminCommunitiesRouteImport.update({
+    id: '/communities',
+    path: '/communities',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedBuildingBuildingIdRoute =
   AuthenticatedBuildingBuildingIdRouteImport.update({
     id: '/building/$buildingId',
@@ -127,6 +134,7 @@ export interface FileRoutesByFullPath {
   '/find': typeof AuthenticatedFindRoute
   '/home': typeof AuthenticatedHomeRoute
   '/buildings': typeof AuthenticatedAdminBuildingsRoute
+  '/communities': typeof AuthenticatedAdminCommunitiesRoute
   '/building/$buildingId': typeof AuthenticatedBuildingBuildingIdRoute
   '/spots/': typeof AuthenticatedSpotsIndexRoute
   '/spots/$spotId/reservations': typeof AuthenticatedSpotsSpotIdReservationsRoute
@@ -144,6 +152,7 @@ export interface FileRoutesByTo {
   '/find': typeof AuthenticatedFindRoute
   '/home': typeof AuthenticatedHomeRoute
   '/buildings': typeof AuthenticatedAdminBuildingsRoute
+  '/communities': typeof AuthenticatedAdminCommunitiesRoute
   '/building/$buildingId': typeof AuthenticatedBuildingBuildingIdRoute
   '/spots': typeof AuthenticatedSpotsIndexRoute
   '/spots/$spotId/reservations': typeof AuthenticatedSpotsSpotIdReservationsRoute
@@ -164,6 +173,7 @@ export interface FileRoutesById {
   '/_authenticated/find': typeof AuthenticatedFindRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/_authenticated/_admin/buildings': typeof AuthenticatedAdminBuildingsRoute
+  '/_authenticated/_admin/communities': typeof AuthenticatedAdminCommunitiesRoute
   '/_authenticated/building/$buildingId': typeof AuthenticatedBuildingBuildingIdRoute
   '/_authenticated/spots/': typeof AuthenticatedSpotsIndexRoute
   '/_authenticated/spots/$spotId/reservations': typeof AuthenticatedSpotsSpotIdReservationsRoute
@@ -183,6 +193,7 @@ export interface FileRouteTypes {
     | '/find'
     | '/home'
     | '/buildings'
+    | '/communities'
     | '/building/$buildingId'
     | '/spots/'
     | '/spots/$spotId/reservations'
@@ -200,6 +211,7 @@ export interface FileRouteTypes {
     | '/find'
     | '/home'
     | '/buildings'
+    | '/communities'
     | '/building/$buildingId'
     | '/spots'
     | '/spots/$spotId/reservations'
@@ -219,6 +231,7 @@ export interface FileRouteTypes {
     | '/_authenticated/find'
     | '/_authenticated/home'
     | '/_authenticated/_admin/buildings'
+    | '/_authenticated/_admin/communities'
     | '/_authenticated/building/$buildingId'
     | '/_authenticated/spots/'
     | '/_authenticated/spots/$spotId/reservations'
@@ -320,6 +333,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminBuildingsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/_admin/communities': {
+      id: '/_authenticated/_admin/communities'
+      path: '/communities'
+      fullPath: '/communities'
+      preLoaderRoute: typeof AuthenticatedAdminCommunitiesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/building/$buildingId': {
       id: '/_authenticated/building/$buildingId'
       path: '/building/$buildingId'
@@ -360,10 +380,12 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminBuildingsRoute: typeof AuthenticatedAdminBuildingsRoute
+  AuthenticatedAdminCommunitiesRoute: typeof AuthenticatedAdminCommunitiesRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminBuildingsRoute: AuthenticatedAdminBuildingsRoute,
+  AuthenticatedAdminCommunitiesRoute: AuthenticatedAdminCommunitiesRoute,
 }
 
 const AuthenticatedAdminRouteWithChildren =

@@ -6,13 +6,30 @@ import {
   HouseIcon,
   ShieldCheckIcon,
   SquareParkingIcon,
+  UsersRoundIcon,
   type LucideIcon,
 } from 'lucide-react'
 
 interface NavItem {
-  key: 'home' | 'findSpot' | 'mySpots' | 'myCars' | 'bookings' | 'buildings' | 'myBuilding'
+  key:
+    | 'home'
+    | 'findSpot'
+    | 'mySpots'
+    | 'myCars'
+    | 'bookings'
+    | 'buildings'
+    | 'communities'
+    | 'myBuilding'
   icon: LucideIcon
-  to: '/home' | '/find' | '/spots' | '/cars' | '/bookings' | '/buildings' | '/building/$buildingId'
+  to:
+    | '/home'
+    | '/find'
+    | '/spots'
+    | '/cars'
+    | '/bookings'
+    | '/buildings'
+    | '/communities'
+    | '/building/$buildingId'
   /** Shown only to admins, or only to building admins (who get their building as `buildingId`) */
   audience?: 'admin' | 'buildingAdmin'
 }
@@ -24,6 +41,7 @@ export const navItems: NavItem[] = [
   { key: 'myCars', icon: CarIcon, to: '/cars' },
   { key: 'bookings', icon: CalendarDaysIcon, to: '/bookings' },
   { key: 'buildings', icon: Building2Icon, to: '/buildings', audience: 'admin' },
+  { key: 'communities', icon: UsersRoundIcon, to: '/communities', audience: 'admin' },
   {
     key: 'myBuilding',
     icon: ShieldCheckIcon,

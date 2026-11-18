@@ -1,12 +1,21 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { Building2Icon, ChevronRightIcon, PlusIcon, SearchIcon, SearchXIcon } from 'lucide-react'
+import {
+  Building2Icon,
+  ChevronRightIcon,
+  PlusIcon,
+  SearchIcon,
+  SearchXIcon,
+  UsersRoundIcon,
+} from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { BuildingFormDialog } from '@/components/buildings/building-form-dialog'
 import { buildingsQuery } from '@/queries/buildings'
+import { communitiesQuery } from '@/queries/communities'
 import type { Building } from '@/types/models'
 
 // The search lives in the URL so a filtered list can be shared or reloaded, and
@@ -18,7 +27,11 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute('/_authenticated/_admin/buildings')({
   validateSearch: searchSchema,
-  loader: ({ context }) => context.queryClient.query({ ...buildingsQuery, staleTime: 'static' }),
+  loader: ({ context: { queryClient } }) =>
+    Promise.all([
+      queryClient.query({ ...buildingsQuery, staleTime: 'static' }),
+      queryClient.query({ ...communitiesQuery, staleTime: 'static' }),
+    ]),
   component: BuildingsPage,
 })
 
@@ -40,6 +53,9 @@ function BuildingsPage() {
   const { q = '', building: dialog } = Route.useSearch()
   const navigate = Route.useNavigate()
   const { data: buildings } = useSuspenseQuery(buildingsQuery)
+  const { data: communities } = useSuspenseQuery(communitiesQuery)
+  const communityName = (id: string | null) =>
+    communities.find((community) => community.id === id)?.name
 
   const shown = buildings.filter((building) => matches(building, q))
   const setDialog = (building: 'new' | undefined) =>
@@ -114,7 +130,15 @@ function BuildingsPage() {
                       <Building2Icon className="size-5" />
                     </span>
                     <span className="grid min-w-0 flex-1">
-                      <span className="truncate font-semibold">{building.name}</span>
+                      <span className="flex min-w-0 items-center gap-2">
+                        <span className="truncate font-semibold">{building.name}</span>
+                        {communityName(building.communityId) && (
+                          <Badge variant="secondary" className="shrink-0">
+                            <UsersRoundIcon />
+                            {communityName(building.communityId)}
+                          </Badge>
+                        )}
+                      </span>
                       <span className="truncate text-sm text-muted-foreground">
                         {building.description}
                       </span>

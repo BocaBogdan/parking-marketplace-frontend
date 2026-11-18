@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dialog'
 import { LicensePlate } from '@/components/cars/license-plate'
 import { ApiError } from '@/lib/api'
+import { useMemberships } from '@/lib/auth'
 import type { BookingWindow } from '@/lib/booking-window'
 import { serverErrorMessage } from '@/lib/form'
 import { formatDuration, formatRelativeDay, formatTime } from '@/lib/format'
@@ -55,6 +56,12 @@ function ReserveForm({
   onDone: () => void
 }) {
   const { t, i18n } = useTranslation()
+  const memberships = useMemberships()
+  // Name the building when it's ambiguous: the user has several, or it's a community one
+  const buildingName =
+    memberships.length > 1 || !memberships.some((m) => m.buildingId === spot.buildingId)
+      ? spot.building?.name
+      : undefined
   const language = i18n.resolvedLanguage ?? 'en'
   const queryClient = useQueryClient()
   const { data: cars } = useSuspenseQuery(myCarsQuery)
@@ -83,7 +90,9 @@ function ReserveForm({
     <>
       <DialogHeader>
         <DialogTitle className="text-lg font-bold">
-          {t('find.dialog.title', { number: spot.number })}
+          {buildingName
+            ? t('find.dialog.titleIn', { number: spot.number, building: buildingName })
+            : t('find.dialog.title', { number: spot.number })}
         </DialogTitle>
         <DialogDescription>{spot.description || t('find.dialog.description')}</DialogDescription>
       </DialogHeader>

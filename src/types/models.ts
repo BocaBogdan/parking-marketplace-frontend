@@ -15,6 +15,8 @@ export interface Spot {
   /** Clerk user id of the owner */
   userId: string
   buildingId: string
+  /** Sent only by search, whose results can come from community buildings the user isn't in */
+  building?: { id: string; name: string }
   number: number
   description: string
   long: string
@@ -88,8 +90,19 @@ export interface Building {
   id: string
   name: string
   description: string
+  /** Residents also see and book spots of the other buildings in this community */
+  communityId: string | null
   createdAt: string
   updatedAt: string
+}
+
+/** Buildings whose residents see and book each other's spots; a building is in at most one */
+export interface Community {
+  id: string
+  name: string
+  /** By name; at least two */
+  buildings: { id: string; name: string }[]
+  createdAt: string
 }
 
 /** A feature flag defined in the backend, and whether one building has it on */
