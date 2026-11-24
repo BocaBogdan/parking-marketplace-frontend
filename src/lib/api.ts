@@ -8,17 +8,21 @@ import type { paths } from '@/types/api'
 /**
  * A non-2xx response. NestJS error bodies look like `{ statusCode, message, error }`, where
  * `message` is a sentence — or, for a failed ValidationPipe, one sentence per invalid field.
+ * Server errors also carry an `errorId`, the reference of their line in the backend logs.
  */
 export class ApiError extends Error {
   readonly status: number
   readonly messages: string[]
+  readonly errorId?: string
 
   constructor(status: number, body: unknown) {
-    const message = (body as { message?: string | string[] } | undefined)?.message
+    const { message, errorId } =
+      (body as { message?: string | string[]; errorId?: string } | undefined) ?? {}
     const messages = message === undefined ? [] : [message].flat()
     super(messages.join('. ') || `Request failed with status ${status}`)
     this.status = status
     this.messages = messages
+    this.errorId = errorId
   }
 }
 

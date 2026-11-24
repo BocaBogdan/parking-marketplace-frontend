@@ -711,5 +711,9 @@ export const en = {
     network: "Couldn't reach the server. Check your connection and try again.",
     generic: 'Something went wrong. Please try again.',
     wakingUp: 'Our server is waking up, this can take up to a minute',
+    pageTitle: "This page couldn't load",
+    retry: 'Try again',
+    signOut: 'Sign out',
+    reference: 'If it keeps happening, send us this reference:',
   },
 }

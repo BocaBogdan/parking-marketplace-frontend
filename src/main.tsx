@@ -5,6 +5,7 @@ import { createRouter, RouterProvider } from '@tanstack/react-router'
 import './index.css'
 import '@/i18n'
 import { AuthProvider } from '@/components/auth-provider'
+import { RouteError } from '@/components/route-error'
 import { warmUpApi } from '@/lib/api'
 import { queryClient } from '@/lib/query-client'
 import { routeTree } from './routeTree.gen'
@@ -18,6 +19,8 @@ const router = createRouter({
   // Let TanStack Query decide freshness instead of the router's own loader cache
   defaultPreloadStaleTime: 0,
   scrollRestoration: true,
+  // A page that can't load offers a retry and sign-out, never a dead end
+  defaultErrorComponent: RouteError,
 })
 
 declare module '@tanstack/react-router' {

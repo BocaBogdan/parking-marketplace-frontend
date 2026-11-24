@@ -744,5 +744,9 @@ export const ro = {
     network: 'Serverul nu poate fi contactat. Verifică conexiunea și încearcă din nou.',
     generic: 'A apărut o eroare. Încearcă din nou.',
     wakingUp: 'Serverul pornește, poate dura până la un minut',
+    pageTitle: 'Pagina nu s-a putut încărca',
+    retry: 'Încearcă din nou',
+    signOut: 'Deconectare',
+    reference: 'Dacă problema persistă, trimite-ne acest cod de referință:',
   },
 } satisfies Locale<typeof en>
