@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 import { LicensePlate } from '@/components/cars/license-plate'
+import { ReservedSpot } from '@/components/bookings/reserved-spot'
 import { formatDay, formatTime } from '@/lib/format'
 import type { Reservation } from '@/queries/reservations'
 import type { Car } from '@/types/models'
@@ -71,6 +72,7 @@ function ReservationCard({
         {formatDay(reservation.start, language, now)} • {formatTime(reservation.start, language)} –{' '}
         {formatTime(reservation.end, language)}
       </p>
+      <ReservedSpot spot={reservation.spot} compact />
       {car && <LicensePlate plate={car.plate} size="sm" />}
     </article>
   )

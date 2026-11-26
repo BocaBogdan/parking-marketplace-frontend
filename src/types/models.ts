@@ -140,12 +140,24 @@ export interface AdminSpotDetail extends AdminSpot {
   schedules: Schedule[]
 }
 
+/** What a driver sees of the spot they booked (GET /booking/mine); nothing about its owner */
+export interface SpotSummary {
+  id: string
+  number: number
+  underground: boolean
+  description: string
+  /** Can be a partner building the driver isn't in */
+  building: { id: string; name: string } | null
+}
+
 /** A reserved window of a spot. A window past midnight is still one booking. */
 export interface Booking {
   id: string
   /** Clerk user id of the driver */
   userId: string
   spotId: string
+  /** Only on the driver's own bookings; null once the spot is deleted */
+  spot?: SpotSummary | null
   carId: string
   /** ISO instants (UTC) */
   startsAt: string

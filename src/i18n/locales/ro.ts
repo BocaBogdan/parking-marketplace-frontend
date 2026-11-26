@@ -450,11 +450,12 @@ export const ro = {
       completed: 'Încheiată',
     },
     removedCar: 'Mașină ștearsă din cont',
+    spotRemoved: 'Locul nu mai este disponibil',
     cancel: 'Anulează rezervarea',
     cancelClosed: 'Nu mai poate fi anulată',
     cancelConfirm: {
       title: 'Anulezi această rezervare?',
-      description: '{{date}}, {{from}} – {{to}}. Locul devine liber pentru ceilalți vecini.',
+      description: '{{spot}}, {{date}}, {{from}} – {{to}}. Locul devine liber pentru ceilalți vecini.',
       keep: 'Păstrează rezervarea',
     },
     empty: {

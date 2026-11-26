@@ -1,12 +1,14 @@
 import { queryOptions } from '@tanstack/react-query'
 import { api, unwrap } from '@/lib/api'
 import { parseApiDate } from '@/lib/format'
-import type { Booking, Car } from '@/types/models'
+import type { Booking, Car, SpotSummary } from '@/types/models'
 
 /** A reserved window, with its instants as epoch ms */
 export interface Reservation {
   id: string
   spotId: string
+  /** Which spot it is, on the driver's own bookings; null otherwise or once it's deleted */
+  spot: SpotSummary | null
   carId: string
   /** Clerk user id of the driver */
   userId: string
@@ -24,6 +26,7 @@ export function toReservation(booking: Booking): Reservation {
   return {
     id: booking.id,
     spotId: booking.spotId,
+    spot: booking.spot ?? null,
     carId: booking.carId,
     userId: booking.userId,
     start: parseApiDate(booking.startsAt),

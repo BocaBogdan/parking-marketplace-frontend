@@ -426,11 +426,12 @@ export const en = {
       completed: 'Completed',
     },
     removedCar: 'Car removed from your account',
+    spotRemoved: 'Spot no longer available',
     cancel: 'Cancel booking',
     cancelClosed: 'Can no longer be cancelled',
     cancelConfirm: {
       title: 'Cancel this booking?',
-      description: '{{date}}, {{from}} – {{to}}. The spot becomes free for other neighbours.',
+      description: '{{spot}}, {{date}}, {{from}} – {{to}}. The spot becomes free for other neighbours.',
       keep: 'Keep booking',
     },
     empty: {

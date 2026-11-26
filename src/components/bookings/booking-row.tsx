@@ -16,6 +16,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { LicensePlate } from '@/components/cars/license-plate'
+import { ReservedSpot } from '@/components/bookings/reserved-spot'
 import { serverErrorMessage } from '@/lib/form'
 import { formatDate, formatDuration, formatTime, zonedDayKey } from '@/lib/format'
 import { cn } from '@/lib/utils'
@@ -75,6 +76,8 @@ export function BookingRow({ reservation, car, now }: BookingRowProps) {
         </Badge>
       </div>
 
+      <ReservedSpot spot={reservation.spot} />
+
       <div className="flex flex-wrap items-center justify-between gap-2">
         {car ? (
           <span className="flex min-w-0 items-center gap-2">
@@ -132,6 +135,9 @@ function CancelBookingButton({ reservation }: { reservation: Reservation }) {
           <AlertDialogTitle>{t('bookings.cancelConfirm.title')}</AlertDialogTitle>
           <AlertDialogDescription>
             {t('bookings.cancelConfirm.description', {
+              spot: reservation.spot
+                ? t('spots.name', { number: reservation.spot.number })
+                : t('bookings.spotRemoved'),
               date: formatDate(reservation.start, language),
               from: formatTime(reservation.start, language),
               to: formatTime(reservation.end, language),
